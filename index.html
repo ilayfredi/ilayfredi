@@ -207,8 +207,11 @@
   /* ---------- about ---------- */
   .sheet {
     width: min(430px, 90vw);
-    max-height: 76vh;
+    max-height: 62vh;
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ink-faint) transparent;
+    -webkit-overflow-scrolling: touch;
     background: var(--white);
     border-radius: 26px;
     padding: 30px 26px;
@@ -253,6 +256,12 @@
     color: var(--ink-soft);
   }
   .signoff b { color: var(--ink); font-weight: 600; }
+  .sheet::-webkit-scrollbar { width: 6px; }
+  .sheet::-webkit-scrollbar-track { background: transparent; }
+  .sheet::-webkit-scrollbar-thumb {
+    background: var(--ink-faint);
+    border-radius: 3px;
+  }
 
   /* ---------- game over ---------- */
   .card {
@@ -367,9 +376,10 @@
       </p>
 
       <p class="signoff">נבנה על ידי <b>עילי פרדי</b>.</p>
-      <div class="menu" style="width:100%;margin-top:22px">
-        <button id="btnBack" class="btn btn-ghost" type="button">חזרה</button>
-      </div>
+    </div>
+    <!-- kept outside the scrolling sheet so the way back is always in reach -->
+    <div class="menu">
+      <button id="btnBack" class="btn btn-ghost" type="button">חזרה</button>
     </div>
   </section>
 
