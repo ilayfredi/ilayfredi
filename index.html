@@ -78,7 +78,7 @@
   /* ---------- splash ---------- */
   .splash-eyebrow {
     font-size: 12px;
-    letter-spacing: 0.42em;
+    letter-spacing: 0.14em;
     color: var(--ink-faint);
     text-transform: uppercase;
   }
@@ -112,11 +112,11 @@
   .crown { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: -4vh; }
   .crown-label {
     font-size: 13px;
-    letter-spacing: 0.34em;
+    letter-spacing: 0.12em;
     color: var(--ink-soft);
   }
   .crown-num {
-    font-family: var(--num);
+    font-family: var(--ui);
     font-size: clamp(58px, 19vw, 116px);
     font-weight: 700;
     line-height: 1;
@@ -224,7 +224,7 @@
   .sheet .lede { color: var(--ink-soft); font-size: 15px; line-height: 1.65; margin-bottom: 20px; }
   .sheet h3 {
     font-size: 12px;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.08em;
     color: var(--ink-faint);
     margin: 20px 0 9px;
   }
@@ -266,9 +266,9 @@
     align-items: center;
     gap: 5px;
   }
-  .card-label { font-size: 13px; letter-spacing: 0.28em; color: var(--ink-soft); }
+  .card-label { font-size: 13px; letter-spacing: 0.12em; color: var(--ink-soft); }
   .card-num {
-    font-family: var(--num);
+    font-family: var(--ui);
     font-size: clamp(52px, 17vw, 82px);
     font-weight: 700;
     line-height: 1.04;
@@ -1069,7 +1069,7 @@
     var big = Math.min(38, VW * 0.098);
 
     h.textAlign = "right";                             // rtl: score in the top-right
-    h.font = "700 " + big + "px ui-monospace, Menlo, Consolas, monospace";
+    h.font = "700 " + big + "px system-ui, -apple-system, sans-serif";
     h.fillStyle = C.ink;
     h.fillText(g.score.toLocaleString(), VW - pad, pad);
 
