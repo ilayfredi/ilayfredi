@@ -2,246 +2,448 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>
   :root {
-    --void:      #080a12;
-    --void-deep: #03040a;
-    --beam:      #7fe3ff;
-    --hazard:    #ff5470;
-    --plasma:    #ffc857;
-    --core:      #fff3d6;
-    --ghost:     #9db4d8;
-    --dim:       #5c6b8a;
-    --rule:      #18203a;
-    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    /* daylight palette - pastel cosmos, deliberately bright */
+    --sky:       #eef3ff;
+    --sky-warm:  #fff4e9;
+    --ink:       #2a3157;
+    --ink-soft:  #737ba6;
+    --ink-faint: #aeb4d1;
+    --sun:       #ffb454;
+    --sun-deep:  #ff9138;
+    --coral:     #ff6b7a;
+    --teal:      #23bfa6;
+    --lilac:     #a99bff;
+    --white:     #ffffff;
+
+    --ui: system-ui, -apple-system, "Segoe UI", "Noto Sans Hebrew", Arial, sans-serif;
+    --num: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+    --shadow-sm: 0 2px 10px rgba(42, 49, 87, 0.08);
+    --shadow-md: 0 10px 30px rgba(42, 49, 87, 0.13);
+    --shadow-lg: 0 24px 60px rgba(42, 49, 87, 0.18);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  body {
-    background: var(--void-deep);
-    color: var(--beam);
-    font-family: var(--sans);
-    min-height: 100dvh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px;
+  html, body {
+    height: 100%;
     overflow: hidden;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-user-select: none;
-    user-select: none;
     overscroll-behavior: none;
   }
 
-  .cabinet {
-    /* the screen is square and wants height, but the chrome must never collapse */
-    width: min(94vw, max(250px, 62dvh), 580px);
+  body {
+    font-family: var(--ui);
+    color: var(--ink);
+    background: var(--sky);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  #app {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 80% at 50% 8%,  var(--sky-warm) 0%, rgba(255,244,233,0) 62%),
+      radial-gradient(100% 70% at 50% 110%, #e4ecff 0%, rgba(228,236,255,0) 70%),
+      var(--sky);
+  }
+
+  canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+  #screen { z-index: 1; }
+  #hud    { z-index: 2; pointer-events: none; }
+
+  /* ---------- overlay screens ---------- */
+  .veil {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
     display: flex;
     flex-direction: column;
-    gap: 9px;
-  }
-
-  /* ---------- marquee ---------- */
-  .marquee {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--rule);
-  }
-  .wordmark {
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.42em;
-    text-transform: uppercase;
-    color: var(--beam);
-    white-space: nowrap;
-  }
-  .wordmark span { color: var(--plasma); }
-  .best {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    color: var(--dim);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-  .best b { color: var(--plasma); font-weight: 600; }
-
-  /* ---------- screen ---------- */
-  .stage {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1;
-    border: 1px solid var(--rule);
-    background: var(--void);
-    box-shadow: 0 0 60px rgba(127, 227, 255, 0.05), inset 0 0 80px rgba(0, 0, 0, 0.7);
-  }
-  /* #screen keeps its phosphor trails and is never cleared;
-     #hud is wiped every frame so the score stays crisp */
-  .stage canvas {
-    position: absolute;
-    inset: 0;
-    display: block;
-    width: 100%;
-    height: 100%;
-    touch-action: none;
-  }
-  #screen { z-index: 0; }
-  #hud    { z-index: 1; pointer-events: none; }
-  .stage::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    background: repeating-linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0) 0px,
-      rgba(0, 0, 0, 0) 2px,
-      rgba(0, 0, 0, 0.15) 3px,
-      rgba(0, 0, 0, 0.15) 4px
-    );
-  }
-
-  /* ---------- deck ---------- */
-  .deck {
-    display: flex;
     align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding-top: 9px;
-    border-top: 1px solid var(--rule);
+    justify-content: center;
+    gap: 22px;
+    padding: 26px 22px calc(26px + env(safe-area-inset-bottom));
+    text-align: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.42s ease, visibility 0.42s;
   }
-  .codebar { display: flex; gap: 6px; flex: 1 1 148px; min-width: 0; }
+  .veil.on { opacity: 1; visibility: visible; }
+
+  #splash { background: linear-gradient(168deg, var(--sky-warm) 0%, var(--sky) 55%, #e6edff 100%); }
+  #home, #about, #over { background: rgba(238, 243, 255, 0.72); backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px); }
+
+  /* ---------- splash ---------- */
+  .splash-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.42em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+  }
+  .signature {
+    font-size: clamp(46px, 15vw, 92px);
+    font-weight: 300;
+    letter-spacing: 0.03em;
+    line-height: 1.12;
+    background: linear-gradient(96deg, var(--sun-deep) 0%, var(--coral) 44%, var(--lilac) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    padding: 0 0.08em 0.06em;
+  }
+  .flourish {
+    width: min(230px, 62vw);
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, transparent, var(--sun) 30%, var(--coral) 70%, transparent);
+    transform-origin: center;
+  }
+  .rise { animation: rise 1s cubic-bezier(0.16, 0.9, 0.3, 1) both; }
+  .rise-2 { animation-delay: 0.16s; }
+  .rise-3 { animation-delay: 0.34s; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* ---------- home ---------- */
+  .crown { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: -4vh; }
+  .crown-label {
+    font-size: 13px;
+    letter-spacing: 0.34em;
+    color: var(--ink-soft);
+  }
+  .crown-num {
+    font-family: var(--num);
+    font-size: clamp(58px, 19vw, 116px);
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(150deg, var(--ink) 0%, #5b64a8 60%, var(--lilac) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .crown-sub { font-size: 13px; color: var(--ink-faint); }
+
+  .menu { display: flex; flex-direction: column; gap: 12px; width: min(330px, 84vw); }
+
+  .btn {
+    font-family: inherit;
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--white);
+    border: 0;
+    border-radius: 999px;
+    padding: 17px 24px;
+    min-height: 56px;
+    cursor: pointer;
+    background: linear-gradient(140deg, var(--sun) 0%, var(--sun-deep) 55%, var(--coral) 100%);
+    box-shadow: var(--shadow-md);
+    transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+  }
+  .btn:active { transform: translateY(2px) scale(0.985); box-shadow: var(--shadow-sm); }
+  .btn:focus-visible { outline: 3px solid var(--lilac); outline-offset: 3px; }
+
+  .btn-ghost {
+    background: var(--white);
+    color: var(--ink);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(42, 49, 87, 0.09);
+    font-weight: 500;
+  }
+  .btn-teal { background: linear-gradient(140deg, #45d3bb 0%, var(--teal) 60%, #17a892 100%); }
+
+  .chip {
+    position: absolute;
+    top: calc(16px + env(safe-area-inset-top));
+    inset-inline-start: 18px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    background: var(--white);
+    border: 1px solid rgba(42, 49, 87, 0.09);
+    border-radius: 999px;
+    padding: 9px 15px;
+    min-height: 38px;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+  }
+  .chip:focus-visible { outline: 3px solid var(--lilac); outline-offset: 2px; }
+
+  .codebar { display: flex; gap: 7px; width: min(330px, 84vw); }
   .codebar input {
     flex: 1 1 auto;
     min-width: 0;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    color: var(--plasma);
-    background: transparent;
-    border: 1px solid var(--rule);
-    border-radius: 2px;
-    padding: 9px;
+    font-family: var(--num);
+    font-size: 13px;
+    color: var(--ink);
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(42, 49, 87, 0.12);
+    border-radius: 12px;
+    padding: 12px 14px;
+    text-align: start;
   }
-  .codebar input::placeholder { color: var(--dim); letter-spacing: 0.13em; text-transform: uppercase; }
-  .codebar input:focus-visible { outline: 2px solid var(--plasma); outline-offset: 2px; }
-  .codebar.bad input { border-color: var(--hazard); color: var(--hazard); }
-  .controls { display: flex; gap: 6px; flex-shrink: 0; }
-  button {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--beam);
-    background: transparent;
-    border: 1px solid rgba(127, 227, 255, 0.26);
-    border-radius: 2px;
-    padding: 9px 11px;
+  .codebar input::placeholder { font-family: var(--ui); color: var(--ink-faint); }
+  .codebar input:focus-visible { outline: 2px solid var(--lilac); outline-offset: 1px; }
+  .codebar.bad input { border-color: var(--coral); color: var(--coral); }
+  .codebar button {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--white);
+    border: 1px solid rgba(42, 49, 87, 0.1);
+    border-radius: 12px;
+    padding: 12px 16px;
     cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    box-shadow: var(--shadow-sm);
   }
-  button:hover { background: rgba(127, 227, 255, 0.09); border-color: rgba(127, 227, 255, 0.5); }
-  button:focus-visible { outline: 2px solid var(--plasma); outline-offset: 2px; }
-  button.muted { color: var(--dim); border-color: var(--rule); }
-  button.done { color: var(--plasma); border-color: rgba(255, 200, 87, 0.55); }
 
-  @media (max-width: 470px) {
-    .wordmark { letter-spacing: 0.24em; font-size: 10px; }
-    .best { font-size: 10px; }
-    button { padding: 9px 9px; letter-spacing: 0.1em; }
-    .codebar { flex-basis: 100%; order: 2; }
-    .controls { order: 1; width: 100%; }
-    .controls button { flex: 1 1 auto; }
+  /* ---------- about ---------- */
+  .sheet {
+    width: min(430px, 90vw);
+    max-height: 76vh;
+    overflow-y: auto;
+    background: var(--white);
+    border-radius: 26px;
+    padding: 30px 26px;
+    box-shadow: var(--shadow-lg);
+    text-align: start;
   }
+  .sheet h2 {
+    font-size: 25px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+  .sheet .lede { color: var(--ink-soft); font-size: 15px; line-height: 1.65; margin-bottom: 20px; }
+  .sheet h3 {
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--ink-faint);
+    margin: 20px 0 9px;
+  }
+  .sheet p { font-size: 15px; line-height: 1.7; color: var(--ink); }
+  .steps { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .steps li {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .dot {
+    flex: 0 0 auto;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    margin-top: 6px;
+    box-shadow: 0 0 0 4px rgba(255, 180, 84, 0.16);
+  }
+  .signoff {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(42, 49, 87, 0.09);
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .signoff b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- game over ---------- */
+  .card {
+    width: min(360px, 88vw);
+    background: var(--white);
+    border-radius: 28px;
+    padding: 30px 26px 26px;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  .card-label { font-size: 13px; letter-spacing: 0.28em; color: var(--ink-soft); }
+  .card-num {
+    font-family: var(--num);
+    font-size: clamp(52px, 17vw, 82px);
+    font-weight: 700;
+    line-height: 1.04;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .card-sector { font-size: 14px; color: var(--ink-soft); margin-bottom: 2px; }
+  .ribbon {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--white);
+    background: linear-gradient(130deg, var(--sun) 0%, var(--coral) 100%);
+    border-radius: 999px;
+    padding: 6px 15px;
+    margin: 5px 0 3px;
+  }
+  .card-best { font-size: 14px; color: var(--ink-soft); margin-bottom: 14px; }
+  .card-best b { font-family: var(--num); color: var(--ink); font-weight: 700; }
+  .card .btn { width: 100%; }
+  .card .btn + .btn { margin-top: 10px; }
+  .linky {
+    margin-top: 15px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    background: none;
+    border: 0;
+    border-bottom: 1px dashed var(--ink-faint);
+    padding: 3px 1px;
+    cursor: pointer;
+  }
+  .linky:focus-visible { outline: 2px solid var(--lilac); outline-offset: 3px; }
+
   @media (prefers-reduced-motion: reduce) {
-    .stage { box-shadow: none; }
+    .rise { animation: none; }
+    .veil { transition: none; }
   }
 </style>
 
-<main class="cabinet">
-  <div class="marquee">
-    <h1 class="wordmark">Orbit<span>&middot;</span>Decay</h1>
-    <p class="best">BEST <b id="best">0</b></p>
-  </div>
+<div id="app" dir="rtl">
+  <canvas id="screen"></canvas>
+  <canvas id="hud"></canvas>
 
-  <div class="stage">
-    <canvas id="screen"></canvas>
-    <canvas id="hud"></canvas>
-  </div>
+  <!-- 1. splash -->
+  <section id="splash" class="veil on">
+    <span class="splash-eyebrow rise">מגישים</span>
+    <h1 class="signature rise rise-2">עילי פרדי</h1>
+    <div class="flourish rise rise-3"></div>
+  </section>
 
-  <div class="deck">
-    <div class="controls">
-      <button id="sound" type="button" aria-label="Toggle sound">Sound</button>
-      <button id="share" type="button">Challenge</button>
+  <!-- 2. home -->
+  <section id="home" class="veil">
+    <button id="sound" class="chip" type="button">צליל פועל</button>
+    <div class="crown">
+      <span class="crown-label">השיא</span>
+      <strong id="homeBest" class="crown-num">0</strong>
+      <span class="crown-sub">מסלול דועך</span>
     </div>
-    <form class="codebar" id="codebar">
-      <input id="code" type="text" placeholder="rival code" autocomplete="off"
-             autocapitalize="off" spellcheck="false"
-             aria-label="Paste a rival code to race their run">
-      <button type="submit" id="load">Load</button>
+    <div class="menu">
+      <button id="btnPlay" class="btn" type="button">שחק</button>
+      <button id="btnAbout" class="btn btn-ghost" type="button">קצת עלינו</button>
+    </div>
+    <form id="codebar" class="codebar">
+      <input id="code" type="text" placeholder="קוד של חבר" autocomplete="off"
+             autocapitalize="off" spellcheck="false" aria-label="קוד אתגר של חבר">
+      <button id="load" type="submit">טען</button>
     </form>
-  </div>
-</main>
+  </section>
+
+  <!-- 3. about -->
+  <section id="about" class="veil">
+    <div class="sheet">
+      <h2>קצת עלינו</h2>
+      <p class="lede">
+        מסלול דועך הוא משחק על שליטה אחת בלבד. אתה נעול במסלול סביב כוכב שקורס,
+        ונגיעה במסך הופכת את כיוון התנועה שלך. זה הכל — ומשם זה רק נעשה קשה יותר.
+      </p>
+
+      <h3>איך משחקים</h3>
+      <ul class="steps">
+        <li><span class="dot" style="background:var(--ink)"></span>
+            <span>נוגעים בכל מקום במסך כדי להפוך כיוון. אין כפתורים.</span></li>
+        <li><span class="dot" style="background:var(--teal)"></span>
+            <span>אוספים את הכדורים הירוקים כדי להעלות את המכפיל.</span></li>
+        <li><span class="dot" style="background:var(--coral)"></span>
+            <span>חולפים קרוב לסלעים בלי להתנגש — ככל שקרוב יותר, כך יותר נקודות.</span></li>
+        <li><span class="dot" style="background:var(--sun)"></span>
+            <span>שישה אזורים. כל אזור שומר על הסכנות של הקודם ומוסיף אחת.</span></li>
+      </ul>
+
+      <h3>האתגר</h3>
+      <p>
+        אחרי שנפסלים אפשר לשתף את הריצה. החבר שמקבל את הקוד מקבל בדיוק את אותו
+        שדה סלעים שלך, והרוח של הספינה שלך טסה לידו — כל תנועה שעשית, משוחזרת.
+      </p>
+
+      <p class="signoff">נבנה על ידי <b>עילי פרדי</b>.</p>
+      <div class="menu" style="width:100%;margin-top:22px">
+        <button id="btnBack" class="btn btn-ghost" type="button">חזרה</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. game over -->
+  <section id="over" class="veil">
+    <div class="card">
+      <span class="card-label">התוצאה שלך</span>
+      <strong id="overScore" class="card-num">0</strong>
+      <p id="overSector" class="card-sector"></p>
+      <p id="overRibbon" class="ribbon" hidden></p>
+      <p class="card-best">השיא: <b id="overBest">0</b></p>
+      <button id="btnAgain" class="btn" type="button">שוב</button>
+      <button id="btnQuit" class="btn btn-ghost" type="button">די זה קשה</button>
+      <button id="btnShare" class="linky" type="button">שתף את התוצאה</button>
+    </div>
+  </section>
+</div>
 
 <script>
 (function () {
   "use strict";
 
   /* ============================================================
-     ORBIT DECAY
-     One input. You are locked in orbit around a collapsing star;
-     tapping reverses your direction of travel. Nothing else.
+     מסלול דועך / ORBIT DECAY
+     One input: touching anywhere reverses your direction of travel
+     around a collapsing star. Six sectors, each keeping the hazards
+     before it and adding one more.
 
-     Six sectors, each keeping every hazard before it and adding
-     one more, so the same single control keeps getting harder
-     to use well.
+     Every hazard is driven by a seeded PRNG plus a fixed-timestep
+     tick counter, so a whole run is described by its seed and the
+     frames the player tapped on. That compresses into a short code,
+     which is what lets a friend replay your exact run as a ghost.
 
-     The trick that makes this shareable: every hazard is driven
-     by a seeded PRNG and a fixed-timestep tick counter, so a whole
-     run is described by its seed plus the frames the player tapped
-     on. That compresses to a short string, which travels in the
-     link's hash or pasted into the code box. Either way your friend
-     flies your exact run with the ghost of it beside them.
+     Rendering note: the field canvas is never cleared, only washed
+     with translucent sky, so moving things leave soft watercolour
+     trails. The HUD lives on a second canvas that IS cleared each
+     frame, because drawing the score on the persistent layer smears
+     the digits.
      ============================================================ */
 
   /* ---------- 1. config ---------- */
   var U       = 1000;             // logical field, 1000 x 1000
-  var CX      = 500, CY = 500;    // star centre
-  var ORBIT   = 268;              // nominal orbit radius
-  var STEP    = 1000 / 60;        // fixed simulation tick
-  var W_BASE  = 0.0265;           // base angular velocity
+  var CX      = 500, CY = 500;
+  var ORBIT   = 268;
+  var STEP    = 1000 / 60;
+  var W_BASE  = 0.0265;
   var SECTOR  = 800;              // ticks per sector (~13s)
   var REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var MONO    = 'ui-monospace, "SF Mono", Menlo, Consolas, monospace';
 
-  // Each sector keeps everything before it and adds one new idea.
-  // The tints run cool to hot as the star turns on you.
+  var C = {
+    sky:   "#eef3ff",
+    ink:   "#2a3157",
+    soft:  "#737ba6",
+    faint: "#aeb4d1",
+    sun:   "#ffb454",
+    coral: "#ff6b7a",
+    teal:  "#23bfa6",
+    lilac: "#a99bff",
+    white: "#ffffff"
+  };
+
   var SECTORS = [
-    { name: "DRIFT",     blurb: "debris on straight lines",      tint: "#7fe3ff" },
-    { name: "CROSSFIRE", blurb: "it comes from both sides now",  tint: "#8ad4ff" },
-    { name: "PULSAR",    blurb: "the star is firing. mind the sweep", tint: "#ffc857" },
-    { name: "SHATTER",   blurb: "the big ones break apart",      tint: "#ff9a6e" },
-    { name: "ECLIPSE",   blurb: "you only see what is near you", tint: "#9db4d8" },
-    { name: "COLLAPSE",  blurb: "the orbit is falling in",       tint: "#ff5470" }
+    { name: "סחף",       blurb: "סלעים בקווים ישרים",        tint: C.ink },
+    { name: "אש צולבת",  blurb: "עכשיו זה מגיע משני הצדדים", tint: "#5b64a8" },
+    { name: "פולסר",     blurb: "הכוכב יורה. שים לב לסריקה",  tint: C.sun },
+    { name: "רסיסים",    blurb: "הגדולים מתפוצצים",           tint: "#ff8a5c" },
+    { name: "ליקוי",     blurb: "רואים רק מה שקרוב",          tint: C.lilac },
+    { name: "קריסה",     blurb: "המסלול נופל פנימה",          tint: C.coral }
   ];
 
-  var cv       = document.getElementById("screen");
-  var ctx      = cv.getContext("2d");
-  var hc       = document.getElementById("hud");
-  var h        = hc.getContext("2d");
-  var bestEl   = document.getElementById("best");
-  var shareBtn = document.getElementById("share");
-  var soundBtn = document.getElementById("sound");
-  var codebar  = document.getElementById("codebar");
-  var codeIn   = document.getElementById("code");
-  var loadBtn  = document.getElementById("load");
+  var $ = function (id) { return document.getElementById(id); };
+  var app = $("app");
+  var cv  = $("screen"), ctx = cv.getContext("2d");
+  var hc  = $("hud"),    h   = hc.getContext("2d");
 
   /* ---------- 2. seeded rng (gameplay only) ---------- */
   var _s = 1;
@@ -253,27 +455,33 @@
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   }
-  // Math.random stays in use for purely cosmetic things (sparks,
-  // screen shake, motes) - they never feed back into the sim.
+  // Math.random stays in use for cosmetics only (sparks, shake, motes)
 
-  /* ---------- 3. canvas sizing ----------
-     phones get the same logical field at a capped pixel count, so a
-     big desktop screen never makes the per-frame fills expensive   */
-  var scale = 1;
+  /* ---------- 3. sizing ----------
+     the canvas fills the whole viewport so a tap lands anywhere;
+     the 1000x1000 field is centred inside it                     */
+  var dpr = 1, cw = 0, ch = 0, S = 1, ox = 0, oy = 0, VW = 0, VH = 0;
   function fit() {
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var css = cv.clientWidth || 320;
-    var px  = Math.min(Math.round(css * dpr), 1100);
-    cv.width  = hc.width  = px;
-    cv.height = hc.height = px;
-    scale = px / U;
-    ctx.setTransform(scale, 0, 0, scale, 0, 0);
-    h.setTransform(scale, 0, 0, scale, 0, 0);
-    ctx.fillStyle = "#080a12";
-    ctx.fillRect(0, 0, U, U);
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    VW = app.clientWidth; VH = app.clientHeight;
+    cw = Math.min(Math.round(VW * dpr), 1800);
+    ch = Math.min(Math.round(VH * dpr), 1800);
+    cv.width = hc.width = cw;
+    cv.height = hc.height = ch;
+    S = Math.min(cw, ch) / U;
+    ox = (cw - U * S) / 2;
+    oy = (ch - U * S) / 2;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = C.sky;
+    ctx.fillRect(0, 0, cw, ch);
   }
   addEventListener("resize", fit);
-  addEventListener("orientationchange", function () { setTimeout(fit, 120); });
+  addEventListener("orientationchange", function () { setTimeout(fit, 140); });
+
+  function field()  { ctx.setTransform(S, 0, 0, S, ox, oy); }
+  function device() { ctx.setTransform(1, 0, 0, 1, 0, 0); }
+  // logical field point -> css pixels, for HUD-space drawing
+  function toCss(p) { return { x: (ox + p.x * S) / dpr, y: (oy + p.y * S) / dpr }; }
 
   /* ---------- 4. audio ---------- */
   var ac = null, muted = false;
@@ -292,93 +500,81 @@
       gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
       o.connect(gn); gn.connect(ac.destination);
       o.start(t); o.stop(t + dur + 0.02);
-    } catch (e) { /* no audio available - the game just runs silent */ }
+    } catch (e) { /* no audio available - the game runs silent */ }
   }
   var sfx = {
-    flip:   function ()  { tone("square",   400, 250, 0.07, 0.05); },
-    orb:    function (n) { tone("sine",     520 * Math.pow(1.06, Math.min(n, 14)), 900, 0.14, 0.09); },
-    graze:  function ()  { tone("triangle", 1500, 1900, 0.04, 0.03); },
-    hit:    function ()  { tone("sawtooth", 190, 55, 0.34, 0.13); },
-    dead:   function ()  { tone("sawtooth", 340, 40, 0.9, 0.14); },
-    ahead:  function ()  { tone("sine",     660, 1320, 0.5, 0.11); },
-    sector: function ()  { tone("square",   220, 880, 0.5, 0.075); },
-    charge: function ()  { tone("sawtooth", 80, 420, 1.1, 0.06); },
-    split:  function ()  { tone("square",   300, 120, 0.12, 0.05); }
+    flip:   function ()  { tone("sine",     520, 360, 0.07, 0.05); },
+    orb:    function (n) { tone("sine",     560 * Math.pow(1.06, Math.min(n, 14)), 980, 0.14, 0.085); },
+    graze:  function ()  { tone("triangle", 1500, 1900, 0.04, 0.028); },
+    hit:    function ()  { tone("sawtooth", 190, 55, 0.32, 0.12); },
+    dead:   function ()  { tone("sawtooth", 340, 40, 0.85, 0.13); },
+    ahead:  function ()  { tone("sine",     660, 1320, 0.5, 0.1); },
+    sector: function ()  { tone("square",   260, 900, 0.45, 0.06); },
+    charge: function ()  { tone("sawtooth", 90, 420, 1.0, 0.05); },
+    split:  function ()  { tone("square",   300, 130, 0.12, 0.045); },
+    ui:     function ()  { tone("sine",     620, 820, 0.08, 0.05); }
   };
 
   /* ---------- 5. stored best ---------- */
   var best = 0;
   try { best = parseInt(localStorage.getItem("orbit-decay-best"), 10) || 0; } catch (e) {}
   function saveBest() { try { localStorage.setItem("orbit-decay-best", String(best)); } catch (e) {} }
-  function paintBest() { bestEl.textContent = best.toLocaleString(); }
+  function paintBest() {
+    $("homeBest").textContent = best.toLocaleString();
+    $("overBest").textContent = best.toLocaleString();
+  }
 
   /* ---------- 6. challenge codec ----------
-     [seed, score, deathFrame, ...flipDeltas] -> base36, dot joined  */
+     [seed, score, deathFrame, ...flipDeltas] -> base36, dot joined */
   function encodeRun(r) {
     var out = [r.seed, r.score, r.death], prev = 0;
-    for (var i = 0; i < r.flips.length; i++) {
-      out.push(r.flips[i] - prev);
-      prev = r.flips[i];
-    }
+    for (var i = 0; i < r.flips.length; i++) { out.push(r.flips[i] - prev); prev = r.flips[i]; }
     return out.map(function (n) { return (n >>> 0).toString(36); }).join(".");
   }
   function decodeRun(code) {
     try {
-      // accept a bare code or a whole pasted link containing one
       var m = /[#&?]c=([^&\s]+)/.exec(code);
       var body = (m ? m[1] : code).trim();
       try { body = decodeURIComponent(body); } catch (e2) {}
       if (!/^[0-9a-z.]+$/i.test(body)) return null;
-
       var p = body.split(".").map(function (s) { return parseInt(s, 36); });
       if (p.length < 3 || p.length > 4000) return null;
-      for (var v = 0; v < p.length; v++) {
-        if (!isFinite(p[v]) || p[v] < 0) return null;
-      }
-      if (p[2] > 5000000) return null;                 // implausible run length
-
+      for (var v = 0; v < p.length; v++) if (!isFinite(p[v]) || p[v] < 0) return null;
+      if (p[2] > 5000000) return null;
       var flips = [], acc = 0;
       for (var i = 3; i < p.length; i++) { acc += p[i]; flips.push(acc); }
       return { seed: p[0] >>> 0, score: p[1], death: p[2], flips: flips };
     } catch (e) { return null; }
   }
-
   function pageUrl() {
-    // inside the artifact viewer the page may be framed; prefer the
-    // address the reader would actually see
-    try {
-      if (window.top !== window && window.top.location.href) return window.top.location.href;
-    } catch (e) {}
+    try { if (window.top !== window && window.top.location.href) return window.top.location.href; } catch (e) {}
     if (document.referrer && /^https?:/.test(document.referrer)) return document.referrer;
     return location.href;
   }
   function stripHash(u) { return u.split("#")[0]; }
 
-  // A challenge can arrive two ways: in the link's hash (when the page is
-  // served at a real address) or pasted into the code box. The paste path
-  // always works, so the link never has to be trusted.
   var challenge = null;
   if (location.hash) challenge = decodeRun(location.hash);
 
   /* ---------- 7. state ---------- */
-  var TITLE = 0, PLAY = 1, OVER = 2;
+  var TITLE = 0, PLAY = 1, OVER = 2;         // simulation state
   var g, ship, ghost, rocks, orbs, bits, run;
   var orbit = ORBIT;
+  var view = "splash";                        // which overlay is up
 
   var motes = [];
-  for (var mi = 0; mi < 40; mi++) {
-    motes.push({ x: Math.random() * U, y: Math.random() * U, d: Math.random() * 0.25 + 0.05 });
+  for (var mi = 0; mi < 34; mi++) {
+    motes.push({ x: Math.random() * U, y: Math.random() * U, d: Math.random() * 0.22 + 0.05 });
   }
 
   function reset(toTitle) {
     var seed = challenge ? challenge.seed : (Math.random() * 0x7fffffff) >>> 0;
     seedRng(seed);
-
     g = {
       state: toTitle ? TITLE : PLAY,
       score: 0, lives: 3, combo: 1, t: 0,
       rockClock: 0, orbClock: 0,
-      shake: 0, iframes: 0, lock: 0, flash: 0,
+      shake: 0, iframes: 0, flash: 0,
       ahead: 0, passed: false,
       sector: 0, banner: 0,
       beamA: rnd() * Math.PI * 2,
@@ -389,12 +585,12 @@
     ghost = challenge ? { a: -Math.PI / 2, dir: 1, boost: 0, idx: 0, alive: true } : null;
     rocks = []; orbs = []; bits = [];
     orbit = ORBIT;
-    run   = { seed: seed, score: 0, death: 0, sector: 0, flips: [] };
+    run = { seed: seed, score: 0, death: 0, sector: 0, flips: [] };
   }
 
-  /* ---------- 8. shared orbital mechanics ----------
-     player and ghost step through identical maths, which is what
-     makes a replay from flip-times exact                        */
+  /* ---------- 8. orbital mechanics ----------
+     player and ghost run identical maths, which is what makes a
+     replay built from flip-times exact                          */
   function angularVelocity(t) { return W_BASE + Math.min(t / 460000, 0.014); }
   function stepOrbiter(o, t) {
     var w = angularVelocity(t) + (o.boost > 0 ? 0.020 * (o.boost / 10) : 0);
@@ -403,15 +599,12 @@
   }
   function posOf(o) { return { x: CX + Math.cos(o.a) * orbit, y: CY + Math.sin(o.a) * orbit }; }
   function onRing(a) { return { x: CX + Math.cos(a) * orbit, y: CY + Math.sin(a) * orbit }; }
-
-  // smallest signed angle between two headings
   function angleGap(a, b) {
     var d = (a - b) % (Math.PI * 2);
     if (d > Math.PI) d -= Math.PI * 2;
     if (d < -Math.PI) d += Math.PI * 2;
     return d;
   }
-
   function spark(x, y, color, speed, life) {
     var a = Math.random() * Math.PI * 2, s = Math.random() * speed + 0.6;
     bits.push({
@@ -419,108 +612,112 @@
       life: life || 1, decay: 0.02 + Math.random() * 0.02, c: color
     });
   }
-
   function beamCount() { return g.sector >= 5 ? 3 : 2; }
-  function beamsLive()  { return g.sector >= 2; }
-  function tint()       { return SECTORS[g.sector].tint; }
+  function beamsLive() { return g.sector >= 2; }
 
-  /* ---------- 9. input ---------- */
-  function press() {
-    if (g.state === TITLE) { sfx.flip(); reset(false); return; }
-    if (g.state === OVER)  { if (g.lock <= 0) reset(false); return; }
+  /* ---------- 9. screens ---------- */
+  function show(name) {
+    view = name;
+    ["splash", "home", "about", "over"].forEach(function (id) {
+      $(id).classList.toggle("on", id === name);
+    });
+  }
+  function goHome() {
+    reset(true);
+    paintBest();
+    show("home");
+  }
+  function startGame() {
+    sfx.ui();
+    reset(false);
+    show(null);                       // no overlay: the field is the whole screen
+  }
+
+  $("btnPlay").addEventListener("click", startGame);
+  $("btnAgain").addEventListener("click", startGame);
+  $("btnAbout").addEventListener("click", function () { sfx.ui(); show("about"); });
+  $("btnBack").addEventListener("click", function () { sfx.ui(); show("home"); });
+  $("btnQuit").addEventListener("click", function () { sfx.ui(); goHome(); });
+
+  $("sound").addEventListener("click", function () {
+    muted = !muted;
+    this.textContent = muted ? "צליל מושתק" : "צליל פועל";
+    if (!muted) sfx.ui();
+  });
+
+  /* ---------- 10. input ----------
+     during play the entire screen is the button                 */
+  function flip() {
+    if (g.state !== PLAY) return;
     ship.dir *= -1;
     ship.boost = 10;
     run.flips.push(g.t + 1);          // takes effect on the next tick
     sfx.flip();
     var p = posOf(ship);
-    for (var i = 0; i < 6; i++) spark(p.x, p.y, "#7fe3ff", 2.2, 0.5);
+    for (var i = 0; i < 6; i++) spark(p.x, p.y, C.ink, 2.2, 0.5);
   }
-
-  cv.addEventListener("pointerdown", function (e) { e.preventDefault(); press(); });
+  app.addEventListener("pointerdown", function (e) {
+    if (view !== null) return;        // an overlay owns the taps
+    e.preventDefault();
+    flip();
+  });
   addEventListener("keydown", function (e) {
     var k = e.key.toLowerCase();
-    if (k === " " || k === "arrowleft" || k === "arrowright" || k === "enter") {
-      // never steal keys from the controls or the code box
-      var tag = e.target && e.target.tagName;
-      if (tag === "BUTTON" || tag === "INPUT" || tag === "TEXTAREA") return;
-      e.preventDefault();
-      press();
-    }
+    if (k !== " " && k !== "arrowleft" && k !== "arrowright" && k !== "enter") return;
+    var tag = e.target && e.target.tagName;
+    if (tag === "BUTTON" || tag === "INPUT" || tag === "TEXTAREA") return;
+    e.preventDefault();
+    if (view === null) flip();
   });
 
-  soundBtn.addEventListener("click", function () {
-    muted = !muted;
-    soundBtn.classList.toggle("muted", muted);
-    soundBtn.textContent = muted ? "Muted" : "Sound";
-    if (!muted) sfx.flip();
-  });
-
-  /* ---------- 10. load a rival's code ---------- */
+  /* ---------- 11. rival code ---------- */
+  var codebar = $("codebar"), codeIn = $("code"), loadBtn = $("load");
   codebar.addEventListener("submit", function (e) {
     e.preventDefault();
-    if (codeIn.blur) codeIn.blur();               // drop the phone keyboard
+    if (codeIn.blur) codeIn.blur();
     var raw = codeIn.value.trim();
-
-    if (!raw) {                                    // empty box clears the rival
-      challenge = null;
-      codebar.classList.remove("bad");
-      reset(true);
-      return;
-    }
+    if (!raw) { challenge = null; codebar.classList.remove("bad"); goHome(); return; }
     var decoded = decodeRun(raw);
     if (!decoded) {
       codebar.classList.add("bad");
-      loadBtn.textContent = "Bad code";
-      setTimeout(function () {
-        codebar.classList.remove("bad");
-        loadBtn.textContent = "Load";
-      }, 2000);
+      loadBtn.textContent = "לא תקין";
+      setTimeout(function () { codebar.classList.remove("bad"); loadBtn.textContent = "טען"; }, 2000);
       return;
     }
     challenge = decoded;
     codebar.classList.remove("bad");
-    loadBtn.textContent = "Loaded";
-    setTimeout(function () { loadBtn.textContent = "Load"; }, 2000);
-    reset(true);                                   // back to the challenge card
+    loadBtn.textContent = "נטען";
+    setTimeout(function () { loadBtn.textContent = "טען"; }, 2000);
+    goHome();
   });
 
-  /* ---------- 11. share ---------- */
+  /* ---------- 12. share ---------- */
   var lastRun = null;
   function shareText() {
     var base = stripHash(pageUrl());
     if (lastRun && lastRun.score > 0) {
       var code = encodeRun(lastRun);
-      return "ORBIT DECAY - I scored " + lastRun.score.toLocaleString() +
-             " and reached sector " + (lastRun.sector + 1) +
-             " (" + SECTORS[lastRun.sector].name + ").\n" +
-             "Same debris field, my ghost to race:\n" +
-             base + "#c=" + code + "\n" +
-             "(if the link drops the code, paste this into the game: " + code + ")";
+      return "מסלול דועך - עשיתי " + lastRun.score.toLocaleString() +
+             " והגעתי לאזור " + (lastRun.sector + 1) + " (" + SECTORS[lastRun.sector].name + ").\n" +
+             "אותו שדה סלעים בדיוק, והרוח שלי טסה לידך:\n" + base + "#c=" + code + "\n" +
+             "(אם הקישור מאבד את הקוד, הדבק אותו במשחק: " + code + ")";
     }
-    return "ORBIT DECAY - one tap, six sectors, don't die:\n" + base;
+    return "מסלול דועך - נגיעה אחת, שישה אזורים:\n" + base;
   }
-  shareBtn.addEventListener("click", function () {
-    var msg = shareText();
+  $("btnShare").addEventListener("click", function () {
+    var btn = this, msg = shareText();
     function ok() {
-      shareBtn.textContent = "Copied";
-      shareBtn.classList.add("done");
-      setTimeout(function () {
-        shareBtn.textContent = "Challenge";
-        shareBtn.classList.remove("done");
-      }, 2000);
+      btn.textContent = "הועתק";
+      setTimeout(function () { btn.textContent = "שתף את התוצאה"; }, 2000);
     }
     function legacy() {
       try {
         var ta = document.createElement("textarea");
-        ta.value = msg;
-        ta.style.position = "fixed";
-        ta.style.top = "-1000px";
-        document.body.appendChild(ta);
-        ta.select();
+        ta.value = msg; ta.style.position = "fixed"; ta.style.top = "-1000px";
+        document.body.appendChild(ta); ta.select();
         document.execCommand("copy");
-        document.body.removeChild(ta);
-        ok();
-      } catch (e) { shareBtn.textContent = "Failed"; }
+        document.body.removeChild(ta); ok();
+      } catch (e) { btn.textContent = "לא הצליח"; }
     }
     if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) {
       navigator.share({ text: msg }).then(function () {}, legacy);
@@ -529,11 +726,10 @@
     } else { legacy(); }
   });
 
-  /* ---------- 12. hazards ---------- */
+  /* ---------- 13. hazards ---------- */
   function spawnRock(fromAngle, speedBias) {
     var sx = CX + Math.cos(fromAngle) * 760;
     var sy = CY + Math.sin(fromAngle) * 760;
-    // aim a little off-centre so paths cut chords, not just spokes
     var ta = rnd() * Math.PI * 2, tr = rnd() * 92;
     var tx = CX + Math.cos(ta) * tr, ty = CY + Math.sin(ta) * tr;
     var d  = Math.hypot(tx - sx, ty - sy);
@@ -544,10 +740,8 @@
       grazed: false, split: false, seed: Math.floor(rnd() * 999)
     });
   }
-
   function shatter(r) {
-    var base = Math.atan2(r.vy, r.vx);
-    var sp = Math.hypot(r.vx, r.vy) * 1.1;
+    var base = Math.atan2(r.vy, r.vx), sp = Math.hypot(r.vx, r.vy) * 1.1;
     for (var i = 0; i < 2; i++) {
       var a = base + (i === 0 ? -0.34 : 0.34);
       rocks.push({
@@ -557,16 +751,15 @@
       });
     }
     r.dead = true;
-    for (var q = 0; q < 9; q++) spark(r.x, r.y, "#ff5470", 2.6, 0.7);
+    for (var q = 0; q < 9; q++) spark(r.x, r.y, C.coral, 2.6, 0.7);
     sfx.split();
   }
 
-  /* ---------- 13. simulation ---------- */
+  /* ---------- 14. simulation ---------- */
   function update() {
     g.t++;
     if (g.shake > 0) g.shake *= 0.88;
     if (g.flash > 0) g.flash -= 0.06;
-    if (g.lock > 0) g.lock--;
     if (g.ahead > 0) g.ahead--;
     if (g.banner > 0) g.banner--;
 
@@ -576,29 +769,21 @@
     }
 
     var live = g.state === PLAY;
-
-    // the attract screen keeps the ship coasting so the page never looks dead
-    if (g.state === TITLE) stepOrbiter(ship, g.t);
+    if (g.state === TITLE) stepOrbiter(ship, g.t);   // menus stay alive
 
     if (live) {
-      // ---- sector progression, driven by ticks so replays match ----
       var sec = Math.min(SECTORS.length - 1, Math.floor(g.t / SECTOR));
       if (sec !== g.sector) {
-        g.sector = sec;
-        g.banner = 130;
+        g.sector = sec; g.banner = 130;
         sfx.sector();
         if (sec === 2) sfx.charge();
       }
 
-      // COLLAPSE pulls the orbit inward toward the swelling star
       if (g.sector >= 5) {
         var into = Math.min(1, (g.t - SECTOR * 5) / (SECTOR * 1.6));
         orbit = ORBIT - 54 * into;
-      } else {
-        orbit = ORBIT;
-      }
+      } else { orbit = ORBIT; }
 
-      // PULSAR sweep charges up once, then stays lethal
       if (beamsLive()) {
         g.beamPower = Math.min(1, g.beamPower + 1 / 110);
         g.beamA += 0.0075 * g.beamDir;
@@ -608,57 +793,40 @@
       stepOrbiter(ship, g.t);
       g.score += 1 + g.sector;
 
-      // ghost replays its recorded taps against the same clock
       if (ghost && ghost.alive) {
         while (ghost.idx < challenge.flips.length && challenge.flips[ghost.idx] === g.t) {
-          ghost.dir *= -1;
-          ghost.boost = 10;
-          ghost.idx++;
+          ghost.dir *= -1; ghost.boost = 10; ghost.idx++;
         }
         stepOrbiter(ghost, g.t);
         if (g.t > challenge.death) ghost.alive = false;
       }
-
       if (challenge && !g.passed && g.score > challenge.score) {
-        g.passed = true;
-        g.ahead = 110;
-        sfx.ahead();
+        g.passed = true; g.ahead = 110; sfx.ahead();
       }
 
-      // ---- debris ----
       var rate = Math.max(13, 52 - g.t / 90);
       if (++g.rockClock > rate) {
         g.rockClock = 0;
         var from = rnd() * Math.PI * 2;
         spawnRock(from, 0);
-        // CROSSFIRE: a mirrored volley from the far side
-        if (g.sector >= 1 && rnd() < (g.sector >= 5 ? 0.85 : 0.5)) {
-          spawnRock(from + Math.PI, 0.3);
-        }
+        if (g.sector >= 1 && rnd() < (g.sector >= 5 ? 0.85 : 0.5)) spawnRock(from + Math.PI, 0.3);
       }
-
-      // ---- plasma ----
       if (++g.orbClock > 108) {
         g.orbClock = 0;
         orbs.push({ a: rnd() * Math.PI * 2, life: 470, drift: (rnd() - 0.5) * 0.004 });
       }
     }
 
-    // snapshot the length so fragments born this tick wait for the next one
+    // snapshot length so fragments born this tick wait for the next
     for (var i = 0, n0 = rocks.length; i < n0; i++) {
       var r = rocks[i];
       if (r.dead) continue;
       r.x += r.vx; r.y += r.vy; r.ang += r.spin;
       var dc = Math.hypot(r.x - CX, r.y - CY);
-
-      // SHATTER: the big ones break as they reach the ring
-      if (live && g.sector >= 3 && !r.split && r.r > 29 && dc < orbit + 46) {
-        shatter(r);
-        continue;
-      }
-      if (dc < 62) {                                   // burns up in the star
+      if (live && g.sector >= 3 && !r.split && r.r > 29 && dc < orbit + 46) { shatter(r); continue; }
+      if (dc < 62) {
         r.dead = true;
-        for (var q = 0; q < 7; q++) spark(r.x, r.y, "#ffc857", 2.4, 0.7);
+        for (var q = 0; q < 7; q++) spark(r.x, r.y, C.sun, 2.4, 0.7);
       }
       if (dc > 900) r.dead = true;
     }
@@ -670,7 +838,6 @@
 
     if (live) {
       var p = posOf(ship);
-
       for (var k = 0; k < orbs.length; k++) {
         var ob = orbs[k];
         if (ob.dead) continue;
@@ -680,31 +847,24 @@
           g.combo = Math.min(g.combo + 1, 25);
           g.score += Math.round(55 * g.combo * (1 + g.sector * 0.4));
           sfx.orb(g.combo);
-          for (var s = 0; s < 12; s++) spark(op.x, op.y, "#ffc857", 3, 1);
+          for (var s = 0; s < 12; s++) spark(op.x, op.y, C.teal, 3, 1);
         }
       }
-
       for (var j = 0; j < rocks.length; j++) {
         var rk = rocks[j];
         if (rk.dead) continue;
         var dist = Math.hypot(p.x - rk.x, p.y - rk.y);
-        if (!rk.grazed && dist < rk.r + 52) {          // reward cutting it fine
+        if (!rk.grazed && dist < rk.r + 52) {
           rk.grazed = true;
           g.score += Math.round(26 * g.combo * (1 + g.sector * 0.4));
           sfx.graze();
         }
-        if (g.iframes <= 0 && dist < rk.r + 13) {
-          rk.dead = true;
-          takeHit(p);
-        }
+        if (g.iframes <= 0 && dist < rk.r + 13) { rk.dead = true; takeHit(p); }
       }
-
-      // PULSAR: caught in the sweep
       if (beamsLive() && g.beamPower >= 1 && g.iframes <= 0) {
         var n = beamCount();
         for (var b = 0; b < n; b++) {
-          var ba = g.beamA + b * (Math.PI * 2 / n);
-          if (Math.abs(angleGap(ship.a, ba)) < 0.105) { takeHit(p); break; }
+          if (Math.abs(angleGap(ship.a, g.beamA + b * (Math.PI * 2 / n))) < 0.105) { takeHit(p); break; }
         }
       }
     }
@@ -725,35 +885,39 @@
     g.combo = 1;
     g.lives--;
     g.iframes = 96;
-    g.shake = REDUCED ? 0 : 22;
+    g.shake = REDUCED ? 0 : 20;
     g.flash = 1;
-    for (var b = 0; b < 26; b++) spark(p.x, p.y, "#ff5470", 4, 1.2);
+    for (var b = 0; b < 26; b++) spark(p.x, p.y, C.coral, 4, 1.2);
     if (g.lives <= 0) {
       g.state = OVER;
-      g.lock = 42;
       sfx.dead();
-      run.score = g.score;
-      run.death = g.t;
-      run.sector = g.sector;
+      run.score = g.score; run.death = g.t; run.sector = g.sector;
       lastRun = run;
-      if (g.score > best) { best = g.score; saveBest(); paintBest(); }
-    } else {
-      sfx.hit();
-    }
+      var isBest = g.score > best;
+      if (isBest) { best = g.score; saveBest(); }
+      paintBest();
+      $("overScore").textContent = g.score.toLocaleString();
+      $("overSector").textContent = "אזור " + (g.sector + 1) + " · " + SECTORS[g.sector].name;
+      var ribbon = $("overRibbon");
+      if (challenge) {
+        ribbon.hidden = false;
+        ribbon.textContent = g.score > challenge.score ? "ניצחת את היריב" : "היריב עדיין מוביל";
+      } else if (isBest) {
+        ribbon.hidden = false;
+        ribbon.textContent = "שיא חדש";
+      } else { ribbon.hidden = true; }
+      setTimeout(function () { show("over"); }, 700);
+    } else { sfx.hit(); }
   }
 
-  /* ---------- 14. render ---------- */
-  function beam(color, width, alpha, path) {
-    ctx.strokeStyle = color;
-    ctx.globalAlpha = alpha;
-    ctx.lineWidth = width;
-    ctx.beginPath();
-    path();
-    ctx.stroke();
+  /* ---------- 15. render ---------- */
+  function stroke(color, width, alpha, path) {
+    ctx.strokeStyle = color; ctx.globalAlpha = alpha; ctx.lineWidth = width;
+    ctx.beginPath(); path(); ctx.stroke();
   }
-  function glow(color, path) {          // phosphor bloom: wide dim + tight bright
-    beam(color, 11, 0.13, path);
-    beam(color, 2.6, 1, path);
+  function inked(color, path) {            // soft halo + crisp line
+    stroke(color, 12, 0.10, path);
+    stroke(color, 3.2, 1, path);
   }
   function chevron() {
     ctx.moveTo(0, -19); ctx.lineTo(12, 13); ctx.lineTo(0, 5); ctx.lineTo(-12, 13);
@@ -772,28 +936,19 @@
 
   function drawBeams() {
     if (!beamsLive()) return;
-    var n = beamCount(), pw = g.beamPower;
-    var half = 0.105, reach = 520;
-    var col = pw >= 1 ? "#ff5470" : "#ffc857";
+    var n = beamCount(), pw = g.beamPower, half = 0.105, reach = 560;
+    var col = pw >= 1 ? C.coral : C.sun;
     for (var b = 0; b < n; b++) {
       var ba = g.beamA + b * (Math.PI * 2 / n);
       var x1 = CX + Math.cos(ba - half) * reach, y1 = CY + Math.sin(ba - half) * reach;
       var x2 = CX + Math.cos(ba + half) * reach, y2 = CY + Math.sin(ba + half) * reach;
-
-      ctx.globalAlpha = 0.03 + 0.045 * pw;            // the wedge itself
+      ctx.globalAlpha = 0.05 + 0.07 * pw;
       ctx.fillStyle = col;
       ctx.beginPath();
       ctx.moveTo(CX, CY); ctx.lineTo(x1, y1); ctx.lineTo(x2, y2); ctx.closePath();
       ctx.fill();
-
-      beam(col, 2, 0.09 + 0.13 * pw, function () {
-        ctx.moveTo(CX, CY); ctx.lineTo(x1, y1);
-        ctx.moveTo(CX, CY); ctx.lineTo(x2, y2);
-      });
-
-      // the phosphor trail smears the wedge wider than it really is,
-      // so mark the true centre of the kill line
-      beam(col, 1.4, 0.10 + 0.30 * pw, function () {
+      // the trail smears the wedge wider than it is, so mark the true line
+      stroke(col, 2, 0.16 + 0.34 * pw, function () {
         ctx.moveTo(CX, CY);
         ctx.lineTo(CX + Math.cos(ba) * reach, CY + Math.sin(ba) * reach);
       });
@@ -801,63 +956,63 @@
   }
 
   function draw() {
-    // phosphor persistence: wash the screen, never clear it
-    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    // watercolour persistence: wash with sky, never clear
+    device();
     ctx.globalCompositeOperation = "source-over";
     ctx.globalAlpha = 1;
-    ctx.fillStyle = REDUCED ? "rgba(8,10,18,0.92)" : "rgba(8,10,18,0.30)";
-    ctx.fillRect(0, 0, U, U);
+    ctx.fillStyle = REDUCED ? "rgba(238,243,255,0.94)" : "rgba(238,243,255,0.34)";
+    ctx.fillRect(0, 0, cw, ch);
 
+    field();
     if (g.shake > 1) ctx.translate((Math.random() - 0.5) * g.shake, (Math.random() - 0.5) * g.shake);
-
-    ctx.globalCompositeOperation = "lighter";
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
 
-    ctx.globalAlpha = 0.05;
-    ctx.fillStyle = "#7fe3ff";
-    for (var m = 0; m < motes.length; m++) ctx.fillRect(motes[m].x, motes[m].y, 2, 2);
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = C.faint;
+    for (var m = 0; m < motes.length; m++) ctx.fillRect(motes[m].x, motes[m].y, 2.4, 2.4);
 
     drawBeams();
+    stroke(C.faint, 2, 0.85, function () { ctx.arc(CX, CY, orbit, 0, 6.2832); });
 
-    beam(tint(), 1.4, 0.12, function () { ctx.arc(CX, CY, orbit, 0, 6.2832); });
-
-    // the collapsing star - swells as the orbit falls in
+    // the star, swelling as the orbit falls in
     var pulse = 1 + Math.sin(g.t * 0.035) * 0.045;
-    var rad = (58 + (ORBIT - orbit) * 0.55) * pulse;
-    var grd = ctx.createRadialGradient(CX, CY, 4, CX, CY, rad * 2.5);
-    grd.addColorStop(0, "rgba(255,243,214,0.95)");
-    grd.addColorStop(0.28, "rgba(255,200,87,0.5)");
-    grd.addColorStop(1, "rgba(255,84,112,0)");
+    var rad = (56 + (ORBIT - orbit) * 0.55) * pulse;
+    var grd = ctx.createRadialGradient(CX, CY, rad * 0.15, CX, CY, rad * 2.6);
+    grd.addColorStop(0, "rgba(255,208,130,0.95)");
+    grd.addColorStop(0.34, "rgba(255,180,84,0.45)");
+    grd.addColorStop(1, "rgba(255,145,56,0)");
     ctx.globalAlpha = 1;
     ctx.fillStyle = grd;
-    ctx.beginPath(); ctx.arc(CX, CY, rad * 2.5, 0, 6.2832); ctx.fill();
-    glow("#fff3d6", function () { ctx.arc(CX, CY, rad, 0, 6.2832); });
+    ctx.beginPath(); ctx.arc(CX, CY, rad * 2.6, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = C.sun;
+    ctx.beginPath(); ctx.arc(CX, CY, rad, 0, 6.2832); ctx.fill();
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = "#fff0d6";
+    ctx.beginPath(); ctx.arc(CX - rad * 0.2, CY - rad * 0.22, rad * 0.5, 0, 6.2832); ctx.fill();
 
-    for (var i = 0; i < rocks.length; i++) glow("#ff5470", rockPath(rocks[i]));
+    for (var i = 0; i < rocks.length; i++) inked(C.coral, rockPath(rocks[i]));
 
     for (var o = 0; o < orbs.length; o++) {
       var ob = orbs[o];
       var op = onRing(ob.a);
-      var fade = ob.life < 90 ? (Math.floor(ob.life / 6) % 2 ? 0.25 : 1) : 1;
-      ctx.globalAlpha = 0.22 * fade;
-      ctx.fillStyle = "#ffc857";
-      ctx.beginPath(); ctx.arc(op.x, op.y, 22, 0, 6.2832); ctx.fill();
+      var fade = ob.life < 90 ? (Math.floor(ob.life / 6) % 2 ? 0.3 : 1) : 1;
+      ctx.globalAlpha = 0.2 * fade;
+      ctx.fillStyle = C.teal;
+      ctx.beginPath(); ctx.arc(op.x, op.y, 23, 0, 6.2832); ctx.fill();
       ctx.globalAlpha = fade;
-      ctx.beginPath(); ctx.arc(op.x, op.y, 8.5, 0, 6.2832); ctx.fill();
+      ctx.beginPath(); ctx.arc(op.x, op.y, 9.5, 0, 6.2832); ctx.fill();
     }
 
-    // rival ghost
     if (ghost && ghost.alive && g.state === PLAY) {
       var gp = posOf(ghost);
       ctx.save();
       ctx.translate(gp.x, gp.y);
       ctx.rotate(ghost.a + (Math.PI / 2) * ghost.dir);
-      beam("#9db4d8", 2, 0.5, chevron);
+      stroke(C.lilac, 3, 0.75, chevron);
       ctx.restore();
     }
 
-    // you
     if (g.state !== OVER) {
       var p = posOf(ship);
       var blink = g.iframes > 0 && Math.floor(g.t / 4) % 2 === 0;
@@ -865,184 +1020,110 @@
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(ship.a + (Math.PI / 2) * ship.dir);
-        glow("#7fe3ff", chevron);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = C.ink;
+        ctx.beginPath(); chevron(); ctx.fill();
+        stroke(C.ink, 12, 0.1, chevron);
         ctx.restore();
       }
     }
 
     for (var c = 0; c < bits.length; c++) {
       var bt = bits[c];
-      ctx.globalAlpha = Math.max(0, bt.life) * 0.9;
+      ctx.globalAlpha = Math.max(0, bt.life) * 0.85;
       ctx.fillStyle = bt.c;
       ctx.fillRect(bt.x - 2, bt.y - 2, 4.5, 4.5);
     }
 
     if (g.flash > 0) {
-      ctx.globalAlpha = g.flash * 0.16;
-      ctx.fillStyle = "#ff5470";
-      ctx.fillRect(0, 0, U, U);
+      device();
+      ctx.globalAlpha = g.flash * 0.2;
+      ctx.fillStyle = C.coral;
+      ctx.fillRect(0, 0, cw, ch);
     }
 
     drawHud();
-    ctx.setTransform(scale, 0, 0, scale, 0, 0);
   }
 
-  function pad(n) {
-    var s = String(n);
-    while (s.length < 6) s = "0" + s;
-    return s;
-  }
-  function two(n) { return (n < 10 ? "0" : "") + n; }
-
+  /* HUD is drawn in css pixels on its own cleared layer */
   function drawHud() {
-    var ctx = h;                       // everything below lands on the HUD layer
-    ctx.setTransform(scale, 0, 0, scale, 0, 0);
-    ctx.clearRect(0, 0, U, U);
-    ctx.globalCompositeOperation = "source-over";
-    ctx.globalAlpha = 1;
-    ctx.textBaseline = "top";
+    h.setTransform(dpr, 0, 0, dpr, 0, 0);
+    h.clearRect(0, 0, VW, VH);
+    h.globalAlpha = 1;
+    h.textBaseline = "top";
 
-    // ECLIPSE: only the space near the ship stays lit
-    if (g.state === PLAY && g.sector >= 4) {
-      var sp = posOf(ship);
-      var eg = ctx.createRadialGradient(sp.x, sp.y, 100, sp.x, sp.y, 400);
-      eg.addColorStop(0, "rgba(3,4,10,0)");
-      eg.addColorStop(0.55, "rgba(3,4,10,0.46)");
-      eg.addColorStop(1, "rgba(3,4,10,0.9)");
-      ctx.fillStyle = eg;
-      ctx.fillRect(0, 0, U, U);
+    if (g.state === PLAY && g.sector >= 4) {          // ליקוי: fog of daylight
+      var sp = toCss(posOf(ship));
+      var r0 = Math.min(VW, VH) * 0.22, r1 = Math.min(VW, VH) * 0.62;
+      var eg = h.createRadialGradient(sp.x, sp.y, r0, sp.x, sp.y, r1);
+      eg.addColorStop(0, "rgba(238,243,255,0)");
+      eg.addColorStop(0.55, "rgba(238,243,255,0.62)");
+      eg.addColorStop(1, "rgba(238,243,255,0.97)");
+      h.fillStyle = eg;
+      h.fillRect(0, 0, VW, VH);
     }
 
-    if (g.state === PLAY || g.state === OVER) {
-      ctx.font = "600 40px " + MONO;
-      ctx.textAlign = "left";
-      ctx.fillStyle = "#7fe3ff";
-      ctx.fillText(pad(g.score), 30, 28);
+    if (g.state !== PLAY) return;
 
-      for (var i = 0; i < 3; i++) {          // pips burn out from the right
-        ctx.globalAlpha = (2 - i) < g.lives ? 1 : 0.16;
-        ctx.fillStyle = "#ff5470";
-        ctx.beginPath(); ctx.arc(U - 42 - i * 30, 46, 8, 0, 6.2832); ctx.fill();
-      }
-      ctx.globalAlpha = 1;
+    var pad = 18 + 4;
+    var big = Math.min(38, VW * 0.098);
 
-      var line = 76;
-      ctx.font = "600 22px " + MONO;
-      ctx.fillStyle = tint();
-      ctx.fillText("SECTOR " + two(g.sector + 1) + "  " + SECTORS[g.sector].name, 30, line);
-      line += 30;
+    h.textAlign = "right";                             // rtl: score in the top-right
+    h.font = "700 " + big + "px ui-monospace, Menlo, Consolas, monospace";
+    h.fillStyle = C.ink;
+    h.fillText(g.score.toLocaleString(), VW - pad, pad);
 
-      if (g.combo > 1) {
-        ctx.font = "600 26px " + MONO;
-        ctx.fillStyle = "#ffc857";
-        ctx.fillText("x" + g.combo, 30, line);
-        line += 32;
-      }
-      if (challenge) {
-        ctx.font = "600 22px " + MONO;
-        ctx.fillStyle = g.passed ? "#ffc857" : "#5c6b8a";
-        ctx.fillText("RIVAL " + pad(challenge.score), 30, line);
-      }
+    h.font = "600 " + Math.min(14, VW * 0.037) + "px " + "system-ui, sans-serif";
+    h.fillStyle = SECTORS[g.sector].tint;
+    h.fillText("אזור " + (g.sector + 1) + " · " + SECTORS[g.sector].name, VW - pad, pad + big + 6);
+
+    if (g.combo > 1) {
+      h.fillStyle = C.teal;
+      h.fillText("×" + g.combo, VW - pad, pad + big + 28);
+    }
+    if (challenge) {
+      h.fillStyle = g.passed ? C.sun : C.faint;
+      h.fillText("יריב " + challenge.score.toLocaleString(), VW - pad, pad + big + (g.combo > 1 ? 50 : 28));
     }
 
-    // sector announcement
-    if (g.banner > 0 && g.state === PLAY) {
-      ctx.globalAlpha = Math.min(1, g.banner / 34);
-      ctx.fillStyle = "rgba(3,4,10,0.62)";
-      ctx.fillRect(0, 388, U, 186);
-      centre([
-        { t: "SECTOR " + two(g.sector + 1), size: 28, c: "#5c6b8a", sp: 8, gap: 32 },
-        { t: SECTORS[g.sector].name, size: 60, c: tint(), sp: 8, gap: 28 },
-        { t: SECTORS[g.sector].blurb, size: 21, c: "#5c6b8a", gap: 0 }
-      ], 406);
-      ctx.globalAlpha = 1;
+    for (var i = 0; i < 3; i++) {                      // lives, top-left
+      h.globalAlpha = i < g.lives ? 1 : 0.2;
+      h.fillStyle = C.coral;
+      h.beginPath(); h.arc(pad + 9 + i * 26, pad + 12, 8, 0, 6.2832); h.fill();
     }
+    h.globalAlpha = 1;
 
-    if (g.ahead > 0 && g.state === PLAY) {
-      ctx.globalAlpha = Math.min(1, g.ahead / 30);
-      centre([{ t: "YOU'RE AHEAD", size: 46, c: "#ffc857", sp: 7, gap: 0 }], 152);
-      ctx.globalAlpha = 1;
+    if (g.banner > 0) {
+      var fade = Math.min(1, g.banner / 34);
+      h.globalAlpha = fade;
+      h.textAlign = "center";
+      h.fillStyle = SECTORS[g.sector].tint;
+      h.font = "700 " + Math.min(40, VW * 0.1) + "px system-ui, sans-serif";
+      h.fillText(SECTORS[g.sector].name, VW / 2, VH * 0.4);
+      h.fillStyle = C.soft;
+      h.font = "500 " + Math.min(16, VW * 0.042) + "px system-ui, sans-serif";
+      h.fillText(SECTORS[g.sector].blurb, VW / 2, VH * 0.4 + Math.min(48, VW * 0.12));
+      h.globalAlpha = 1;
     }
-
-    if (g.state === TITLE) {
-      // the star sits dead centre, so the card needs its own ground
-      ctx.fillStyle = "rgba(3,4,10,0.76)";
-      ctx.fillRect(0, 0, U, U);
-      if (challenge) {
-        centre([
-          { t: "CHALLENGE", size: 34, c: "#ffc857", sp: 7, gap: 40 },
-          { t: pad(challenge.score), size: 78, c: "#7fe3ff", sp: 2, gap: 44 },
-          { t: "same debris field. their ghost is", size: 23, c: "#5c6b8a", gap: 32 },
-          { t: "flying beside you. beat the number.", size: 23, c: "#5c6b8a", gap: 76 },
-          { t: Math.floor(g.t / 30) % 2 ? "TAP TO BEGIN" : " ", size: 30, c: "#ffc857", sp: 4, gap: 0 }
-        ]);
-      } else {
-        centre([
-          { t: "ORBIT DECAY", size: 60, c: "#7fe3ff", sp: 8, gap: 46 },
-          { t: "one input. tap to flip your orbit.", size: 23, c: "#5c6b8a", gap: 32 },
-          { t: "six sectors, each one worse", size: 23, c: "#5c6b8a", gap: 32 },
-          { t: "than the last.", size: 23, c: "#5c6b8a", gap: 70 },
-          { t: Math.floor(g.t / 30) % 2 ? "TAP TO BEGIN" : " ", size: 30, c: "#ffc857", sp: 4, gap: 0 }
-        ]);
-      }
-    }
-
-    if (g.state === OVER) {
-      ctx.fillStyle = "rgba(3,4,10,0.84)";
-      ctx.fillRect(0, 0, U, U);
-      var verdict, vcol;
-      if (challenge) {
-        verdict = g.score > challenge.score ? "YOU WIN" : "RIVAL HOLDS";
-        vcol    = g.score > challenge.score ? "#ffc857" : "#5c6b8a";
-      } else {
-        verdict = (g.score >= best && g.score > 0) ? "NEW BEST" : "BEST  " + pad(best);
-        vcol    = "#ffc857";
-      }
-      centre([
-        { t: "ORBIT LOST", size: 52, c: "#ff5470", sp: 6, gap: 46 },
-        { t: pad(g.score), size: 70, c: "#7fe3ff", sp: 2, gap: 34 },
-        { t: "SECTOR " + two(g.sector + 1) + "  " + SECTORS[g.sector].name, size: 23, c: tint(), sp: 3, gap: 32 },
-        { t: verdict, size: 25, c: vcol, sp: 3, gap: 32 },
-        { t: "press Challenge to send this run", size: 19, c: "#5c6b8a", gap: 38 },
-        { t: g.lock > 0 ? " " : (Math.floor(g.t / 30) % 2 ? "TAP TO FLY AGAIN" : " "), size: 25, c: "#5c6b8a", sp: 3, gap: 0 }
-      ]);
+    if (g.ahead > 0) {
+      h.globalAlpha = Math.min(1, g.ahead / 30);
+      h.textAlign = "center";
+      h.fillStyle = C.sun;
+      h.font = "700 " + Math.min(30, VW * 0.075) + "px system-ui, sans-serif";
+      h.fillText("עברת אותו!", VW / 2, VH * 0.26);
+      h.globalAlpha = 1;
     }
   }
 
-  // canvas has no letter-spacing, so tracked lines are set glyph by glyph
-  function centre(lines, forceY) {
-    var ctx = h;
-    var total = 0, i;
-    for (i = 0; i < lines.length; i++) total += lines[i].size + (lines[i].gap || 0);
-    var y = forceY !== undefined ? forceY : CY - total / 2 - 40;
-    for (i = 0; i < lines.length; i++) {
-      var L = lines[i];
-      ctx.font = "600 " + L.size + "px " + MONO;
-      ctx.fillStyle = L.c;
-      if (L.sp) {
-        var chars = L.t.split(""), w = 0, j;
-        for (j = 0; j < chars.length; j++) w += ctx.measureText(chars[j]).width + L.sp;
-        w -= L.sp;
-        var x = CX - w / 2;
-        ctx.textAlign = "left";
-        for (j = 0; j < chars.length; j++) {
-          ctx.fillText(chars[j], x, y);
-          x += ctx.measureText(chars[j]).width + L.sp;
-        }
-      } else {
-        ctx.textAlign = "center";
-        ctx.fillText(L.t, CX, y);
-      }
-      y += L.size + (L.gap || 0);
-    }
-    ctx.textAlign = "left";
-  }
-
-  /* ---------- 15. fixed-timestep loop ----------
+  /* ---------- 16. fixed-timestep loop ----------
      the sim must advance in equal ticks or replays desync on
-     120Hz displays                                            */
+     high-refresh screens                                        */
   var acc = 0, prev = performance.now();
   function loop(now) {
+    // covers a phone's address bar sliding away, an orientation flip, and
+    // the case where the page first laid out at zero size in a hidden tab
+    if (app.clientWidth !== VW || app.clientHeight !== VH) fit();
+
     var dt = Math.min(now - prev, 120);
     prev = now;
     acc += dt;
@@ -1052,9 +1133,11 @@
     requestAnimationFrame(loop);
   }
 
+  /* ---------- boot ---------- */
   reset(true);
   paintBest();
   fit();
   requestAnimationFrame(loop);
+  setTimeout(function () { if (view === "splash") show("home"); }, 2000);
 })();
 </script>
