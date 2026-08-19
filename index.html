@@ -669,49 +669,12 @@
   }
 
   /* ---------- state ---------- */
-  var TITLE = 0, PLAY = 1, REPLAY = 2, OVER = 3;
+  var TITLE = 0, PLAY = 1, OVER = 2;
   var g, ship, ghost, rocks, orbs, bits, run, shieldPk;
-  var orbit = ORBIT, timeScale = 1, view = "splash", dailyMode = false;
+  var orbit = ORBIT, view = "splash", dailyMode = false;
 
   var motes = [];
   for (var mi = 0; mi < 34; mi++) motes.push({ x: Math.random() * U, y: Math.random() * U, d: Math.random() * 0.22 + 0.05 });
-
-  /* replay ring buffer: [shipA, shipDir, orbit, nRocks, nOrbs, rocks*5, orbs*1] */
-  var RB_LEN = 190, MAXR = 48, MAXO = 8, RB_STRIDE = 5 + MAXR * 5 + MAXO;
-  var rb = [];
-  for (var ri = 0; ri < RB_LEN; ri++) rb.push(new Float32Array(RB_STRIDE));
-  var rbHead = 0, rbCount = 0, rbPlay = 0;
-
-  function rbPush() {
-    var f = rb[rbHead];
-    f[0] = ship.a; f[1] = ship.dir; f[2] = orbit;
-    var n = Math.min(rocks.length, MAXR), m = Math.min(orbs.length, MAXO);
-    f[3] = n; f[4] = m;
-    var i, k = 5;
-    for (i = 0; i < n; i++) {
-      var r = rocks[i];
-      f[k++] = r.x; f[k++] = r.y; f[k++] = r.r; f[k++] = r.ang; f[k++] = r.seed;
-    }
-    k = 5 + MAXR * 5;
-    for (i = 0; i < m; i++) f[k++] = orbs[i].a;
-    rbHead = (rbHead + 1) % RB_LEN;
-    rbCount = Math.min(rbCount + 1, RB_LEN);
-  }
-  var viewRocks = [], viewOrbs = [];
-  for (var vi = 0; vi < MAXR; vi++) viewRocks.push({ x: 0, y: 0, r: 0, ang: 0, seed: 0 });
-  function rbRead(i) {
-    var idx = (rbHead - rbCount + i + RB_LEN * 2) % RB_LEN;
-    var f = rb[idx];
-    var n = f[3] | 0, m = f[4] | 0, k = 5, j;
-    for (j = 0; j < n; j++) {
-      var o = viewRocks[j];
-      o.x = f[k++]; o.y = f[k++]; o.r = f[k++]; o.ang = f[k++]; o.seed = f[k++];
-    }
-    k = 5 + MAXR * 5;
-    viewOrbs.length = 0;
-    for (j = 0; j < m; j++) viewOrbs.push(f[k++]);
-    return { a: f[0], dir: f[1], orbit: f[2], n: n };
-  }
 
   function reset(toTitle) {
     var seed;
@@ -728,21 +691,23 @@
       ahead: 0, passed: false,
       sector: 0, banner: 0,
       beamA: rnd() * Math.PI * 2, beamDir: rnd() < 0.5 ? -1 : 1, beamPower: 0,
-      shield: false, revived: false,
+      shield: false, revived: false, pulse: 0,
       orbsGot: 0, grazes: 0
     };
     ship = { a: -Math.PI / 2, dir: 1, boost: 0 };
     ghost = (challenge && !dailyMode) ? { a: -Math.PI / 2, dir: 1, boost: 0, idx: 0, alive: true } : null;
     rocks = []; orbs = []; bits = []; shieldPk = null;
-    orbit = ORBIT; timeScale = 1;
-    rbHead = 0; rbCount = 0;
+    orbit = ORBIT;
     run = { seed: seed, score: 0, death: 0, sector: 0, flips: [] };
   }
 
   /* ---------- mechanics ---------- */
+  // a short sharp kick on the flip reads as "the input landed" without
+  // smearing your position the way the old long boost did
+  var BOOST_N = 6, BOOST_W = 0.017;
   function angularVelocity(t) { return W_BASE + Math.min(t / 460000, 0.014); }
   function stepOrbiter(o, t) {
-    var w = angularVelocity(t) + (o.boost > 0 ? 0.020 * (o.boost / 10) : 0);
+    var w = angularVelocity(t) + (o.boost > 0 ? BOOST_W * (o.boost / BOOST_N) : 0);
     if (o.boost > 0) o.boost--;
     o.a += w * o.dir;
   }
@@ -847,11 +812,12 @@
   /* ---------- input ---------- */
   function flip() {
     if (g.state !== PLAY) return;
-    ship.dir *= -1; ship.boost = 10;
+    ship.dir *= -1; ship.boost = BOOST_N;
+    g.pulse = 1;                                  // instant "you pressed it" ring
     run.flips.push(g.t + 1);
     sfx.flip();
     var p = posOf(ship);
-    for (var i = 0; i < 6; i++) spark(p.x, p.y, shipColor(), 2.2, 0.5);
+    for (var i = 0; i < 5; i++) spark(p.x, p.y, shipColor(), 2.0, 0.4);
   }
   app.addEventListener("pointerdown", function (e) {
     if (view !== null) return;
@@ -996,7 +962,7 @@
     if (g.flash > 0) g.flash -= 0.06;
     if (g.ahead > 0) g.ahead--;
     if (g.banner > 0) g.banner--;
-    if (timeScale < 1) timeScale = Math.min(1, timeScale + 0.028);
+    if (g.pulse > 0) g.pulse -= 0.075;
 
     for (var m = 0; m < motes.length; m++) {
       motes[m].y += motes[m].d;
@@ -1029,7 +995,7 @@
 
       if (ghost && ghost.alive) {
         while (ghost.idx < challenge.flips.length && challenge.flips[ghost.idx] === g.t) {
-          ghost.dir *= -1; ghost.boost = 10; ghost.idx++;
+          ghost.dir *= -1; ghost.boost = BOOST_N; ghost.idx++;
         }
         stepOrbiter(ghost, g.t);
         if (g.t > challenge.death) ghost.alive = false;
@@ -1106,9 +1072,8 @@
           rk.grazed = true; g.grazes++;
           g.score += Math.round(26 * g.combo * (1 + g.sector * 0.4));
           sfx.graze();
-          timeScale = Math.min(timeScale, 0.42);      // the world stretches for a beat
         }
-        if (g.iframes <= 0 && dist < rk.r + 13) { rk.dead = true; takeHit(p); }
+        if (g.iframes <= 0 && dist < rk.r + 11) { rk.dead = true; takeHit(p); }
       }
 
       if (beamsLive() && g.beamPower >= 1 && g.iframes <= 0) {
@@ -1117,8 +1082,6 @@
           if (Math.abs(angleGap(ship.a, g.beamA + b * (Math.PI * 2 / n))) < 0.105) { takeHit(p); break; }
         }
       }
-
-      rbPush();
     }
 
     for (var c = 0; c < bits.length; c++) {
@@ -1152,8 +1115,7 @@
       g.wasBest = g.score > best;
       if (g.wasBest) { best = g.score; lsSet("od-best", String(best)); }
       paintBest(); paintSwatches();
-      g.state = REPLAY;                                // the last moments, slowed down
-      rbPlay = Math.max(0, rbCount - 170);
+      finishRun();                                     // straight to the card, no wait
     } else { sfx.hit(); buzz(35); }
   }
 
@@ -1205,6 +1167,31 @@
     }
   }
 
+  /* Marks where an incoming rock will cut the ring, so a one-input game
+     stays a decision instead of a reflex test. Only shows once the rock
+     is close enough that the prediction is worth acting on. */
+  function drawImpacts() {
+    for (var i = 0; i < rocks.length; i++) {
+      var r = rocks[i];
+      if (r.dead) continue;
+      var dx = r.x - CX, dy = r.y - CY;
+      var dc = Math.hypot(dx, dy);
+      if (dc <= orbit) continue;
+      var closing = -(dx * r.vx + dy * r.vy) / dc;      // inward speed
+      if (closing <= 0.1) continue;
+      var eta = (dc - orbit) / closing;
+      if (eta > 75) continue;
+      var px = r.x + r.vx * eta, py = r.y + r.vy * eta;
+      var a = Math.atan2(py - CY, px - CX);
+      var near = 1 - eta / 75;
+      var p1 = { x: CX + Math.cos(a) * (orbit - 13), y: CY + Math.sin(a) * (orbit - 13) };
+      var p2 = { x: CX + Math.cos(a) * (orbit + 13), y: CY + Math.sin(a) * (orbit + 13) };
+      stroke(C.coral, 2 + near * 2, 0.12 + near * 0.5, function () {
+        ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
+      });
+    }
+  }
+
   function draw() {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.globalCompositeOperation = "source-over";
@@ -1219,15 +1206,11 @@
     ctx.globalAlpha = 0.5; ctx.fillStyle = C.faint;
     for (var m = 0; m < motes.length; m++) ctx.fillRect(motes[m].x, motes[m].y, 2.4, 2.4);
 
-    var replaying = g.state === REPLAY && rbCount > 0;
-    var snap = null, dOrbit = orbit, dRocks = rocks, dRockN = rocks.length;
-    if (replaying) {
-      snap = rbRead(Math.min(rbCount - 1, Math.floor(rbPlay)));
-      dOrbit = snap.orbit; dRocks = viewRocks; dRockN = snap.n;
-    }
+    var dOrbit = orbit, dRocks = rocks, dRockN = rocks.length;
 
-    if (!replaying) drawBeams();
+    drawBeams();
     stroke(C.faint, 2, 0.85, function () { ctx.arc(CX, CY, dOrbit, 0, 6.2832); });
+    if (g.state === PLAY) drawImpacts();
 
     var pulse = 1 + Math.sin(g.t * 0.035) * 0.045;
     var rad = (56 + (ORBIT - dOrbit) * 0.55) * pulse;
@@ -1244,31 +1227,21 @@
 
     for (var i = 0; i < dRockN; i++) inked(C.coral, rockPath(dRocks[i]));
 
-    if (replaying) {
-      for (var vo = 0; vo < viewOrbs.length; vo++) {
-        var vp = { x: CX + Math.cos(viewOrbs[vo]) * dOrbit, y: CY + Math.sin(viewOrbs[vo]) * dOrbit };
-        ctx.globalAlpha = 0.2; ctx.fillStyle = C.teal;
-        ctx.beginPath(); ctx.arc(vp.x, vp.y, 23, 0, 6.2832); ctx.fill();
-        ctx.globalAlpha = 1;
-        ctx.beginPath(); ctx.arc(vp.x, vp.y, 9.5, 0, 6.2832); ctx.fill();
-      }
-    } else {
-      for (var o = 0; o < orbs.length; o++) {
-        var ob = orbs[o], op = onRing(ob.a);
-        var fade = ob.life < 90 ? (Math.floor(ob.life / 6) % 2 ? 0.3 : 1) : 1;
-        ctx.globalAlpha = 0.2 * fade; ctx.fillStyle = C.teal;
-        ctx.beginPath(); ctx.arc(op.x, op.y, 23, 0, 6.2832); ctx.fill();
-        ctx.globalAlpha = fade;
-        ctx.beginPath(); ctx.arc(op.x, op.y, 9.5, 0, 6.2832); ctx.fill();
-      }
-      if (shieldPk) {
-        var sp2 = onRing(shieldPk.a);
-        var bl = shieldPk.life < 90 && Math.floor(shieldPk.life / 6) % 2;
-        ctx.globalAlpha = bl ? 0.3 : 1;
-        stroke(C.lilac, 3.5, ctx.globalAlpha, function () { ctx.arc(sp2.x, sp2.y, 14, 0, 6.2832); });
-        ctx.globalAlpha = (bl ? 0.1 : 0.25); ctx.fillStyle = C.lilac;
-        ctx.beginPath(); ctx.arc(sp2.x, sp2.y, 22, 0, 6.2832); ctx.fill();
-      }
+    for (var o = 0; o < orbs.length; o++) {
+      var ob = orbs[o], op = onRing(ob.a);
+      var fade = ob.life < 90 ? (Math.floor(ob.life / 6) % 2 ? 0.3 : 1) : 1;
+      ctx.globalAlpha = 0.2 * fade; ctx.fillStyle = C.teal;
+      ctx.beginPath(); ctx.arc(op.x, op.y, 23, 0, 6.2832); ctx.fill();
+      ctx.globalAlpha = fade;
+      ctx.beginPath(); ctx.arc(op.x, op.y, 9.5, 0, 6.2832); ctx.fill();
+    }
+    if (shieldPk) {
+      var sp2 = onRing(shieldPk.a);
+      var bl = shieldPk.life < 90 && Math.floor(shieldPk.life / 6) % 2;
+      ctx.globalAlpha = bl ? 0.3 : 1;
+      stroke(C.lilac, 3.5, ctx.globalAlpha, function () { ctx.arc(sp2.x, sp2.y, 14, 0, 6.2832); });
+      ctx.globalAlpha = (bl ? 0.1 : 0.25); ctx.fillStyle = C.lilac;
+      ctx.beginPath(); ctx.arc(sp2.x, sp2.y, 22, 0, 6.2832); ctx.fill();
     }
 
     if (ghost && ghost.alive && g.state === PLAY) {
@@ -1280,19 +1253,21 @@
     }
 
     if (g.state !== OVER) {
-      var sa = replaying ? snap.a : ship.a;
-      var sd = replaying ? snap.dir : ship.dir;
+      var sa = ship.a, sd = ship.dir;
       var sx = CX + Math.cos(sa) * dOrbit, sy = CY + Math.sin(sa) * dOrbit;
-      var blink = !replaying && g.iframes > 0 && Math.floor(g.t / 4) % 2 === 0;
+      if (g.pulse > 0) {                        // the flip acknowledgement
+        stroke(shipColor(), 2.5, g.pulse * 0.6, function () {
+          ctx.arc(sx, sy, 20 + (1 - g.pulse) * 40, 0, 6.2832);
+        });
+      }
+      var blink = g.iframes > 0 && Math.floor(g.t / 4) % 2 === 0;
       if (!blink) {
         ctx.save(); ctx.translate(sx, sy); ctx.rotate(sa + (Math.PI / 2) * sd);
         ctx.globalAlpha = 1; ctx.fillStyle = shipColor();
         ctx.beginPath(); chevron(); ctx.fill();
         stroke(shipColor(), 12, 0.1, chevron);
         ctx.restore();
-        if (g.shield && !replaying) {
-          stroke(C.lilac, 3, 0.8, function () { ctx.arc(sx, sy, 28, 0, 6.2832); });
-        }
+        if (g.shield) stroke(C.lilac, 3, 0.8, function () { ctx.arc(sx, sy, 28, 0, 6.2832); });
       }
     }
 
@@ -1309,10 +1284,10 @@
       ctx.fillRect(0, 0, cw, ch);
     }
 
-    drawHud(replaying);
+    drawHud();
   }
 
-  function drawHud(replaying) {
+  function drawHud() {
     h.setTransform(dpr, 0, 0, dpr, 0, 0);
     h.clearRect(0, 0, VW, VH);
     h.globalAlpha = 1; h.textBaseline = "top";
@@ -1328,13 +1303,6 @@
       h.fillStyle = eg; h.fillRect(0, 0, VW, VH);
     }
 
-    if (replaying) {
-      h.textAlign = "center";
-      h.fillStyle = C.soft;
-      h.font = "600 " + Math.min(20, VW * 0.05) + "px system-ui, sans-serif";
-      h.fillText("הרגע האחרון", VW / 2, VH * 0.08);
-      return;
-    }
     if (g.state !== PLAY) return;
 
     var pad = 22, big = Math.min(38, VW * 0.098);
@@ -1396,15 +1364,7 @@
     var dt = Math.min(now - prev, 120);
     prev = now;
 
-    if (g.state === REPLAY) {
-      rbPlay += 0.3;                       // slow motion, ~3.5x stretched
-      if (rbPlay >= rbCount - 1) finishRun();
-      draw();
-      requestAnimationFrame(loop);
-      return;
-    }
-
-    acc += dt * timeScale;                 // slow-mo bends wall time, never the tick count
+    acc += dt;
     var steps = 0;
     while (acc >= STEP && steps < 5) { update(); acc -= STEP; steps++; }
     draw();
