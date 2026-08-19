@@ -463,7 +463,10 @@
   function lsGet(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
+  // "orbit-decay-best" was the key before the Hebrew rebuild - carry it over
   var best = parseInt(lsGet("od-best", "0"), 10) || 0;
+  var legacyBest = parseInt(lsGet("orbit-decay-best", "0"), 10) || 0;
+  if (legacyBest > best) { best = legacyBest; lsSet("od-best", String(best)); }
   var hapticsOn = lsGet("od-haptics", "1") === "1";
   var musicOn = lsGet("od-music", "1") === "1";
   var themeIdx = parseInt(lsGet("od-theme", "0"), 10) || 0;
