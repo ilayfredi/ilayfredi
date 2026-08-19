@@ -72,28 +72,24 @@
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   }
 
-  /* splash */
   .gametitle {
-    font-size: clamp(42px, 13.5vw, 86px); font-weight: 800;
+    font-size: clamp(40px, 13vw, 84px); font-weight: 800;
     line-height: 1.06; letter-spacing: -0.015em;
     background: linear-gradient(100deg, var(--sun) 0%, var(--coral) 48%, var(--lilac) 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
     padding: 0 .06em .08em; text-wrap: balance;
     filter: drop-shadow(0 6px 18px rgba(0,0,0,.12));
   }
-  .splash-eyebrow { font-size: 12px; letter-spacing: .14em; color: var(--faint); }
-  .signature {
-    font-size: clamp(30px, 9vw, 52px); font-weight: 700;
-    line-height: 1.15; color: var(--ink); margin-top: -6px;
-  }
+  .splash-eyebrow { font-size: 12px; letter-spacing: .1em; color: var(--faint); }
+  .signature { font-size: clamp(28px, 8.5vw, 50px); font-weight: 700; line-height: 1.15; color: var(--ink); margin-top: -6px; }
   .badges { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; }
   .badge {
     font-size: 12px; font-weight: 600; color: var(--ink);
     background: var(--card); border: 1px solid var(--line);
     border-radius: 999px; padding: 6px 13px; box-shadow: var(--sh-sm);
   }
-  .praise { font-size: 14.5px; color: var(--soft); max-width: 30ch; min-height: 2.6em; transition: opacity .22s ease; }
-  .skip { font-size: 12px; color: var(--faint); letter-spacing: .08em; margin-top: 4px; }
+  .praise { font-size: 14.5px; color: var(--soft); max-width: 32ch; min-height: 2.6em; transition: opacity .22s ease; }
+  .skip { font-size: 12px; color: var(--faint); letter-spacing: .06em; margin-top: 4px; }
   .flourish {
     width: min(230px, 62vw); height: 2px; border-radius: 2px;
     background: linear-gradient(90deg, transparent, var(--sun) 30%, var(--coral) 70%, transparent);
@@ -102,29 +98,31 @@
   .rise-2 { animation-delay: .14s; } .rise-3 { animation-delay: .3s; } .rise-4 { animation-delay: .46s; }
   @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 
-  /* chrome */
   .toprow {
     position: absolute; top: calc(13px + env(safe-area-inset-top));
-    inset-inline: 14px; display: flex; justify-content: space-between; gap: 8px;
+    inset-inline: 14px; display: flex; justify-content: space-between;
+    gap: 7px; flex-wrap: wrap;
   }
   .chip {
     font-family: inherit; font-size: 12px; font-weight: 500; color: var(--soft);
     background: var(--card); border: 1px solid var(--line); border-radius: 999px;
     padding: 8px 13px; min-height: 36px; cursor: pointer; box-shadow: var(--sh-sm);
+    white-space: nowrap;
   }
   .chip:focus-visible { outline: 3px solid var(--lilac); outline-offset: 2px; }
+  #lang { font-weight: 700; letter-spacing: .04em; }
 
   .crown { display: flex; flex-direction: column; align-items: center; gap: 1px; }
-  .crown-label { font-size: 13px; letter-spacing: .12em; color: var(--soft); }
+  .crown-label { font-size: 13px; letter-spacing: .1em; color: var(--soft); }
   .crown-num {
     font-size: clamp(48px, 16vw, 92px); font-weight: 700; line-height: 1;
-    font-variant-numeric: tabular-nums;
+    font-variant-numeric: tabular-nums; direction: ltr;
     background: linear-gradient(150deg, var(--ink) 0%, var(--lilac) 115%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
   .crown-sub { font-size: 13px; color: var(--faint); }
 
-  .menu { display: flex; flex-direction: column; gap: 9px; width: min(330px, 86vw); }
+  .menu { display: flex; flex-direction: column; gap: 10px; width: min(330px, 86vw); }
   .btn {
     font-family: inherit; font-size: 19px; font-weight: 600; color: #fff;
     border: 0; border-radius: 999px; padding: 15px 24px; min-height: 53px; cursor: pointer;
@@ -134,10 +132,7 @@
   }
   .btn:active { transform: translateY(2px) scale(.985); box-shadow: var(--sh-sm); }
   .btn:focus-visible { outline: 3px solid var(--lilac); outline-offset: 3px; }
-  .btn-ghost {
-    background: var(--card); color: var(--ink); box-shadow: var(--sh-sm);
-    border: 1px solid var(--line); font-weight: 500;
-  }
+  .btn-ghost { background: var(--card); color: var(--ink); box-shadow: var(--sh-sm); border: 1px solid var(--line); font-weight: 500; }
   .btn-lilac { background: linear-gradient(140deg, var(--lilac) 0%, var(--teal) 130%); }
   .btn-teal { background: linear-gradient(140deg, var(--teal) 0%, var(--lilac) 130%); }
   .btn-sm { font-size: 16px; min-height: 45px; padding: 11px 20px; }
@@ -146,7 +141,7 @@
     width: min(330px, 86vw); background: var(--card); border-radius: 18px;
     padding: 13px 15px; box-shadow: var(--sh-sm); text-align: start;
   }
-  .panel h3 { font-size: 11px; letter-spacing: .08em; color: var(--faint); font-weight: 600; margin-bottom: 8px; }
+  .panel h3 { font-size: 11px; letter-spacing: .06em; color: var(--faint); font-weight: 600; margin-bottom: 8px; }
   .quest { display: flex; align-items: center; gap: 9px; padding: 3px 0; font-size: 13px; }
   .quest .tick {
     flex: 0 0 auto; width: 17px; height: 17px; border-radius: 50%;
@@ -154,14 +149,12 @@
   }
   .quest.done .tick { background: var(--teal); border-color: var(--teal); }
   .quest.done span { color: var(--soft); text-decoration: line-through; }
-  .quest .prog { margin-inline-start: auto; font-family: var(--num); font-size: 11px; color: var(--faint); }
+  .quest .prog { margin-inline-start: auto; font-family: var(--num); font-size: 11px; color: var(--faint); direction: ltr; }
 
-  /* style picker */
   .styles { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
   .sty {
     width: 40px; height: 40px; border-radius: 13px; cursor: pointer; padding: 0;
-    border: 3px solid transparent; position: relative; overflow: hidden;
-    box-shadow: var(--sh-sm);
+    border: 3px solid transparent; position: relative; overflow: hidden; box-shadow: var(--sh-sm);
   }
   .sty.sel { border-color: var(--ink); }
   .sty:focus-visible { outline: 3px solid var(--lilac); outline-offset: 2px; }
@@ -180,7 +173,7 @@
   .codebar button {
     font-family: inherit; font-size: 13px; font-weight: 600; color: var(--ink);
     background: var(--card); border: 1px solid var(--line); border-radius: 12px;
-    padding: 11px 15px; cursor: pointer; box-shadow: var(--sh-sm);
+    padding: 11px 15px; cursor: pointer; box-shadow: var(--sh-sm); white-space: nowrap;
   }
 
   .sheet {
@@ -193,7 +186,7 @@
   .sheet::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 3px; }
   .sheet h2 { font-size: 23px; font-weight: 700; margin-bottom: 6px; }
   .sheet .lede { color: var(--soft); font-size: 15px; line-height: 1.65; margin-bottom: 16px; }
-  .sheet h3 { font-size: 12px; letter-spacing: .08em; color: var(--faint); margin: 16px 0 8px; }
+  .sheet h3 { font-size: 12px; letter-spacing: .06em; color: var(--faint); margin: 16px 0 8px; }
   .sheet p { font-size: 15px; line-height: 1.7; }
   .steps { list-style: none; display: flex; flex-direction: column; gap: 9px; }
   .steps li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.55; }
@@ -204,7 +197,7 @@
   .toggle button {
     font-family: inherit; font-size: 12px; font-weight: 600; color: var(--ink);
     background: var(--card); border: 1px solid var(--line); border-radius: 999px;
-    padding: 7px 14px; cursor: pointer;
+    padding: 7px 14px; cursor: pointer; white-space: nowrap;
   }
   .toggle button.off { color: var(--faint); }
 
@@ -222,10 +215,10 @@
     padding: 24px 22px 20px; box-shadow: var(--sh-lg);
     display: flex; flex-direction: column; align-items: center; gap: 3px;
   }
-  .card-label { font-size: 13px; letter-spacing: .12em; color: var(--soft); }
+  .card-label { font-size: 13px; letter-spacing: .1em; color: var(--soft); }
   .card-num {
     font-size: clamp(46px, 14vw, 72px); font-weight: 700; line-height: 1.05;
-    font-variant-numeric: tabular-nums; color: var(--ink);
+    font-variant-numeric: tabular-nums; color: var(--ink); direction: ltr;
   }
   .card-sector { font-size: 14px; color: var(--soft); }
   .ribbon {
@@ -233,21 +226,16 @@
     background: linear-gradient(130deg, var(--sun) 0%, var(--coral) 100%);
     border-radius: 999px; padding: 6px 15px; margin: 5px 0 2px;
   }
-  .ribbon[hidden] { display: none; }
-  .stats {
-    display: flex; gap: 6px; width: 100%;
-    margin: 12px 0 4px;
-  }
+  .stats { display: flex; gap: 6px; width: 100%; margin: 12px 0 4px; }
   .stats div {
     flex: 1 1 0; min-width: 0;
     display: flex; flex-direction: column; align-items: center; gap: 1px;
-    background: var(--ground, transparent);
     border: 1px solid var(--line); border-radius: 12px; padding: 8px 4px;
   }
   .stats b { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; direction: ltr; }
-  .stats span { font-size: 11px; color: var(--soft); }
+  .stats span { font-size: 11px; color: var(--soft); text-align: center; line-height: 1.25; }
   .card-best { font-size: 14px; color: var(--soft); margin-bottom: 11px; }
-  .card-best b { color: var(--ink); font-weight: 700; }
+  .card-best b { color: var(--ink); font-weight: 700; direction: ltr; display: inline-block; }
   .card .btn { width: 100%; }
   .card .btn + .btn { margin-top: 8px; }
   .linky {
@@ -269,116 +257,111 @@
   <canvas id="hud"></canvas>
 
   <section id="splash" class="veil on">
-    <h1 class="gametitle rise">שטויות בחלל</h1>
+    <h1 class="gametitle rise" data-i18n="title">שטויות בחלל</h1>
     <div class="flourish rise rise-2"></div>
-    <span class="splash-eyebrow rise rise-2">נוצר מהראש של</span>
-    <p class="signature rise rise-3">עילי פרדי</p>
+    <span class="splash-eyebrow rise rise-2" data-i18n="madeBy">נוצר מהראש של</span>
+    <p class="signature rise rise-3" data-i18n="author">עילי פרדי</p>
     <div class="badges rise rise-4">
-      <span class="badge">גאון של החלל</span>
-      <span class="badge">אלוף בלתי מעורער</span>
-      <span class="badge">אגדה חיה</span>
+      <span class="badge" data-i18n="badge1">גאון של החלל</span>
+      <span class="badge" data-i18n="badge2">אלוף בלתי מעורער</span>
+      <span class="badge" data-i18n="badge3">אגדה חיה</span>
     </div>
-    <p id="praise" class="praise rise rise-4">האיש שהפך נגיעה אחת למשחק שלם</p>
-    <span class="skip rise rise-4">גע כדי לדלג</span>
+    <p id="praise" class="praise rise rise-4"></p>
+    <span class="skip rise rise-4" data-i18n="skip">גע כדי לדלג</span>
   </section>
 
   <section id="home" class="veil">
     <div class="toprow">
-      <button id="sound" class="chip" type="button">צליל פועל</button>
-      <button id="btnGet" class="chip" type="button">הורד לטלפון</button>
+      <button id="sound" class="chip" type="button"></button>
+      <button id="lang" class="chip" type="button">EN</button>
+      <button id="btnGet" class="chip" type="button" data-i18n="getApp">הורד לטלפון</button>
     </div>
 
     <div class="crown">
-      <span class="crown-label">השיא</span>
+      <span class="crown-label" data-i18n="bestLabel">השיא</span>
       <strong id="homeBest" class="crown-num">0</strong>
-      <span class="crown-sub">שטויות בחלל</span>
+      <span class="crown-sub" data-i18n="title">שטויות בחלל</span>
     </div>
 
     <div class="menu">
-      <button id="btnPlay" class="btn" type="button">שחק</button>
-      <button id="btnDaily" class="btn btn-lilac btn-sm" type="button">אתגר יומי</button>
-      <button id="btnAbout" class="btn btn-ghost btn-sm" type="button">קצת עלינו</button>
+      <button id="btnPlay" class="btn" type="button" data-i18n="play">שחק</button>
+      <button id="btnDaily" class="btn btn-lilac btn-sm" type="button" data-i18n="daily">אתגר יומי</button>
+      <button id="btnAbout" class="btn btn-ghost btn-sm" type="button" data-i18n="about">קצת עלינו</button>
     </div>
 
     <div class="panel">
-      <h3>משימות היום</h3>
+      <h3 data-i18n="questsTitle">משימות היום</h3>
       <div id="questList"></div>
     </div>
 
     <div class="styles" id="styles"></div>
 
     <form id="codebar" class="codebar">
-      <input id="code" type="text" placeholder="קוד של חבר" autocomplete="off"
-             autocapitalize="off" spellcheck="false" aria-label="קוד אתגר של חבר">
-      <button id="load" type="submit">טען</button>
+      <input id="code" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+             data-i18n-ph="codePh" data-i18n-aria="codeAria">
+      <button id="load" type="submit" data-i18n="loadBtn">טען</button>
     </form>
   </section>
 
   <section id="getapp" class="veil">
     <div class="sheet">
-      <h2>הורדה לטלפון</h2>
-      <p class="lede">המשחק נשמר כאפליקציה אמיתית — אייקון במסך הבית, מסך מלא בלי סרגל כתובת, ועובד גם בלי אינטרנט.</p>
+      <h2 data-i18n="getTitle">הורדה לטלפון</h2>
+      <p class="lede" data-i18n="getLede"></p>
       <div id="installBox" hidden>
-        <div class="menu" style="width:100%"><button id="install" class="btn" type="button">התקן עכשיו</button></div>
+        <div class="menu" style="width:100%"><button id="install" class="btn" type="button" data-i18n="installNow">התקן עכשיו</button></div>
       </div>
-      <h3>אנדרואיד</h3>
+      <h3 data-i18n="android">אנדרואיד</h3>
       <ol class="howto">
-        <li>פתח את התפריט (שלוש נקודות) בפינת הדפדפן.</li>
-        <li>בחר "הוספה למסך הבית" או "התקנת אפליקציה".</li>
-        <li>אשר. האייקון מופיע במסך הבית.</li>
+        <li data-i18n="and1"></li><li data-i18n="and2"></li><li data-i18n="and3"></li>
       </ol>
-      <h3>אייפון</h3>
+      <h3 data-i18n="iphone">אייפון</h3>
       <ol class="howto">
-        <li>לחץ על כפתור השיתוף בתחתית ספארי (ריבוע עם חץ למעלה).</li>
-        <li>גלול ובחר "הוסף למסך הבית".</li>
-        <li>לחץ "הוסף" בפינה.</li>
+        <li data-i18n="ios1"></li><li data-i18n="ios2"></li><li data-i18n="ios3"></li>
       </ol>
-      <p class="signoff">חייב להיפתח ב<b>ספארי</b> באייפון — בכרום באייפון האפשרות לא קיימת.</p>
+      <p class="signoff" data-i18n="getNote"></p>
     </div>
-    <div class="menu"><button id="btnGetBack" class="btn btn-ghost" type="button">אחורנית</button></div>
+    <div class="menu"><button id="btnGetBack" class="btn btn-ghost" type="button" data-i18n="back">אחורנית</button></div>
   </section>
 
   <section id="about" class="veil">
     <div class="sheet">
-      <h2>קצת עלינו</h2>
-      <p class="lede">
-        שטויות בחלל הוא משחק על שליטה אחת בלבד. אתה נעול במסלול סביב כוכב שקורס,
-        ונגיעה במסך הופכת את כיוון התנועה שלך. זה הכל — ומשם זה רק נעשה קשה יותר.
-      </p>
-      <h3>איך משחקים</h3>
+      <h2 data-i18n="about">קצת עלינו</h2>
+      <p class="lede" data-i18n="aboutLede"></p>
+      <h3 data-i18n="howTitle">איך משחקים</h3>
       <ul class="steps">
-        <li><span class="dot" style="background:var(--ink)"></span><span>נוגעים בכל מקום במסך כדי להפוך כיוון. אין כפתורים.</span></li>
-        <li><span class="dot" style="background:var(--teal)"></span><span>אוספים כדורי פלזמה כדי להעלות את המכפיל.</span></li>
-        <li><span class="dot" style="background:var(--coral)"></span><span>חולפים קרוב לסלעים בלי להתנגש — ככל שקרוב יותר, כך יותר נקודות.</span></li>
-        <li><span class="dot" style="background:var(--lilac)"></span><span>מגנים מופיעים על המסלול. כל אחד סופג פגיעה אחת.</span></li>
-        <li><span class="dot" style="background:var(--sun)"></span><span>עשרה אזורים. כל אזור שומר על הסכנות של הקודם ומוסיף אחת.</span></li>
+        <li><span class="dot" style="background:var(--ink)"></span><span data-i18n="how1"></span></li>
+        <li><span class="dot" style="background:var(--teal)"></span><span data-i18n="how2"></span></li>
+        <li><span class="dot" style="background:var(--coral)"></span><span data-i18n="how3"></span></li>
+        <li><span class="dot" style="background:var(--lilac)"></span><span data-i18n="how4"></span></li>
+        <li><span class="dot" style="background:var(--sun)"></span><span data-i18n="how5"></span></li>
       </ul>
-      <h3>אתגר יומי</h3>
-      <p>כל יום כולם מקבלים בדיוק את אותו שדה סלעים, לפי התאריך. אותם סלעים — רק מי שמשחק טוב יותר מנצח.</p>
-      <h3>הגדרות</h3>
-      <div class="toggle"><span>רטט בפגיעה</span><button id="tglHaptics" type="button">פועל</button></div>
-      <div class="toggle"><span>מוזיקה</span><button id="tglMusic" type="button">פועלת</button></div>
-      <p class="signoff">נבנה על ידי <b>עילי פרדי</b>.</p>
+      <h3 data-i18n="daily">אתגר יומי</h3>
+      <p data-i18n="dailyP"></p>
+      <h3 data-i18n="settings">הגדרות</h3>
+      <div class="toggle"><span data-i18n="setHaptics">רטט בפגיעה</span><button id="tglHaptics" type="button"></button></div>
+      <div class="toggle"><span data-i18n="setMusic">מוזיקה</span><button id="tglMusic" type="button"></button></div>
+      <div class="toggle"><span data-i18n="setLang">שפה</span><button id="tglLang" type="button"></button></div>
+      <p class="signoff"><span data-i18n="builtBy">נבנה על ידי</span> <b data-i18n="author">עילי פרדי</b></p>
     </div>
-    <div class="menu"><button id="btnBack" class="btn btn-ghost" type="button">אחורנית</button></div>
+    <div class="menu"><button id="btnBack" class="btn btn-ghost" type="button" data-i18n="back">אחורנית</button></div>
   </section>
 
   <section id="over" class="veil">
     <div class="card">
-      <span class="card-label">התוצאה שלך</span>
+      <span class="card-label" data-i18n="yourScore">התוצאה שלך</span>
       <strong id="overScore" class="card-num">0</strong>
       <p id="overSector" class="card-sector"></p>
       <p id="overRibbon" class="ribbon" hidden></p>
       <div class="stats">
-        <div><b id="stOrbs">0</b><span>כדורים</span></div>
-        <div><b id="stGraze">0</b><span>חליפות</span></div>
-        <div><b id="stCombo">×1</b><span>מכפיל שיא</span></div>
+        <div><b id="stOrbs">0</b><span data-i18n="stOrbs">כדורים</span></div>
+        <div><b id="stGraze">0</b><span data-i18n="stGraze">חליפות</span></div>
+        <div><b id="stCombo">×1</b><span data-i18n="stCombo">מכפיל שיא</span></div>
       </div>
-      <p class="card-best">השיא: <b id="overBest">0</b></p>
-      <button id="btnRevive" class="btn btn-teal" type="button" hidden>עוד חיים אחד</button>
-      <button id="btnAgain" class="btn" type="button">שוב</button>
-      <button id="btnQuit" class="btn btn-ghost" type="button">אחורנית</button>
-      <button id="btnShare" class="linky" type="button">שתף את התוצאה</button>
+      <p class="card-best"><span data-i18n="bestColon">השיא:</span> <b id="overBest">0</b></p>
+      <button id="btnRevive" class="btn btn-teal" type="button" hidden data-i18n="revive">עוד חיים אחד</button>
+      <button id="btnAgain" class="btn" type="button" data-i18n="again">שוב</button>
+      <button id="btnQuit" class="btn btn-ghost" type="button" data-i18n="back">אחורנית</button>
+      <button id="btnShare" class="linky" type="button" data-i18n="share">שתף את התוצאה</button>
     </div>
   </section>
 </div>
@@ -390,96 +373,196 @@
   /* ============================================================
      שטויות בחלל / SPACE NONSENSE
      One input: touching anywhere reverses your direction around a
-     collapsing star. Six sectors, each keeping the hazards before
+     collapsing star. Ten sectors, each keeping the hazards before
      it and adding one more.
 
-     Everything that affects the world comes from a seeded PRNG plus
-     a fixed-timestep tick counter, so a run is fully described by
-     its seed and the frames the player tapped on. That is what makes
-     the shareable ghost replay and the date-seeded daily challenge
-     nearly free.
+     Every hazard comes from a seeded PRNG plus a fixed-timestep tick
+     counter, so a run is fully described by its seed and the frames
+     the player tapped on - which is what makes the shareable ghost
+     replay and the date-seeded daily challenge nearly free.
      ============================================================ */
 
+  /* ---------- translations ----------
+     Every player-visible string lives here. Canvas text goes through
+     t() too, so the HUD switches with the menus.                    */
+  var L = {
+    he: {
+      dir: "rtl", htmlLang: "he", other: "EN", otherName: "English",
+      title: "שטויות בחלל", author: "עילי פרדי",
+      madeBy: "נוצר מהראש של", skip: "גע כדי לדלג",
+      badge1: "גאון של החלל", badge2: "אלוף בלתי מעורער", badge3: "אגדה חיה",
+      praise: ["האיש שהפך נגיעה אחת למשחק שלם", "עשרה אזורים, אפס פשרות",
+               "מתכנת, מעצב, ואלוף המסלול", "כל סלע כאן עבר את האישור שלו"],
+      bestLabel: "השיא", bestColon: "השיא:",
+      play: "שחק", daily: "אתגר יומי", about: "קצת עלינו",
+      questsTitle: "משימות היום",
+      codePh: "קוד של חבר", codeAria: "קוד אתגר של חבר",
+      loadBtn: "טען", loaded: "נטען", badCode: "לא תקין",
+      soundOn: "צליל פועל", soundOff: "צליל מושתק",
+      getApp: "הורד לטלפון", getTitle: "הורדה לטלפון",
+      getLede: "המשחק נשמר כאפליקציה אמיתית — אייקון במסך הבית, מסך מלא בלי סרגל כתובת, ועובד גם בלי אינטרנט.",
+      installNow: "התקן עכשיו", android: "אנדרואיד", iphone: "אייפון",
+      and1: "פתח את התפריט (שלוש נקודות) בפינת הדפדפן.",
+      and2: 'בחר "הוספה למסך הבית" או "התקנת אפליקציה".',
+      and3: "אשר. האייקון מופיע במסך הבית.",
+      ios1: "לחץ על כפתור השיתוף בתחתית ספארי (ריבוע עם חץ למעלה).",
+      ios2: 'גלול ובחר "הוסף למסך הבית".',
+      ios3: 'לחץ "הוסף" בפינה.',
+      getNote: "באייפון זה חייב להיפתח בספארי — בכרום באייפון האפשרות לא קיימת.",
+      aboutLede: "שטויות בחלל הוא משחק על שליטה אחת בלבד. אתה נעול במסלול סביב כוכב שקורס, ונגיעה במסך הופכת את כיוון התנועה שלך. זה הכל — ומשם זה רק נעשה קשה יותר.",
+      howTitle: "איך משחקים",
+      how1: "נוגעים בכל מקום במסך כדי להפוך כיוון. אין כפתורים.",
+      how2: "אוספים כדורי פלזמה כדי להעלות את המכפיל.",
+      how3: "חולפים קרוב לסלעים בלי להתנגש — ככל שקרוב יותר, כך יותר נקודות.",
+      how4: "מגנים מופיעים על המסלול. כל אחד סופג פגיעה אחת.",
+      how5: "עשרה אזורים. כל אזור שומר על הסכנות של הקודם ומוסיף אחת.",
+      dailyP: "כל יום כולם מקבלים בדיוק את אותו שדה סלעים, לפי התאריך. אותם סלעים — רק מי שמשחק טוב יותר מנצח.",
+      settings: "הגדרות", setHaptics: "רטט בפגיעה", setMusic: "מוזיקה", setLang: "שפה",
+      on: "פועל", off: "כבוי", musicOn: "פועלת", musicOff: "כבויה",
+      builtBy: "נבנה על ידי",
+      yourScore: "התוצאה שלך", stOrbs: "כדורים", stGraze: "חליפות", stCombo: "מכפיל שיא",
+      revive: "עוד חיים אחד", again: "שוב", back: "אחורנית",
+      share: "שתף את התוצאה", copied: "הועתק", shareFail: "לא הצליח",
+      newBest: "שיא חדש", youWin: "ניצחת את היריב", rivalHolds: "היריב עדיין מוביל",
+      zone: "אזור", rival: "יריב", passed: "עברת אותו!", brokeBest: "שברת את השיא שלך!",
+      sectors: [
+        { name: "סחף", blurb: "סלעים בקווים ישרים" },
+        { name: "אש צולבת", blurb: "עכשיו זה מגיע משני הצדדים" },
+        { name: "תאוצה", blurb: "הסלעים מהירים יותר" },
+        { name: "פולסר", blurb: "הכוכב יורה. שים לב לסריקה" },
+        { name: "רסיסים", blurb: "הגדולים מתפוצצים" },
+        { name: "ליקוי", blurb: "רואים רק מה שקרוב" },
+        { name: "סופה", blurb: "מטחים שלמים בבת אחת" },
+        { name: "קרן משולשת", blurb: "שלוש קרניים במקום שתיים" },
+        { name: "היצרות", blurb: "המסלול מתחיל ליפול פנימה" },
+        { name: "קריסה", blurb: "הכל, ביחד, עד הסוף" }
+      ],
+      qOrbs: function (n) { return "אסוף " + n + " כדורי פלזמה"; },
+      qSector: function (n) { return "הגע לאזור " + n; },
+      qScore: function (n) { return "עשה " + n.toLocaleString() + " נקודות בריצה"; },
+      qGraze: function (n) { return "חלוף ליד " + n + " סלעים"; },
+      shPlain: function (u) { return "שטויות בחלל - נגיעה אחת, עשרה אזורים:\n" + u; },
+      shRun: function (s, d, z, zn, u, c) {
+        return "שטויות בחלל - " + (d ? "האתגר היומי: " : "") + "עשיתי " + s +
+               " והגעתי לאזור " + z + " (" + zn + ").\n" +
+               "אותו שדה סלעים בדיוק, והרוח שלי טסה לידך:\n" + u + "#c=" + c + "\n" +
+               "(אם הקישור מאבד את הקוד, הדבק אותו במשחק: " + c + ")";
+      }
+    },
+    en: {
+      dir: "ltr", htmlLang: "en", other: "עב", otherName: "עברית",
+      title: "Space Nonsense", author: "Ilay Fredi",
+      madeBy: "Dreamed up by", skip: "tap to skip",
+      badge1: "Certified space genius", badge2: "Undisputed champion", badge3: "Living legend",
+      praise: ["The one who turned a single tap into a whole game", "Ten sectors, zero compromises",
+               "Coder, designer, master of the orbit", "Every rock here got his personal approval"],
+      bestLabel: "BEST", bestColon: "Best:",
+      play: "Play", daily: "Daily challenge", about: "About",
+      questsTitle: "Today's missions",
+      codePh: "friend's code", codeAria: "A friend's challenge code",
+      loadBtn: "Load", loaded: "Loaded", badCode: "Invalid",
+      soundOn: "Sound on", soundOff: "Sound off",
+      getApp: "Get the app", getTitle: "Install on your phone",
+      getLede: "It saves as a real app — an icon on your home screen, full screen with no address bar, and it works with no signal.",
+      installNow: "Install now", android: "Android", iphone: "iPhone",
+      and1: "Open the browser menu (three dots) in the corner.",
+      and2: 'Choose "Add to Home screen" or "Install app".',
+      and3: "Confirm. The icon appears on your home screen.",
+      ios1: "Tap the share button at the bottom of Safari (square with an arrow).",
+      ios2: 'Scroll and choose "Add to Home Screen".',
+      ios3: 'Tap "Add" in the corner.',
+      getNote: "On iPhone this only works in Safari — Chrome on iOS has no such option.",
+      aboutLede: "Space Nonsense is a game about a single control. You are locked in orbit around a collapsing star, and touching the screen reverses your direction. That is all of it — and from there it only gets harder.",
+      howTitle: "How to play",
+      how1: "Touch anywhere to reverse direction. There are no buttons.",
+      how2: "Collect plasma orbs to raise your multiplier.",
+      how3: "Skim past rocks without hitting them — the closer you cut it, the more you score.",
+      how4: "Shields appear on the ring. Each one absorbs a single hit.",
+      how5: "Ten sectors. Each keeps the hazards before it and adds one more.",
+      dailyP: "Every day everyone gets exactly the same debris field, seeded by the date. Same rocks — only the better run wins.",
+      settings: "Settings", setHaptics: "Vibration on hit", setMusic: "Music", setLang: "Language",
+      on: "On", off: "Off", musicOn: "On", musicOff: "Off",
+      builtBy: "Built by",
+      yourScore: "Your score", stOrbs: "Orbs", stGraze: "Skims", stCombo: "Best multiplier",
+      revive: "One more life", again: "Again", back: "Back",
+      share: "Share your score", copied: "Copied", shareFail: "Failed",
+      newBest: "New best", youWin: "You beat them", rivalHolds: "Rival still leads",
+      zone: "Sector", rival: "Rival", passed: "You passed them!", brokeBest: "New personal best!",
+      sectors: [
+        { name: "Drift", blurb: "rocks on straight lines" },
+        { name: "Crossfire", blurb: "now it comes from both sides" },
+        { name: "Velocity", blurb: "the rocks are faster" },
+        { name: "Pulsar", blurb: "the star is firing. mind the sweep" },
+        { name: "Shatter", blurb: "the big ones break apart" },
+        { name: "Eclipse", blurb: "you only see what is near you" },
+        { name: "Storm", blurb: "whole volleys at once" },
+        { name: "Triple Beam", blurb: "three beams instead of two" },
+        { name: "Narrowing", blurb: "the orbit starts falling in" },
+        { name: "Collapse", blurb: "everything, together, to the end" }
+      ],
+      qOrbs: function (n) { return "Collect " + n + " plasma orbs"; },
+      qSector: function (n) { return "Reach sector " + n; },
+      qScore: function (n) { return "Score " + n.toLocaleString() + " in one run"; },
+      qGraze: function (n) { return "Skim past " + n + " rocks"; },
+      shPlain: function (u) { return "Space Nonsense - one tap, ten sectors:\n" + u; },
+      shRun: function (s, d, z, zn, u, c) {
+        return "Space Nonsense - " + (d ? "daily challenge: " : "") + "I scored " + s +
+               " and reached sector " + z + " (" + zn + ").\n" +
+               "Same debris field, my ghost racing beside you:\n" + u + "#c=" + c + "\n" +
+               "(if the link drops the code, paste this into the game: " + c + ")";
+      }
+    }
+  };
+
+  function lsGet(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  var lang = lsGet("od-lang", "");
+  if (lang !== "he" && lang !== "en") {
+    lang = /^he\b/i.test(navigator.language || "") ? "he" : "en";
+  }
+  function t(k) { var v = L[lang][k]; return v === undefined ? L.he[k] : v; }
+  function SECTORS() { return t("sectors"); }
+
+  /* ---------- config ---------- */
   var U = 1000, CX = 500, CY = 500, ORBIT = 268;
   var STEP = 1000 / 60, W_BASE = 0.0265, SECTOR = 700;
   var BOOST_N = 6, BOOST_W = 0.017;
   var REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var SEC_TINT = ["ink", "lilac", "teal", "sun", "coral", "lilac", "coral", "sun", "teal", "coral"];
 
-  /* ---------- display styles, freely switchable ---------- */
   var STYLES = [
-    { id: "day", name: "יום",
-      sky: "#eef3ff", bg1: "#fff4e9", bg2: "#e4ecff", veil: "rgba(238,243,255,0.76)",
+    { id: "day", sky: "#eef3ff", bg1: "#fff4e9", bg2: "#e4ecff", veil: "rgba(238,243,255,0.76)",
       ink: "#2a3157", soft: "#737ba6", faint: "#aeb4d1", card: "#ffffff", line: "rgba(42,49,87,0.10)",
-      sun: "#ffb454", coral: "#ff6b7a", teal: "#23bfa6", lilac: "#a99bff",
-      ship: "#2a3157", wash: "rgba(238,243,255,0.34)" },
-    { id: "sunset", name: "שקיעה",
-      sky: "#fff1ec", bg1: "#ffe0cf", bg2: "#ffd8e6", veil: "rgba(255,241,236,0.78)",
+      sun: "#ffb454", coral: "#ff6b7a", teal: "#23bfa6", lilac: "#a99bff", ship: "#2a3157", wash: "rgba(238,243,255,0.34)" },
+    { id: "sunset", sky: "#fff1ec", bg1: "#ffe0cf", bg2: "#ffd8e6", veil: "rgba(255,241,236,0.78)",
       ink: "#4a2340", soft: "#9b6180", faint: "#d9aabd", card: "#fffaf7", line: "rgba(74,35,64,0.10)",
-      sun: "#ff9a5c", coral: "#ff4f80", teal: "#4ec5c1", lilac: "#b06ab3",
-      ship: "#4a2340", wash: "rgba(255,241,236,0.34)" },
-    { id: "sea", name: "ים",
-      sky: "#eaf7fa", bg1: "#d6f1f7", bg2: "#e3edff", veil: "rgba(234,247,250,0.78)",
+      sun: "#ff9a5c", coral: "#ff4f80", teal: "#4ec5c1", lilac: "#b06ab3", ship: "#4a2340", wash: "rgba(255,241,236,0.34)" },
+    { id: "sea", sky: "#eaf7fa", bg1: "#d6f1f7", bg2: "#e3edff", veil: "rgba(234,247,250,0.78)",
       ink: "#123a4a", soft: "#4b8296", faint: "#a4cbd7", card: "#ffffff", line: "rgba(18,58,74,0.10)",
-      sun: "#ffc75f", coral: "#ff7b6b", teal: "#14b8a6", lilac: "#7aa2ff",
-      ship: "#123a4a", wash: "rgba(234,247,250,0.34)" },
-    { id: "mint", name: "מנטה",
-      sky: "#eefaf3", bg1: "#dbf7e8", bg2: "#e8f2ff", veil: "rgba(238,250,243,0.78)",
+      sun: "#ffc75f", coral: "#ff7b6b", teal: "#14b8a6", lilac: "#7aa2ff", ship: "#123a4a", wash: "rgba(234,247,250,0.34)" },
+    { id: "mint", sky: "#eefaf3", bg1: "#dbf7e8", bg2: "#e8f2ff", veil: "rgba(238,250,243,0.78)",
       ink: "#1d4034", soft: "#5c8a77", faint: "#a7ccbb", card: "#ffffff", line: "rgba(29,64,52,0.10)",
-      sun: "#ffbe55", coral: "#ff7a85", teal: "#12b886", lilac: "#8fa8ff",
-      ship: "#1d4034", wash: "rgba(238,250,243,0.34)" },
-    { id: "night", name: "לילה",
-      sky: "#10131f", bg1: "#1d2440", bg2: "#0b0e18", veil: "rgba(16,19,31,0.80)",
+      sun: "#ffbe55", coral: "#ff7a85", teal: "#12b886", lilac: "#8fa8ff", ship: "#1d4034", wash: "rgba(238,250,243,0.34)" },
+    { id: "night", sky: "#10131f", bg1: "#1d2440", bg2: "#0b0e18", veil: "rgba(16,19,31,0.80)",
       ink: "#e9edff", soft: "#98a2c8", faint: "#4d5679", card: "#1b2033", line: "rgba(255,255,255,0.11)",
-      sun: "#ffc061", coral: "#ff6b7a", teal: "#35d6b8", lilac: "#b3a4ff",
-      ship: "#e9edff", wash: "rgba(16,19,31,0.34)" }
+      sun: "#ffc061", coral: "#ff6b7a", teal: "#35d6b8", lilac: "#b3a4ff", ship: "#e9edff", wash: "rgba(16,19,31,0.34)" }
   ];
-
-  /* Ten sectors. Each one keeps everything before it and adds exactly one
-     new idea, so the climb stays readable instead of piling on at once. */
-  var SECTORS = [
-    { name: "סחף",        blurb: "סלעים בקווים ישרים",        tint: "ink" },
-    { name: "אש צולבת",   blurb: "עכשיו זה מגיע משני הצדדים", tint: "lilac" },
-    { name: "תאוצה",      blurb: "הסלעים מהירים יותר",        tint: "teal" },
-    { name: "פולסר",      blurb: "הכוכב יורה. שים לב לסריקה", tint: "sun" },
-    { name: "רסיסים",     blurb: "הגדולים מתפוצצים",          tint: "coral" },
-    { name: "ליקוי",      blurb: "רואים רק מה שקרוב",         tint: "lilac" },
-    { name: "סופה",       blurb: "מטחים שלמים בבת אחת",       tint: "coral" },
-    { name: "קרן משולשת", blurb: "שלוש קרניים במקום שתיים",   tint: "sun" },
-    { name: "היצרות",     blurb: "המסלול מתחיל ליפול פנימה",  tint: "teal" },
-    { name: "קריסה",      blurb: "הכל, ביחד, עד הסוף",        tint: "coral" }
-  ];
-  // one place that says which hazard wakes up when
-  function has(f) {
-    var s = g.sector;
-    switch (f) {
-      case "cross":  return s >= 1;
-      case "fast":   return s >= 2;
-      case "beams":  return s >= 3;
-      case "shatter":return s >= 4;
-      case "dark":   return s >= 5;
-      case "storm":  return s >= 6;
-      case "beams3": return s >= 7;
-      case "shrink": return s >= 8;
-      default: return false;
-    }
-  }
 
   var $ = function (id) { return document.getElementById(id); };
   var app = $("app"), cv = $("screen"), ctx = cv.getContext("2d");
   var hc = $("hud"), h = hc.getContext("2d");
-
-  var C = {};                       // live colours for the canvas
-  var styleIdx = 0;
+  var C = {}, styleIdx = 0;
 
   /* ---------- rng ---------- */
   var _s = 1;
   function seedRng(n) { _s = n >>> 0; }
   function rnd() {
     _s = (_s + 0x6D2B79F5) >>> 0;
-    var t = _s;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    var x = _s;
+    x = Math.imul(x ^ (x >>> 15), x | 1);
+    x ^= x + Math.imul(x ^ (x >>> 7), x | 61);
+    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
   }
   function todayKey() { var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
   function hashStr(s) {
@@ -488,24 +571,55 @@
     return x >>> 0;
   }
 
-  /* ---------- storage ---------- */
-  function lsGet(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }
-  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
-
   var best = parseInt(lsGet("od-best", "0"), 10) || 0;
   var legacyBest = parseInt(lsGet("orbit-decay-best", "0"), 10) || 0;
   if (legacyBest > best) { best = legacyBest; lsSet("od-best", String(best)); }
   var hapticsOn = lsGet("od-haptics", "1") === "1";
   var musicOn = lsGet("od-music", "1") === "1";
 
-  /* ---------- apply a style ---------- */
+  /* ---------- language ---------- */
+  function applyLang(save) {
+    document.documentElement.setAttribute("lang", t("htmlLang"));
+    document.documentElement.setAttribute("dir", t("dir"));
+    document.title = t("title");
+
+    var nodes = document.querySelectorAll("[data-i18n]");
+    for (var i = 0; i < nodes.length; i++) {
+      var k = nodes[i].getAttribute("data-i18n");
+      nodes[i].textContent = t(k);
+    }
+    var ph = document.querySelectorAll("[data-i18n-ph]");
+    for (var j = 0; j < ph.length; j++) ph[j].setAttribute("placeholder", t(ph[j].getAttribute("data-i18n-ph")));
+    var ar = document.querySelectorAll("[data-i18n-aria]");
+    for (var k2 = 0; k2 < ar.length; k2++) ar[k2].setAttribute("aria-label", t(ar[k2].getAttribute("data-i18n-aria")));
+
+    $("lang").textContent = t("other");
+    $("sound").textContent = muted ? t("soundOff") : t("soundOn");
+    $("tglHaptics").textContent = hapticsOn ? t("on") : t("off");
+    $("tglHaptics").classList.toggle("off", !hapticsOn);
+    $("tglMusic").textContent = musicOn ? t("musicOn") : t("musicOff");
+    $("tglMusic").classList.toggle("off", !musicOn);
+    $("tglLang").textContent = t("otherName");
+    $("praise").textContent = t("praise")[0];
+
+    if (save) lsSet("od-lang", lang);
+    buildQuests();
+    paintBest();
+  }
+  function toggleLang() {
+    lang = lang === "he" ? "en" : "he";
+    applyLang(true);
+    sfx.ui();
+  }
+
+  /* ---------- style ---------- */
   function applyStyle(i, save) {
     styleIdx = Math.max(0, Math.min(STYLES.length - 1, i));
     var s = STYLES[styleIdx], r = document.documentElement.style;
     ["sky", "bg1", "bg2", "veil", "ink", "soft", "faint", "card", "line", "sun", "coral", "teal", "lilac"]
       .forEach(function (k) { r.setProperty("--" + k, s[k]); });
-    C = { sky: s.sky, ink: s.ink, soft: s.soft, faint: s.faint,
-          sun: s.sun, coral: s.coral, teal: s.teal, lilac: s.lilac, ship: s.ship, wash: s.wash };
+    C = { sky: s.sky, ink: s.ink, soft: s.soft, faint: s.faint, sun: s.sun,
+          coral: s.coral, teal: s.teal, lilac: s.lilac, ship: s.ship, wash: s.wash };
     var meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute("content", s.sky);
     if (save) lsSet("od-style", String(styleIdx));
@@ -520,8 +634,6 @@
       var b = document.createElement("button");
       b.type = "button";
       b.className = "sty" + (i === styleIdx ? " sel" : "");
-      b.title = s.name;
-      b.setAttribute("aria-label", "סגנון " + s.name);
       var bg = document.createElement("i");
       bg.style.background = "linear-gradient(140deg," + s.bg1 + " 0%," + s.sky + " 55%," + s.bg2 + " 100%)";
       var d = document.createElement("b");
@@ -549,7 +661,6 @@
   addEventListener("orientationchange", function () { setTimeout(fit, 140); });
   function toCss(p) { return { x: (ox + p.x * S) / dpr, y: (oy + p.y * S) / dpr }; }
 
-  /* ---------- haptics (Android; iOS Safari has no Vibration API) ---------- */
   function buzz(p) { if (!hapticsOn) return; try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
 
   /* ---------- audio ---------- */
@@ -568,15 +679,15 @@
     if (muted) return;
     var a = audio(); if (!a) return;
     try {
-      var t = a.currentTime, o = a.createOscillator(), gn = a.createGain();
+      var tt = a.currentTime, o = a.createOscillator(), gn = a.createGain();
       o.type = type;
-      o.frequency.setValueAtTime(f0, t);
-      o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + dur);
-      gn.gain.setValueAtTime(0.0001, t);
-      gn.gain.exponentialRampToValueAtTime(vol, t + 0.012);
-      gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.frequency.setValueAtTime(f0, tt);
+      o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), tt + dur);
+      gn.gain.setValueAtTime(0.0001, tt);
+      gn.gain.exponentialRampToValueAtTime(vol, tt + 0.012);
+      gn.gain.exponentialRampToValueAtTime(0.0001, tt + dur);
       o.connect(gn); gn.connect(masterGain);
-      o.start(t); o.stop(t + dur + 0.02);
+      o.start(tt); o.stop(tt + dur + 0.02);
     } catch (e) {}
   }
   var sfx = {
@@ -592,27 +703,26 @@
     shield: function ()  { tone("triangle", 700, 1400, 0.25, 0.08); },
     ui:     function ()  { tone("sine", 620, 820, 0.08, 0.05); }
   };
-
   var music = { timer: null, next: 0, step: 0 };
   var PENT = [0, 3, 5, 7, 10];
   function nf(s) { return 220 * Math.pow(2, s / 12); }
-  function blip(type, freq, t, dur, vol) {
+  function blip(type, freq, tt, dur, vol) {
     if (!ac) return;
     var o = ac.createOscillator(), gn = ac.createGain();
-    o.type = type; o.frequency.setValueAtTime(freq, t);
-    gn.gain.setValueAtTime(0.0001, t);
-    gn.gain.exponentialRampToValueAtTime(vol, t + 0.02);
-    gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.type = type; o.frequency.setValueAtTime(freq, tt);
+    gn.gain.setValueAtTime(0.0001, tt);
+    gn.gain.exponentialRampToValueAtTime(vol, tt + 0.02);
+    gn.gain.exponentialRampToValueAtTime(0.0001, tt + dur);
     o.connect(gn); gn.connect(masterGain);
-    o.start(t); o.stop(t + dur + 0.02);
+    o.start(tt); o.stop(tt + dur + 0.02);
   }
-  function musicStep(step, t) {
+  function musicStep(step, tt) {
     var sec = g ? g.sector : 0, deg = PENT[step % PENT.length];
-    if (step % 4 === 0) blip("sine", nf(deg - 24), t, 0.42, 0.055);
-    if (sec >= 1 && step % 2 === 0) blip("triangle", nf(deg + 12), t, 0.16, 0.026);
-    if (sec >= 2 && step % 8 === 0) blip("sawtooth", nf(deg - 12), t, 0.7, 0.015);
-    if (sec >= 3 && step % 4 === 2) blip("square", nf(deg + 24), t, 0.05, 0.014);
-    if (sec >= 5 && step % 2 === 1) blip("square", nf(deg + 7), t, 0.07, 0.013);
+    if (step % 4 === 0) blip("sine", nf(deg - 24), tt, 0.42, 0.055);
+    if (sec >= 1 && step % 2 === 0) blip("triangle", nf(deg + 12), tt, 0.16, 0.026);
+    if (sec >= 3 && step % 8 === 0) blip("sawtooth", nf(deg - 12), tt, 0.7, 0.015);
+    if (sec >= 5 && step % 4 === 2) blip("square", nf(deg + 24), tt, 0.05, 0.014);
+    if (sec >= 8 && step % 2 === 1) blip("square", nf(deg + 7), tt, 0.07, 0.013);
   }
   function musicStart() {
     if (!musicOn || muted) return;
@@ -656,22 +766,22 @@
   if (location.hash) challenge = decodeRun(location.hash);
 
   /* ---------- daily missions ---------- */
-  var QUEST_POOL = [
-    { id: "orbs",   label: function (n) { return "אסוף " + n + " כדורי פלזמה"; }, lo: 10, hi: 22 },
-    { id: "sector", label: function (n) { return "הגע לאזור " + n; },              lo: 3,  hi: 5 },
-    { id: "score",  label: function (n) { return "עשה " + n.toLocaleString() + " נקודות בריצה"; }, lo: 2500, hi: 8000 },
-    { id: "graze",  label: function (n) { return "חלוף ליד " + n + " סלעים"; },     lo: 18, hi: 40 }
+  var QUEST_DEFS = [
+    { id: "orbs", key: "qOrbs", lo: 10, hi: 22 },
+    { id: "sector", key: "qSector", lo: 3, hi: 6 },
+    { id: "score", key: "qScore", lo: 2500, hi: 8000 },
+    { id: "graze", key: "qGraze", lo: 18, hi: 40 }
   ];
   var quests = [], questProg = {};
   function buildQuests() {
     var key = todayKey();
     seedRng(hashStr("q" + key));
-    var pool = QUEST_POOL.slice(), picked = [];
+    var pool = QUEST_DEFS.slice(), picked = [];
     for (var i = 0; i < 3 && pool.length; i++) {
       var q = pool.splice(Math.floor(rnd() * pool.length), 1)[0];
       var target = q.lo + Math.floor(rnd() * (q.hi - q.lo + 1));
       if (q.id === "score") target = Math.round(target / 500) * 500;
-      picked.push({ id: q.id, target: target, label: q.label(target) });
+      picked.push({ id: q.id, target: target, label: t(q.key)(target) });
     }
     quests = picked;
     try { questProg = JSON.parse(lsGet("od-quests-" + key, "{}")) || {}; } catch (e) { questProg = {}; }
@@ -709,6 +819,21 @@
     motes.push({ x: Math.random() * U, y: Math.random() * U, d: Math.random() * 0.22 + 0.04, s: Math.random() * 2 + 1.4 });
   }
 
+  function has(f) {
+    var s = g.sector;
+    switch (f) {
+      case "cross": return s >= 1;
+      case "fast": return s >= 2;
+      case "beams": return s >= 3;
+      case "shatter": return s >= 4;
+      case "dark": return s >= 5;
+      case "storm": return s >= 6;
+      case "beams3": return s >= 7;
+      case "shrink": return s >= 8;
+      default: return false;
+    }
+  }
+
   function reset(toTitle) {
     var seed = dailyMode ? hashStr("d" + todayKey()) : (challenge ? challenge.seed : (Math.random() * 0x7fffffff) >>> 0);
     seedRng(seed);
@@ -720,7 +845,7 @@
       ahead: 0, passed: false, sector: 0, banner: 0,
       beamA: rnd() * Math.PI * 2, beamDir: rnd() < 0.5 ? -1 : 1, beamPower: 0,
       shield: 0, revived: false, orbsGot: 0, grazes: 0,
-      bestCombo: 1, bestFlash: 0, beatBest: false
+      bestCombo: 1, bestFlash: 0, beatBest: false, wasBest: false
     };
     ship = { a: -Math.PI / 2, dir: 1, boost: 0 };
     ghost = (challenge && !dailyMode) ? { a: -Math.PI / 2, dir: 1, boost: 0, idx: 0, alive: true } : null;
@@ -729,9 +854,9 @@
     run = { seed: seed, score: 0, death: 0, sector: 0, flips: [] };
   }
 
-  function angularVelocity(t) { return W_BASE + Math.min(t / 460000, 0.014); }
-  function stepOrbiter(o, t) {
-    var w = angularVelocity(t) + (o.boost > 0 ? BOOST_W * (o.boost / BOOST_N) : 0);
+  function angularVelocity(tt) { return W_BASE + Math.min(tt / 460000, 0.014); }
+  function stepOrbiter(o, tt) {
+    var w = angularVelocity(tt) + (o.boost > 0 ? BOOST_W * (o.boost / BOOST_N) : 0);
     if (o.boost > 0) o.boost--;
     o.a += w * o.dir;
   }
@@ -748,8 +873,6 @@
     bits.push({ x: x, y: y, vx: Math.cos(a) * s * 2.4, vy: Math.sin(a) * s * 2.4,
                 life: life || 1, decay: 0.02 + Math.random() * 0.02, c: color });
   }
-  // a number that lifts off the thing you just hit - the cheapest way to make
-  // scoring feel like it landed
   function pop(x, y, txt, color) {
     if (pops.length > 14) pops.shift();
     pops.push({ x: x, y: y, txt: txt, c: color, life: 1 });
@@ -775,6 +898,8 @@
   $("btnQuit").addEventListener("click", function () { sfx.ui(); goHome(); });
   $("btnGet").addEventListener("click", function () { sfx.ui(); show("getapp"); });
   $("btnGetBack").addEventListener("click", function () { sfx.ui(); show("home"); });
+  $("lang").addEventListener("click", toggleLang);
+  $("tglLang").addEventListener("click", toggleLang);
   $("btnRevive").addEventListener("click", function () {
     sfx.ui();
     g.state = PLAY; g.lives = 1; g.iframes = 150; g.revived = true; g.combo = 1;
@@ -783,19 +908,19 @@
   });
   $("sound").addEventListener("click", function () {
     muted = !muted;
-    this.textContent = muted ? "צליל מושתק" : "צליל פועל";
+    this.textContent = muted ? t("soundOff") : t("soundOn");
     if (muted) musicStop(); else { sfx.ui(); if (g.state === PLAY) musicStart(); }
   });
   $("tglHaptics").addEventListener("click", function () {
     hapticsOn = !hapticsOn;
-    this.textContent = hapticsOn ? "פועל" : "כבוי";
+    this.textContent = hapticsOn ? t("on") : t("off");
     this.classList.toggle("off", !hapticsOn);
     lsSet("od-haptics", hapticsOn ? "1" : "0");
     if (hapticsOn) buzz(20);
   });
   $("tglMusic").addEventListener("click", function () {
     musicOn = !musicOn;
-    this.textContent = musicOn ? "פועלת" : "כבויה";
+    this.textContent = musicOn ? t("musicOn") : t("musicOff");
     this.classList.toggle("off", !musicOn);
     if (!musicOn) musicStop(); else if (g.state === PLAY) musicStart();
     lsSet("od-music", musicOn ? "1" : "0");
@@ -832,13 +957,13 @@
     if (!raw) { challenge = null; codebar.classList.remove("bad"); goHome(); return; }
     var d = decodeRun(raw);
     if (!d) {
-      codebar.classList.add("bad"); loadBtn.textContent = "לא תקין";
-      setTimeout(function () { codebar.classList.remove("bad"); loadBtn.textContent = "טען"; }, 2000);
+      codebar.classList.add("bad"); loadBtn.textContent = t("badCode");
+      setTimeout(function () { codebar.classList.remove("bad"); loadBtn.textContent = t("loadBtn"); }, 2000);
       return;
     }
     challenge = d;
-    loadBtn.textContent = "נטען";
-    setTimeout(function () { loadBtn.textContent = "טען"; }, 2000);
+    loadBtn.textContent = t("loaded");
+    setTimeout(function () { loadBtn.textContent = t("loadBtn"); }, 2000);
     goHome();
   });
 
@@ -846,13 +971,9 @@
   var lastRun = null;
   function shareText() {
     var base = stripHash(pageUrl());
-    if (!lastRun || !lastRun.score) return "שטויות בחלל - נגיעה אחת, עשרה אזורים:\n" + base;
-    var code = encodeRun(lastRun);
-    var head = lastRun.daily ? "שטויות בחלל - האתגר היומי: עשיתי " + lastRun.score.toLocaleString()
-                             : "שטויות בחלל - עשיתי " + lastRun.score.toLocaleString();
-    return head + " והגעתי לאזור " + (lastRun.sector + 1) + " (" + SECTORS[lastRun.sector].name + ").\n" +
-           "אותו שדה סלעים בדיוק, והרוח שלי טסה לידך:\n" + base + "#c=" + code + "\n" +
-           "(אם הקישור מאבד את הקוד, הדבק אותו במשחק: " + code + ")";
+    if (!lastRun || !lastRun.score) return t("shPlain")(base);
+    return t("shRun")(lastRun.score.toLocaleString(), lastRun.daily,
+                      lastRun.sector + 1, SECTORS()[lastRun.sector].name, base, encodeRun(lastRun));
   }
   function scoreCard() {
     var W = 1080, c = document.createElement("canvas");
@@ -873,36 +994,39 @@
     x.fillStyle = s.ship;
     x.beginPath(); x.moveTo(0, -40); x.lineTo(26, 28); x.lineTo(0, 10); x.lineTo(-26, 28); x.closePath(); x.fill();
     x.restore();
-    x.direction = "rtl"; x.textAlign = "center";
+    x.direction = t("dir"); x.textAlign = "center";
     x.fillStyle = s.soft; x.font = "500 40px system-ui, sans-serif";
-    x.fillText(lastRun && lastRun.daily ? "האתגר היומי" : "שטויות בחלל", W / 2, 118);
+    x.fillText(lastRun && lastRun.daily ? t("daily") : t("title"), W / 2, 118);
+    x.direction = "ltr";
     x.fillStyle = s.ink; x.font = "700 190px system-ui, sans-serif";
     x.fillText((lastRun ? lastRun.score : 0).toLocaleString(), W / 2, 828);
+    x.direction = t("dir");
     x.fillStyle = s.soft; x.font = "500 44px system-ui, sans-serif";
-    x.fillText("אזור " + ((lastRun ? lastRun.sector : 0) + 1) + " · " + (lastRun ? SECTORS[lastRun.sector].name : ""), W / 2, 890);
+    x.fillText(t("zone") + " " + ((lastRun ? lastRun.sector : 0) + 1) + " · " + (lastRun ? SECTORS()[lastRun.sector].name : ""), W / 2, 890);
+    x.direction = "ltr";
     x.fillStyle = s.faint; x.font = "500 34px system-ui, sans-serif";
     x.fillText("ilayfredi.github.io/ilayfredi", W / 2, 986);
     return c;
   }
   $("btnShare").addEventListener("click", function () {
     var btn = this, msg = shareText();
-    function done(l) { btn.textContent = l; setTimeout(function () { btn.textContent = "שתף את התוצאה"; }, 2200); }
+    function done(l) { btn.textContent = l; setTimeout(function () { btn.textContent = t("share"); }, 2200); }
     function copyText() {
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(msg).then(function () { done("הועתק"); }, function () { done("לא הצליח"); });
+        navigator.clipboard.writeText(msg).then(function () { done(t("copied")); }, function () { done(t("shareFail")); });
       } else {
         try {
           var ta = document.createElement("textarea");
           ta.value = msg; ta.style.position = "fixed"; ta.style.top = "-1000px";
           document.body.appendChild(ta); ta.select(); document.execCommand("copy");
-          document.body.removeChild(ta); done("הועתק");
-        } catch (e) { done("לא הצליח"); }
+          document.body.removeChild(ta); done(t("copied"));
+        } catch (e) { done(t("shareFail")); }
       }
     }
     try {
       scoreCard().toBlob(function (blob) {
         if (!blob) return copyText();
-        var file = new File([blob], "orbit-decay.png", { type: "image/png" });
+        var file = new File([blob], "space-nonsense.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           navigator.share({ files: [file], text: msg }).then(function () {}, copyText);
         } else if (navigator.share) { navigator.share({ text: msg }).then(function () {}, copyText); }
@@ -957,13 +1081,12 @@
     if (g.state === TITLE) stepOrbiter(ship, g.t);
 
     if (live) {
-      var sec = Math.min(SECTORS.length - 1, Math.floor(g.t / SECTOR));
+      var sec = Math.min(SECTORS().length - 1, Math.floor(g.t / SECTOR));
       if (sec !== g.sector) {
         g.sector = sec; g.banner = 130;
         sfx.sector(); buzz([12, 40, 12]);
-        if (sec === 2) sfx.charge();
+        if (sec === 3) sfx.charge();
       }
-      // the ring starts closing at "היצרות" and finishes during "קריסה"
       if (has("shrink")) {
         var into = Math.min(1, (g.t - SECTOR * 8) / (SECTOR * 2.2));
         orbit = ORBIT - 52 * into;
@@ -984,15 +1107,10 @@
       if (challenge && !dailyMode && !g.passed && g.score > challenge.score) {
         g.passed = true; g.ahead = 110; sfx.ahead();
       }
-      // the moment you pass your own record, mid-run
       if (!g.beatBest && best > 0 && g.score > best) {
         g.beatBest = true; g.bestFlash = 120; sfx.ahead(); buzz([15, 50, 15]);
       }
 
-      // roomier field: slower ramp, a much higher floor, and the crossfire
-      // volley fires less often than it used to
-      // Calm opening, then a long steady squeeze. The floor is what makes the
-      // last sectors hard; the slow slope is what keeps them reachable.
       var warm = Math.min(1, g.t / 320);
       var rate = Math.max(19, (66 - g.t / 118) + (1 - warm) * 42);
       if (++g.rockClock > rate) {
@@ -1001,7 +1119,6 @@
         var fast = has("fast") ? 0.5 + Math.min(1.1, g.sector * 0.14) : 0;
         spawnRock(from, fast);
         if (has("cross") && rnd() < (0.2 + g.sector * 0.045)) spawnRock(from + Math.PI, 0.3 + fast);
-        // "סופה": a whole volley arrives together
         if (has("storm") && rnd() < 0.16) {
           var spread = 0.5 + rnd() * 0.5;
           spawnRock(from + spread, fast);
@@ -1012,7 +1129,6 @@
         g.orbClock = 0;
         orbs.push({ a: rnd() * Math.PI * 2, life: 470, drift: (rnd() - 0.5) * 0.004 });
       }
-      // shields are common now, and you can stack up to three
       if (++g.shieldClock > 300 && shields.length < 2 && g.shield < 2 && rnd() < 0.06) {
         g.shieldClock = 0;
         shields.push({ a: rnd() * Math.PI * 2, life: 520 });
@@ -1118,15 +1234,15 @@
   }
   function finishRun() {
     $("overScore").textContent = g.score.toLocaleString();
-    $("overSector").textContent = "אזור " + (g.sector + 1) + " · " + SECTORS[g.sector].name;
+    $("overSector").textContent = t("zone") + " " + (g.sector + 1) + " · " + SECTORS()[g.sector].name;
     $("stOrbs").textContent = g.orbsGot;
     $("stGraze").textContent = g.grazes;
     $("stCombo").textContent = "×" + g.bestCombo;
     var rb = $("overRibbon");
     if (challenge && !dailyMode) {
       rb.hidden = false;
-      rb.textContent = g.score > challenge.score ? "ניצחת את היריב" : "היריב עדיין מוביל";
-    } else if (g.wasBest) { rb.hidden = false; rb.textContent = "שיא חדש"; }
+      rb.textContent = g.score > challenge.score ? t("youWin") : t("rivalHolds");
+    } else if (g.wasBest) { rb.hidden = false; rb.textContent = t("newBest"); }
     else rb.hidden = true;
     $("btnRevive").hidden = g.revived;
     g.state = OVER;
@@ -1184,14 +1300,10 @@
       var mo = motes[m];
       fill(C.faint, 0.45, function () { ctx.arc(mo.x, mo.y, mo.s * 0.6, 0, 6.2832); });
     }
-
     drawBeams();
-
-    // orbit track: a soft band with a crisp line inside it
     stroke(C.faint, 9, 0.16, function () { ctx.arc(CX, CY, orbit, 0, 6.2832); });
     stroke(C.faint, 1.6, 0.9, function () { ctx.arc(CX, CY, orbit, 0, 6.2832); });
 
-    // the star
     var pulse = 1 + Math.sin(g.t * 0.035) * 0.045;
     var rad = (56 + (ORBIT - orbit) * 0.55) * pulse;
     var grd = ctx.createRadialGradient(CX, CY, rad * 0.2, CX, CY, rad * 3.1);
@@ -1207,7 +1319,6 @@
       fill(C.coral, 0.18, rp);
       stroke(C.coral, 2.8, 0.95, rp);
     }
-
     for (var o = 0; o < orbs.length; o++) {
       var ob = orbs[o], op = onRing(ob.a);
       var fade = ob.life < 90 ? (Math.floor(ob.life / 6) % 2 ? 0.3 : 1) : 1;
@@ -1215,21 +1326,18 @@
       fill(C.teal, fade, function () { ctx.arc(op.x, op.y, 9.5, 0, 6.2832); });
       fill("#ffffff", 0.5 * fade, function () { ctx.arc(op.x - 3, op.y - 3.4, 3.2, 0, 6.2832); });
     }
-
     for (var sI = 0; sI < shields.length; sI++) {
       var sh = shields[sI], shp = onRing(sh.a);
       var bl = sh.life < 90 && Math.floor(sh.life / 6) % 2 ? 0.3 : 1;
       fill(C.lilac, 0.16 * bl, function () { ctx.arc(shp.x, shp.y, 24, 0, 6.2832); });
       stroke(C.lilac, 3.4, bl, function () { ctx.arc(shp.x, shp.y, 13.5, 0, 6.2832); });
     }
-
     if (ghost && ghost.alive && g.state === PLAY) {
       var gp = posOf(ghost);
       ctx.save(); ctx.translate(gp.x, gp.y); ctx.rotate(ghost.a + (Math.PI / 2) * ghost.dir);
       stroke(C.lilac, 3, 0.75, chevron);
       ctx.restore();
     }
-
     if (g.state !== OVER) {
       var sa = ship.a, sd = ship.dir;
       var sx = CX + Math.cos(sa) * orbit, sy = CY + Math.sin(sa) * orbit;
@@ -1247,14 +1355,12 @@
         }
       }
     }
-
     for (var c2 = 0; c2 < bits.length; c2++) {
       var bt = bits[c2];
       ctx.globalAlpha = Math.max(0, bt.life) * 0.85;
       ctx.fillStyle = bt.c;
       ctx.beginPath(); ctx.arc(bt.x, bt.y, 2.6, 0, 6.2832); ctx.fill();
     }
-
     if (g.flash > 0) {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.globalAlpha = g.flash * 0.2; ctx.fillStyle = C.coral;
@@ -1264,9 +1370,10 @@
   }
 
   function drawHud() {
+    var rtl = t("dir") === "rtl";
     h.setTransform(dpr, 0, 0, dpr, 0, 0);
     h.clearRect(0, 0, VW, VH);
-    h.globalAlpha = 1; h.textBaseline = "top"; h.direction = "rtl";
+    h.globalAlpha = 1; h.textBaseline = "top"; h.direction = t("dir");
 
     if (g.state === PLAY && has("dark")) {
       var sp = toCss(posOf(ship));
@@ -1277,10 +1384,8 @@
     }
     if (g.state !== PLAY) return;
 
-    // floating score numbers, drawn on the cleared layer so they stay crisp.
-    // LTR so the plus sign stays in front of the digits instead of flipping.
-    h.textAlign = "center";
-    h.direction = "ltr";
+    // score numbers keep a left-to-right sign no matter the ui language
+    h.textAlign = "center"; h.direction = "ltr";
     for (var pi = 0; pi < pops.length; pi++) {
       var pp = pops[pi], sc = toCss({ x: pp.x, y: pp.y });
       h.globalAlpha = Math.max(0, Math.min(1, pp.life * 1.6));
@@ -1288,74 +1393,78 @@
       h.font = "700 " + Math.min(17, VW * 0.043) + "px system-ui, sans-serif";
       h.fillText(pp.txt, sc.x, sc.y);
     }
-    h.direction = "rtl";
-    h.globalAlpha = 1;
+    h.direction = t("dir"); h.globalAlpha = 1;
 
     var pad = 22, big = Math.min(38, VW * 0.098);
+    var SEC = SECTORS();
 
-    // progress to the next sector, hairline across the very top
     var prog = (g.t % SECTOR) / SECTOR;
-    if (g.sector < SECTORS.length - 1) {
+    if (g.sector < SEC.length - 1) {
       h.fillStyle = C.faint; h.globalAlpha = 0.28;
       h.fillRect(0, 0, VW, 3);
-      h.globalAlpha = 1; h.fillStyle = C[SECTORS[g.sector].tint];
-      h.fillRect(VW * (1 - prog), 0, VW * prog, 3);
+      h.globalAlpha = 1; h.fillStyle = C[SEC_TINT[g.sector]];
+      h.fillRect(rtl ? VW * (1 - prog) : 0, 0, VW * prog, 3);
     }
-    h.textAlign = "right";
+
+    // score sits on the reading-start side, lives on the other
+    var sx2 = rtl ? VW - pad : pad;
+    h.textAlign = rtl ? "right" : "left";
     h.font = "700 " + big + "px system-ui, -apple-system, sans-serif";
     h.fillStyle = C.ink;
-    h.fillText(g.score.toLocaleString(), VW - pad, pad);
+    h.fillText(g.score.toLocaleString(), sx2, pad);
 
     var line = pad + big + 6;
     h.font = "600 " + Math.min(14, VW * 0.037) + "px system-ui, sans-serif";
-    h.fillStyle = C[SECTORS[g.sector].tint];
-    h.fillText("אזור " + (g.sector + 1) + " · " + SECTORS[g.sector].name, VW - pad, line);
+    h.fillStyle = C[SEC_TINT[g.sector]];
+    h.fillText(t("zone") + " " + (g.sector + 1) + " · " + SEC[g.sector].name, sx2, line);
     line += 22;
-    if (dailyMode) { h.fillStyle = C.lilac; h.fillText("אתגר יומי", VW - pad, line); line += 22; }
+    if (dailyMode) { h.fillStyle = C.lilac; h.fillText(t("daily"), sx2, line); line += 22; }
     if (g.combo > 1) {
       h.direction = "ltr";
-      h.fillStyle = C.teal; h.fillText("×" + g.combo, VW - pad, line);
-      h.direction = "rtl"; line += 22;
+      h.fillStyle = C.teal; h.fillText("×" + g.combo, sx2, line);
+      h.direction = t("dir"); line += 22;
     }
     if (challenge && !dailyMode) {
       h.fillStyle = g.passed ? C.sun : C.faint;
-      h.fillText("יריב " + challenge.score.toLocaleString(), VW - pad, line);
+      h.fillText(t("rival") + " " + challenge.score.toLocaleString(), sx2, line);
     }
 
+    var lx = rtl ? pad + 9 : VW - pad - 9;
+    var stepx = rtl ? 25 : -25;
     for (var i = 0; i < 3; i++) {
       h.globalAlpha = i < g.lives ? 1 : 0.18;
       h.fillStyle = C.coral;
-      h.beginPath(); h.arc(pad + 9 + i * 25, pad + 12, 8, 0, 6.2832); h.fill();
+      h.beginPath(); h.arc(lx + i * stepx, pad + 12, 8, 0, 6.2832); h.fill();
     }
     h.globalAlpha = 1;
     for (var sK = 0; sK < g.shield; sK++) {
       h.strokeStyle = C.lilac; h.lineWidth = 2.6;
-      h.beginPath(); h.arc(pad + 9 + (3 + sK) * 25, pad + 12, 7.5, 0, 6.2832); h.stroke();
+      h.beginPath(); h.arc(lx + (3 + sK) * stepx, pad + 12, 7.5, 0, 6.2832); h.stroke();
     }
 
     if (g.banner > 0) {
       h.globalAlpha = Math.min(1, g.banner / 34);
       h.textAlign = "center";
-      h.fillStyle = C[SECTORS[g.sector].tint];
+      h.fillStyle = C[SEC_TINT[g.sector]];
       h.font = "700 " + Math.min(40, VW * 0.1) + "px system-ui, sans-serif";
-      h.fillText(SECTORS[g.sector].name, VW / 2, VH * 0.4);
+      h.fillText(SEC[g.sector].name, VW / 2, VH * 0.4);
       h.fillStyle = C.soft;
       h.font = "500 " + Math.min(16, VW * 0.042) + "px system-ui, sans-serif";
-      h.fillText(SECTORS[g.sector].blurb, VW / 2, VH * 0.4 + Math.min(48, VW * 0.12));
+      h.fillText(SEC[g.sector].blurb, VW / 2, VH * 0.4 + Math.min(48, VW * 0.12));
       h.globalAlpha = 1;
     }
     if (g.ahead > 0) {
       h.globalAlpha = Math.min(1, g.ahead / 30);
       h.textAlign = "center"; h.fillStyle = C.sun;
       h.font = "700 " + Math.min(30, VW * 0.075) + "px system-ui, sans-serif";
-      h.fillText("עברת אותו!", VW / 2, VH * 0.26);
+      h.fillText(t("passed"), VW / 2, VH * 0.26);
       h.globalAlpha = 1;
     }
     if (g.bestFlash > 0) {
       h.globalAlpha = Math.min(1, g.bestFlash / 34);
       h.textAlign = "center"; h.fillStyle = C.sun;
-      h.font = "700 " + Math.min(32, VW * 0.08) + "px system-ui, sans-serif";
-      h.fillText("שברת את השיא שלך!", VW / 2, VH * 0.18);
+      h.font = "700 " + Math.min(30, VW * 0.076) + "px system-ui, sans-serif";
+      h.fillText(t("brokeBest"), VW / 2, VH * 0.18);
       h.globalAlpha = 1;
     }
   }
@@ -1391,26 +1500,15 @@
   /* ---------- boot ---------- */
   applyStyle(parseInt(lsGet("od-style", "0"), 10) || 0, false);
   reset(true);
-  paintBest();
-  buildQuests();
-  $("tglHaptics").textContent = hapticsOn ? "פועל" : "כבוי";
-  $("tglHaptics").classList.toggle("off", !hapticsOn);
-  $("tglMusic").textContent = musicOn ? "פועלת" : "כבויה";
-  $("tglMusic").classList.toggle("off", !musicOn);
+  applyLang(false);
   fit();
   requestAnimationFrame(loop);
 
-  // splash: cycle a few lines of credit, and let a tap skip ahead
-  var PRAISE = [
-    "האיש שהפך נגיעה אחת למשחק שלם",
-    "עשרה אזורים, אפס פשרות",
-    "מתכנת, מעצב, ואלוף המסלול",
-    "כל סלע כאן עבר את האישור שלו"
-  ];
   var praiseI = 0, praiseTimer = setInterval(function () {
-    praiseI = (praiseI + 1) % PRAISE.length;
+    var list = t("praise");
+    praiseI = (praiseI + 1) % list.length;
     var el = $("praise");
-    if (el) { el.style.opacity = "0"; setTimeout(function () { el.textContent = PRAISE[praiseI]; el.style.opacity = "1"; }, 220); }
+    if (el) { el.style.opacity = "0"; setTimeout(function () { el.textContent = t("praise")[praiseI]; el.style.opacity = "1"; }, 220); }
   }, 1500);
   function leaveSplash() {
     if (view !== "splash") return;
