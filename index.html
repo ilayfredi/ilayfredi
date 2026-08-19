@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>מסלול דועך</title>
+<title>שטויות בחלל</title>
 
-<meta name="description" content="משחק ארקייד בנגיעה אחת. אתה נעול במסלול סביב כוכב שקורס — נגיעה הופכת את הכיוון. שישה אזורים, אתגר יומי, ומרוץ מול הרוח של החברים שלך.">
+<meta name="description" content="משחק ארקייד בנגיעה אחת. אתה נעול במסלול סביב כוכב שקורס — נגיעה הופכת את הכיוון. עשרה אזורים, אתגר יומי, ומרוץ מול הרוח של החברים שלך.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="מסלול דועך">
-<meta property="og:description" content="נגיעה אחת. שישה אזורים. כמה תחזיק?">
+<meta property="og:title" content="שטויות בחלל">
+<meta property="og:description" content="נגיעה אחת. עשרה אזורים. כמה תחזיק?">
 <meta property="og:image" content="https://ilayfredi.github.io/ilayfredi/preview.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -21,7 +21,7 @@
 <meta name="theme-color" content="#eef3ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="מסלול דועך">
+<meta name="apple-mobile-web-app-title" content="שטויות בחלל">
 
 <style>
   :root {
@@ -73,20 +73,33 @@
   }
 
   /* splash */
-  .splash-eyebrow { font-size: 12px; letter-spacing: 0.14em; color: var(--faint); }
-  .signature {
-    font-size: clamp(46px, 15vw, 92px); font-weight: 300;
-    letter-spacing: 0.03em; line-height: 1.12;
-    background: linear-gradient(96deg, var(--sun) 0%, var(--coral) 46%, var(--lilac) 100%);
+  .gametitle {
+    font-size: clamp(42px, 13.5vw, 86px); font-weight: 800;
+    line-height: 1.06; letter-spacing: -0.015em;
+    background: linear-gradient(100deg, var(--sun) 0%, var(--coral) 48%, var(--lilac) 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
-    padding: 0 0.08em 0.06em;
+    padding: 0 .06em .08em; text-wrap: balance;
+    filter: drop-shadow(0 6px 18px rgba(0,0,0,.12));
   }
+  .splash-eyebrow { font-size: 12px; letter-spacing: .14em; color: var(--faint); }
+  .signature {
+    font-size: clamp(30px, 9vw, 52px); font-weight: 700;
+    line-height: 1.15; color: var(--ink); margin-top: -6px;
+  }
+  .badges { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; }
+  .badge {
+    font-size: 12px; font-weight: 600; color: var(--ink);
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 999px; padding: 6px 13px; box-shadow: var(--sh-sm);
+  }
+  .praise { font-size: 14.5px; color: var(--soft); max-width: 30ch; min-height: 2.6em; transition: opacity .22s ease; }
+  .skip { font-size: 12px; color: var(--faint); letter-spacing: .08em; margin-top: 4px; }
   .flourish {
     width: min(230px, 62vw); height: 2px; border-radius: 2px;
     background: linear-gradient(90deg, transparent, var(--sun) 30%, var(--coral) 70%, transparent);
   }
   .rise { animation: rise 1s cubic-bezier(.16,.9,.3,1) both; }
-  .rise-2 { animation-delay: .16s; } .rise-3 { animation-delay: .34s; }
+  .rise-2 { animation-delay: .14s; } .rise-3 { animation-delay: .3s; } .rise-4 { animation-delay: .46s; }
   @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 
   /* chrome */
@@ -221,6 +234,18 @@
     border-radius: 999px; padding: 6px 15px; margin: 5px 0 2px;
   }
   .ribbon[hidden] { display: none; }
+  .stats {
+    display: flex; gap: 6px; width: 100%;
+    margin: 12px 0 4px;
+  }
+  .stats div {
+    flex: 1 1 0; min-width: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    background: var(--ground, transparent);
+    border: 1px solid var(--line); border-radius: 12px; padding: 8px 4px;
+  }
+  .stats b { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stats span { font-size: 11px; color: var(--soft); }
   .card-best { font-size: 14px; color: var(--soft); margin-bottom: 11px; }
   .card-best b { color: var(--ink); font-weight: 700; }
   .card .btn { width: 100%; }
@@ -244,9 +269,17 @@
   <canvas id="hud"></canvas>
 
   <section id="splash" class="veil on">
-    <span class="splash-eyebrow rise">מגישים</span>
-    <h1 class="signature rise rise-2">עילי פרדי</h1>
-    <div class="flourish rise rise-3"></div>
+    <h1 class="gametitle rise">שטויות בחלל</h1>
+    <div class="flourish rise rise-2"></div>
+    <span class="splash-eyebrow rise rise-2">נוצר מהראש של</span>
+    <p class="signature rise rise-3">עילי פרדי</p>
+    <div class="badges rise rise-4">
+      <span class="badge">גאון של החלל</span>
+      <span class="badge">אלוף בלתי מעורער</span>
+      <span class="badge">אגדה חיה</span>
+    </div>
+    <p id="praise" class="praise rise rise-4">האיש שהפך נגיעה אחת למשחק שלם</p>
+    <span class="skip rise rise-4">גע כדי להתחיל</span>
   </section>
 
   <section id="home" class="veil">
@@ -258,7 +291,7 @@
     <div class="crown">
       <span class="crown-label">השיא</span>
       <strong id="homeBest" class="crown-num">0</strong>
-      <span class="crown-sub">מסלול דועך</span>
+      <span class="crown-sub">שטויות בחלל</span>
     </div>
 
     <div class="menu">
@@ -309,7 +342,7 @@
     <div class="sheet">
       <h2>קצת עלינו</h2>
       <p class="lede">
-        מסלול דועך הוא משחק על שליטה אחת בלבד. אתה נעול במסלול סביב כוכב שקורס,
+        שטויות בחלל הוא משחק על שליטה אחת בלבד. אתה נעול במסלול סביב כוכב שקורס,
         ונגיעה במסך הופכת את כיוון התנועה שלך. זה הכל — ומשם זה רק נעשה קשה יותר.
       </p>
       <h3>איך משחקים</h3>
@@ -318,7 +351,7 @@
         <li><span class="dot" style="background:var(--teal)"></span><span>אוספים כדורי פלזמה כדי להעלות את המכפיל.</span></li>
         <li><span class="dot" style="background:var(--coral)"></span><span>חולפים קרוב לסלעים בלי להתנגש — ככל שקרוב יותר, כך יותר נקודות.</span></li>
         <li><span class="dot" style="background:var(--lilac)"></span><span>מגנים מופיעים על המסלול. כל אחד סופג פגיעה אחת.</span></li>
-        <li><span class="dot" style="background:var(--sun)"></span><span>שישה אזורים. כל אזור שומר על הסכנות של הקודם ומוסיף אחת.</span></li>
+        <li><span class="dot" style="background:var(--sun)"></span><span>עשרה אזורים. כל אזור שומר על הסכנות של הקודם ומוסיף אחת.</span></li>
       </ul>
       <h3>אתגר יומי</h3>
       <p>כל יום כולם מקבלים בדיוק את אותו שדה סלעים, לפי התאריך. אותם סלעים — רק מי שמשחק טוב יותר מנצח.</p>
@@ -336,6 +369,11 @@
       <strong id="overScore" class="card-num">0</strong>
       <p id="overSector" class="card-sector"></p>
       <p id="overRibbon" class="ribbon" hidden></p>
+      <div class="stats">
+        <div><b id="stOrbs">0</b><span>כדורים</span></div>
+        <div><b id="stGraze">0</b><span>חליפות</span></div>
+        <div><b id="stCombo">×1</b><span>מכפיל שיא</span></div>
+      </div>
       <p class="card-best">השיא: <b id="overBest">0</b></p>
       <button id="btnRevive" class="btn btn-teal" type="button" hidden>עוד חיים אחד</button>
       <button id="btnAgain" class="btn" type="button">שוב</button>
@@ -350,7 +388,7 @@
   "use strict";
 
   /* ============================================================
-     מסלול דועך / ORBIT DECAY
+     שטויות בחלל / SPACE NONSENSE
      One input: touching anywhere reverses your direction around a
      collapsing star. Six sectors, each keeping the hazards before
      it and adding one more.
@@ -363,7 +401,7 @@
      ============================================================ */
 
   var U = 1000, CX = 500, CY = 500, ORBIT = 268;
-  var STEP = 1000 / 60, W_BASE = 0.0265, SECTOR = 800;
+  var STEP = 1000 / 60, W_BASE = 0.0265, SECTOR = 700;
   var BOOST_N = 6, BOOST_W = 0.017;
   var REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -396,15 +434,35 @@
       ship: "#e9edff", wash: "rgba(16,19,31,0.34)" }
   ];
 
+  /* Ten sectors. Each one keeps everything before it and adds exactly one
+     new idea, so the climb stays readable instead of piling on at once. */
   var SECTORS = [
-    { name: "סחף",      blurb: "סלעים בקווים ישרים" },
-    { name: "אש צולבת", blurb: "עכשיו זה מגיע משני הצדדים" },
-    { name: "פולסר",    blurb: "הכוכב יורה. שים לב לסריקה" },
-    { name: "רסיסים",   blurb: "הגדולים מתפוצצים" },
-    { name: "ליקוי",    blurb: "רואים רק מה שקרוב" },
-    { name: "קריסה",    blurb: "המסלול נופל פנימה" }
+    { name: "סחף",        blurb: "סלעים בקווים ישרים",        tint: "ink" },
+    { name: "אש צולבת",   blurb: "עכשיו זה מגיע משני הצדדים", tint: "lilac" },
+    { name: "תאוצה",      blurb: "הסלעים מהירים יותר",        tint: "teal" },
+    { name: "פולסר",      blurb: "הכוכב יורה. שים לב לסריקה", tint: "sun" },
+    { name: "רסיסים",     blurb: "הגדולים מתפוצצים",          tint: "coral" },
+    { name: "ליקוי",      blurb: "רואים רק מה שקרוב",         tint: "lilac" },
+    { name: "סופה",       blurb: "מטחים שלמים בבת אחת",       tint: "coral" },
+    { name: "קרן משולשת", blurb: "שלוש קרניים במקום שתיים",   tint: "sun" },
+    { name: "היצרות",     blurb: "המסלול מתחיל ליפול פנימה",  tint: "teal" },
+    { name: "קריסה",      blurb: "הכל, ביחד, עד הסוף",        tint: "coral" }
   ];
-  var SEC_TINT = ["ink", "lilac", "sun", "coral", "lilac", "coral"];
+  // one place that says which hazard wakes up when
+  function has(f) {
+    var s = g.sector;
+    switch (f) {
+      case "cross":  return s >= 1;
+      case "fast":   return s >= 2;
+      case "beams":  return s >= 3;
+      case "shatter":return s >= 4;
+      case "dark":   return s >= 5;
+      case "storm":  return s >= 6;
+      case "beams3": return s >= 7;
+      case "shrink": return s >= 8;
+      default: return false;
+    }
+  }
 
   var $ = function (id) { return document.getElementById(id); };
   var app = $("app"), cv = $("screen"), ctx = cv.getContext("2d");
@@ -562,7 +620,7 @@
     music.next = a.currentTime + 0.1; music.step = 0;
     music.timer = setInterval(function () {
       if (!ac) return;
-      var dur = (g && g.sector >= 5) ? 0.115 : (g && g.sector >= 3 ? 0.13 : 0.15);
+      var dur = (g && g.sector >= 7) ? 0.112 : (g && g.sector >= 4 ? 0.128 : 0.15);
       while (music.next < ac.currentTime + 0.25) { musicStep(music.step, music.next); music.next += dur; music.step++; }
     }, 90);
   }
@@ -643,7 +701,7 @@
 
   /* ---------- state ---------- */
   var TITLE = 0, PLAY = 1, OVER = 2;
-  var g, ship, ghost, rocks, orbs, bits, run, shields;
+  var g, ship, ghost, rocks, orbs, bits, run, shields, pops;
   var orbit = ORBIT, view = "splash", dailyMode = false;
 
   var motes = [];
@@ -661,11 +719,12 @@
       shake: 0, iframes: 0, flash: 0, pulse: 0,
       ahead: 0, passed: false, sector: 0, banner: 0,
       beamA: rnd() * Math.PI * 2, beamDir: rnd() < 0.5 ? -1 : 1, beamPower: 0,
-      shield: 0, revived: false, orbsGot: 0, grazes: 0
+      shield: 0, revived: false, orbsGot: 0, grazes: 0,
+      bestCombo: 1, bestFlash: 0, beatBest: false
     };
     ship = { a: -Math.PI / 2, dir: 1, boost: 0 };
     ghost = (challenge && !dailyMode) ? { a: -Math.PI / 2, dir: 1, boost: 0, idx: 0, alive: true } : null;
-    rocks = []; orbs = []; bits = []; shields = [];
+    rocks = []; orbs = []; bits = []; shields = []; pops = [];
     orbit = ORBIT;
     run = { seed: seed, score: 0, death: 0, sector: 0, flips: [] };
   }
@@ -689,8 +748,14 @@
     bits.push({ x: x, y: y, vx: Math.cos(a) * s * 2.4, vy: Math.sin(a) * s * 2.4,
                 life: life || 1, decay: 0.02 + Math.random() * 0.02, c: color });
   }
-  function beamCount() { return g.sector >= 5 ? 3 : 2; }
-  function beamsLive() { return g.sector >= 2; }
+  // a number that lifts off the thing you just hit - the cheapest way to make
+  // scoring feel like it landed
+  function pop(x, y, txt, color) {
+    if (pops.length > 14) pops.shift();
+    pops.push({ x: x, y: y, txt: txt, c: color, life: 1 });
+  }
+  function beamCount() { return has("beams3") ? 3 : 2; }
+  function beamsLive() { return has("beams"); }
 
   /* ---------- screens ---------- */
   function show(name) {
@@ -781,10 +846,10 @@
   var lastRun = null;
   function shareText() {
     var base = stripHash(pageUrl());
-    if (!lastRun || !lastRun.score) return "מסלול דועך - נגיעה אחת, שישה אזורים:\n" + base;
+    if (!lastRun || !lastRun.score) return "שטויות בחלל - נגיעה אחת, עשרה אזורים:\n" + base;
     var code = encodeRun(lastRun);
-    var head = lastRun.daily ? "מסלול דועך - האתגר היומי: עשיתי " + lastRun.score.toLocaleString()
-                             : "מסלול דועך - עשיתי " + lastRun.score.toLocaleString();
+    var head = lastRun.daily ? "שטויות בחלל - האתגר היומי: עשיתי " + lastRun.score.toLocaleString()
+                             : "שטויות בחלל - עשיתי " + lastRun.score.toLocaleString();
     return head + " והגעתי לאזור " + (lastRun.sector + 1) + " (" + SECTORS[lastRun.sector].name + ").\n" +
            "אותו שדה סלעים בדיוק, והרוח שלי טסה לידך:\n" + base + "#c=" + code + "\n" +
            "(אם הקישור מאבד את הקוד, הדבק אותו במשחק: " + code + ")";
@@ -810,7 +875,7 @@
     x.restore();
     x.direction = "rtl"; x.textAlign = "center";
     x.fillStyle = s.soft; x.font = "500 40px system-ui, sans-serif";
-    x.fillText(lastRun && lastRun.daily ? "האתגר היומי" : "מסלול דועך", W / 2, 118);
+    x.fillText(lastRun && lastRun.daily ? "האתגר היומי" : "שטויות בחלל", W / 2, 118);
     x.fillStyle = s.ink; x.font = "700 190px system-ui, sans-serif";
     x.fillText((lastRun ? lastRun.score : 0).toLocaleString(), W / 2, 828);
     x.fillStyle = s.soft; x.font = "500 44px system-ui, sans-serif";
@@ -877,7 +942,11 @@
     if (g.flash > 0) g.flash -= 0.06;
     if (g.ahead > 0) g.ahead--;
     if (g.banner > 0) g.banner--;
+    if (g.bestFlash > 0) g.bestFlash--;
     if (g.pulse > 0) g.pulse -= 0.075;
+
+    for (var pi = 0; pi < pops.length; pi++) { pops[pi].y -= 0.9; pops[pi].life -= 0.018; }
+    pops = pops.filter(function (p) { return p.life > 0; });
 
     for (var m = 0; m < motes.length; m++) {
       motes[m].y += motes[m].d;
@@ -894,9 +963,10 @@
         sfx.sector(); buzz([12, 40, 12]);
         if (sec === 2) sfx.charge();
       }
-      if (g.sector >= 5) {
-        var into = Math.min(1, (g.t - SECTOR * 5) / (SECTOR * 1.6));
-        orbit = ORBIT - 54 * into;
+      // the ring starts closing at "היצרות" and finishes during "קריסה"
+      if (has("shrink")) {
+        var into = Math.min(1, (g.t - SECTOR * 8) / (SECTOR * 2.2));
+        orbit = ORBIT - 52 * into;
       } else orbit = ORBIT;
 
       if (beamsLive()) { g.beamPower = Math.min(1, g.beamPower + 1 / 110); g.beamA += 0.0075 * g.beamDir; }
@@ -914,23 +984,36 @@
       if (challenge && !dailyMode && !g.passed && g.score > challenge.score) {
         g.passed = true; g.ahead = 110; sfx.ahead();
       }
+      // the moment you pass your own record, mid-run
+      if (!g.beatBest && best > 0 && g.score > best) {
+        g.beatBest = true; g.bestFlash = 120; sfx.ahead(); buzz([15, 50, 15]);
+      }
 
       // roomier field: slower ramp, a much higher floor, and the crossfire
       // volley fires less often than it used to
-      var warm = Math.min(1, g.t / 300);
-      var rate = Math.max(27, (70 - g.t / 150) + (1 - warm) * 40);
+      // Calm opening, then a long steady squeeze. The floor is what makes the
+      // last sectors hard; the slow slope is what keeps them reachable.
+      var warm = Math.min(1, g.t / 320);
+      var rate = Math.max(19, (66 - g.t / 118) + (1 - warm) * 42);
       if (++g.rockClock > rate) {
         g.rockClock = 0;
         var from = rnd() * Math.PI * 2;
-        spawnRock(from, 0);
-        if (g.sector >= 1 && rnd() < (g.sector >= 5 ? 0.5 : 0.28)) spawnRock(from + Math.PI, 0.3);
+        var fast = has("fast") ? 0.5 + Math.min(1.1, g.sector * 0.14) : 0;
+        spawnRock(from, fast);
+        if (has("cross") && rnd() < (0.2 + g.sector * 0.045)) spawnRock(from + Math.PI, 0.3 + fast);
+        // "סופה": a whole volley arrives together
+        if (has("storm") && rnd() < 0.16) {
+          var spread = 0.5 + rnd() * 0.5;
+          spawnRock(from + spread, fast);
+          spawnRock(from - spread, fast);
+        }
       }
       if (++g.orbClock > 108) {
         g.orbClock = 0;
         orbs.push({ a: rnd() * Math.PI * 2, life: 470, drift: (rnd() - 0.5) * 0.004 });
       }
       // shields are common now, and you can stack up to three
-      if (++g.shieldClock > 300 && shields.length < 2 && g.shield < 3 && rnd() < 0.07) {
+      if (++g.shieldClock > 300 && shields.length < 2 && g.shield < 2 && rnd() < 0.06) {
         g.shieldClock = 0;
         shields.push({ a: rnd() * Math.PI * 2, life: 520 });
       }
@@ -941,7 +1024,7 @@
       if (r.dead) continue;
       r.x += r.vx; r.y += r.vy; r.ang += r.spin;
       var dc = Math.hypot(r.x - CX, r.y - CY);
-      if (live && g.sector >= 3 && !r.split && r.r > 34 && dc < orbit + 46) { shatter(r); continue; }
+      if (live && has("shatter") && !r.split && r.r > 32 && dc < orbit + 46) { shatter(r); continue; }
       if (dc < 62) { r.dead = true; for (var q = 0; q < 7; q++) spark(r.x, r.y, C.sun, 2.4, 0.7); }
       if (dc > 900) r.dead = true;
     }
@@ -960,7 +1043,10 @@
         if (Math.hypot(p.x - op.x, p.y - op.y) < 34) {
           ob.dead = true;
           g.combo = Math.min(g.combo + 1, 25); g.orbsGot++;
-          g.score += Math.round(55 * g.combo * (1 + g.sector * 0.4));
+          if (g.combo > g.bestCombo) g.bestCombo = g.combo;
+          var gain = Math.round(55 * g.combo * (1 + g.sector * 0.4));
+          g.score += gain;
+          pop(op.x, op.y, "+" + gain, C.teal);
           sfx.orb(g.combo); buzz(8);
           for (var s = 0; s < 12; s++) spark(op.x, op.y, C.teal, 3, 1);
         }
@@ -971,7 +1057,7 @@
         var shp = onRing(sh.a);
         if (Math.hypot(p.x - shp.x, p.y - shp.y) < 36) {
           sh.dead = true;
-          g.shield = Math.min(3, g.shield + 1);
+          g.shield = Math.min(2, g.shield + 1);
           sfx.shield(); buzz([10, 30, 10]);
           for (var s2 = 0; s2 < 16; s2++) spark(shp.x, shp.y, C.lilac, 3, 1);
         }
@@ -982,7 +1068,9 @@
         var dist = Math.hypot(p.x - rk.x, p.y - rk.y);
         if (!rk.grazed && dist < rk.r + 52) {
           rk.grazed = true; g.grazes++;
-          g.score += Math.round(26 * g.combo * (1 + g.sector * 0.4));
+          var gz = Math.round(26 * g.combo * (1 + g.sector * 0.4));
+          g.score += gz;
+          pop(rk.x, rk.y, "+" + gz, C.coral);
           sfx.graze();
         }
         if (g.iframes <= 0 && dist < rk.r + 11) { rk.dead = true; takeHit(p); }
@@ -1031,6 +1119,9 @@
   function finishRun() {
     $("overScore").textContent = g.score.toLocaleString();
     $("overSector").textContent = "אזור " + (g.sector + 1) + " · " + SECTORS[g.sector].name;
+    $("stOrbs").textContent = g.orbsGot;
+    $("stGraze").textContent = g.grazes;
+    $("stCombo").textContent = "×" + g.bestCombo;
     var rb = $("overRibbon");
     if (challenge && !dailyMode) {
       rb.hidden = false;
@@ -1177,7 +1268,7 @@
     h.clearRect(0, 0, VW, VH);
     h.globalAlpha = 1; h.textBaseline = "top"; h.direction = "rtl";
 
-    if (g.state === PLAY && g.sector >= 4) {
+    if (g.state === PLAY && has("dark")) {
       var sp = toCss(posOf(ship));
       var r0 = Math.min(VW, VH) * 0.22, r1 = Math.min(VW, VH) * 0.62;
       var eg = h.createRadialGradient(sp.x, sp.y, r0, sp.x, sp.y, r1);
@@ -1186,7 +1277,27 @@
     }
     if (g.state !== PLAY) return;
 
+    // floating score numbers, drawn on the cleared layer so they stay crisp
+    h.textAlign = "center";
+    for (var pi = 0; pi < pops.length; pi++) {
+      var pp = pops[pi], sc = toCss({ x: pp.x, y: pp.y });
+      h.globalAlpha = Math.max(0, Math.min(1, pp.life * 1.6));
+      h.fillStyle = pp.c;
+      h.font = "700 " + Math.min(17, VW * 0.043) + "px system-ui, sans-serif";
+      h.fillText(pp.txt, sc.x, sc.y);
+    }
+    h.globalAlpha = 1;
+
     var pad = 22, big = Math.min(38, VW * 0.098);
+
+    // progress to the next sector, hairline across the very top
+    var prog = (g.t % SECTOR) / SECTOR;
+    if (g.sector < SECTORS.length - 1) {
+      h.fillStyle = C.faint; h.globalAlpha = 0.28;
+      h.fillRect(0, 0, VW, 3);
+      h.globalAlpha = 1; h.fillStyle = C[SECTORS[g.sector].tint];
+      h.fillRect(VW * (1 - prog), 0, VW * prog, 3);
+    }
     h.textAlign = "right";
     h.font = "700 " + big + "px system-ui, -apple-system, sans-serif";
     h.fillStyle = C.ink;
@@ -1194,7 +1305,7 @@
 
     var line = pad + big + 6;
     h.font = "600 " + Math.min(14, VW * 0.037) + "px system-ui, sans-serif";
-    h.fillStyle = C[SEC_TINT[g.sector]];
+    h.fillStyle = C[SECTORS[g.sector].tint];
     h.fillText("אזור " + (g.sector + 1) + " · " + SECTORS[g.sector].name, VW - pad, line);
     line += 22;
     if (dailyMode) { h.fillStyle = C.lilac; h.fillText("אתגר יומי", VW - pad, line); line += 22; }
@@ -1218,7 +1329,7 @@
     if (g.banner > 0) {
       h.globalAlpha = Math.min(1, g.banner / 34);
       h.textAlign = "center";
-      h.fillStyle = C[SEC_TINT[g.sector]];
+      h.fillStyle = C[SECTORS[g.sector].tint];
       h.font = "700 " + Math.min(40, VW * 0.1) + "px system-ui, sans-serif";
       h.fillText(SECTORS[g.sector].name, VW / 2, VH * 0.4);
       h.fillStyle = C.soft;
@@ -1231,6 +1342,13 @@
       h.textAlign = "center"; h.fillStyle = C.sun;
       h.font = "700 " + Math.min(30, VW * 0.075) + "px system-ui, sans-serif";
       h.fillText("עברת אותו!", VW / 2, VH * 0.26);
+      h.globalAlpha = 1;
+    }
+    if (g.bestFlash > 0) {
+      h.globalAlpha = Math.min(1, g.bestFlash / 34);
+      h.textAlign = "center"; h.fillStyle = C.sun;
+      h.font = "700 " + Math.min(32, VW * 0.08) + "px system-ui, sans-serif";
+      h.fillText("שברת את השיא שלך!", VW / 2, VH * 0.18);
       h.globalAlpha = 1;
     }
   }
@@ -1274,7 +1392,26 @@
   $("tglMusic").classList.toggle("off", !musicOn);
   fit();
   requestAnimationFrame(loop);
-  setTimeout(function () { if (view === "splash") show("home"); }, 2000);
+
+  // splash: cycle a few lines of credit, and let a tap skip ahead
+  var PRAISE = [
+    "האיש שהפך נגיעה אחת למשחק שלם",
+    "עשרה אזורים, אפס פשרות",
+    "מתכנת, מעצב, ואלוף המסלול",
+    "כל סלע כאן עבר את האישור שלו"
+  ];
+  var praiseI = 0, praiseTimer = setInterval(function () {
+    praiseI = (praiseI + 1) % PRAISE.length;
+    var el = $("praise");
+    if (el) { el.style.opacity = "0"; setTimeout(function () { el.textContent = PRAISE[praiseI]; el.style.opacity = "1"; }, 220); }
+  }, 1500);
+  function leaveSplash() {
+    if (view !== "splash") return;
+    clearInterval(praiseTimer);
+    show("home");
+  }
+  $("splash").addEventListener("pointerdown", leaveSplash);
+  setTimeout(leaveSplash, 4200);
 })();
 </script>
 </body>
