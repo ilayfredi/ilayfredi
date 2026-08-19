@@ -25,271 +25,215 @@
 
 <style>
   :root {
-    --sky:       #eef3ff;
-    --sky-warm:  #fff4e9;
-    --ink:       #2a3157;
-    --ink-soft:  #737ba6;
-    --ink-faint: #aeb4d1;
-    --sun:       #ffb454;
-    --sun-deep:  #ff9138;
-    --coral:     #ff6b7a;
-    --teal:      #23bfa6;
-    --lilac:     #a99bff;
-    --white:     #ffffff;
-
+    --sky: #eef3ff; --bg1: #fff4e9; --bg2: #e4ecff;
+    --ink: #2a3157; --soft: #737ba6; --faint: #aeb4d1;
+    --sun: #ffb454; --coral: #ff6b7a; --teal: #23bfa6; --lilac: #a99bff;
+    --card: #ffffff; --line: rgba(42,49,87,0.10); --veil: rgba(238,243,255,0.76);
     --ui: system-ui, -apple-system, "Segoe UI", "Noto Sans Hebrew", Arial, sans-serif;
     --num: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-
-    --shadow-sm: 0 2px 10px rgba(42, 49, 87, 0.08);
-    --shadow-md: 0 10px 30px rgba(42, 49, 87, 0.13);
-    --shadow-lg: 0 24px 60px rgba(42, 49, 87, 0.18);
+    --sh-sm: 0 2px 10px rgba(20,26,50,0.07);
+    --sh-md: 0 10px 30px rgba(20,26,50,0.12);
+    --sh-lg: 0 24px 60px rgba(20,26,50,0.17);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
-
   body {
-    font-family: var(--ui);
-    color: var(--ink);
-    background: var(--sky);
+    font-family: var(--ui); color: var(--ink); background: var(--sky);
     -webkit-tap-highlight-color: transparent;
-    -webkit-user-select: none;
-    user-select: none;
+    -webkit-user-select: none; user-select: none;
   }
 
   #app {
-    position: fixed;
-    inset: 0;
-    overflow: hidden;
+    position: fixed; inset: 0; overflow: hidden;
     background:
-      radial-gradient(120% 80% at 50% 8%,  var(--sky-warm) 0%, rgba(255,244,233,0) 62%),
-      radial-gradient(100% 70% at 50% 110%, #e4ecff 0%, rgba(228,236,255,0) 70%),
+      radial-gradient(125% 85% at 50% 4%, var(--bg1) 0%, transparent 60%),
+      radial-gradient(110% 75% at 50% 112%, var(--bg2) 0%, transparent 68%),
       var(--sky);
+    transition: background 0.5s ease;
   }
-
   canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
   #screen { z-index: 1; }
-  #hud    { z-index: 2; pointer-events: none; }
+  #hud { z-index: 2; pointer-events: none; }
 
-  /* ---------- overlay screens ---------- */
   .veil {
-    position: absolute;
-    inset: 0;
-    z-index: 5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom));
-    text-align: center;
-    overflow-y: auto;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.42s ease, visibility 0.42s;
+    position: absolute; inset: 0; z-index: 5;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 15px;
+    padding: calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));
+    text-align: center; overflow-y: auto;
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s;
   }
   .veil.on { opacity: 1; visibility: visible; }
+  #splash { background: linear-gradient(170deg, var(--bg1) 0%, var(--sky) 58%, var(--bg2) 100%); }
+  #home, #about, #over, #getapp {
+    background: var(--veil);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
 
-  /* splash stays see-through so the orbit keeps drawing behind the name */
-  #splash { background: linear-gradient(168deg, rgba(255,244,233,0.86) 0%, rgba(238,243,255,0.8) 55%, rgba(230,237,255,0.88) 100%); }
-  #home, #about, #over { background: rgba(238, 243, 255, 0.74); backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px); }
-
-  /* ---------- splash ---------- */
-  .splash-eyebrow { font-size: 12px; letter-spacing: 0.14em; color: var(--ink-faint); }
+  /* splash */
+  .splash-eyebrow { font-size: 12px; letter-spacing: 0.14em; color: var(--faint); }
   .signature {
-    font-size: clamp(46px, 15vw, 92px);
-    font-weight: 300;
-    letter-spacing: 0.03em;
-    line-height: 1.12;
-    background: linear-gradient(96deg, var(--sun-deep) 0%, var(--coral) 44%, var(--lilac) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    font-size: clamp(46px, 15vw, 92px); font-weight: 300;
+    letter-spacing: 0.03em; line-height: 1.12;
+    background: linear-gradient(96deg, var(--sun) 0%, var(--coral) 46%, var(--lilac) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
     padding: 0 0.08em 0.06em;
   }
   .flourish {
     width: min(230px, 62vw); height: 2px; border-radius: 2px;
     background: linear-gradient(90deg, transparent, var(--sun) 30%, var(--coral) 70%, transparent);
   }
-  .rise { animation: rise 1s cubic-bezier(0.16, 0.9, 0.3, 1) both; }
-  .rise-2 { animation-delay: 0.16s; }
-  .rise-3 { animation-delay: 0.34s; }
+  .rise { animation: rise 1s cubic-bezier(.16,.9,.3,1) both; }
+  .rise-2 { animation-delay: .16s; } .rise-3 { animation-delay: .34s; }
   @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 
-  /* ---------- home ---------- */
+  /* chrome */
   .toprow {
-    position: absolute;
-    top: calc(14px + env(safe-area-inset-top));
-    inset-inline: 16px;
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
+    position: absolute; top: calc(13px + env(safe-area-inset-top));
+    inset-inline: 14px; display: flex; justify-content: space-between; gap: 8px;
   }
   .chip {
-    font-family: inherit; font-size: 12px; font-weight: 500;
-    color: var(--ink-soft); background: var(--white);
-    border: 1px solid rgba(42, 49, 87, 0.09);
-    border-radius: 999px; padding: 8px 13px; min-height: 36px;
-    cursor: pointer; box-shadow: var(--shadow-sm);
+    font-family: inherit; font-size: 12px; font-weight: 500; color: var(--soft);
+    background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+    padding: 8px 13px; min-height: 36px; cursor: pointer; box-shadow: var(--sh-sm);
   }
   .chip:focus-visible { outline: 3px solid var(--lilac); outline-offset: 2px; }
-  .chip[hidden] { display: none; }
 
-  .crown { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  .crown-label { font-size: 13px; letter-spacing: 0.12em; color: var(--ink-soft); }
+  .crown { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .crown-label { font-size: 13px; letter-spacing: .12em; color: var(--soft); }
   .crown-num {
-    font-family: var(--ui);
-    font-size: clamp(52px, 17vw, 100px);
-    font-weight: 700; line-height: 1;
+    font-size: clamp(48px, 16vw, 92px); font-weight: 700; line-height: 1;
     font-variant-numeric: tabular-nums;
-    background: linear-gradient(150deg, var(--ink) 0%, #5b64a8 60%, var(--lilac) 100%);
+    background: linear-gradient(150deg, var(--ink) 0%, var(--lilac) 115%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
-  .crown-sub { font-size: 13px; color: var(--ink-faint); }
+  .crown-sub { font-size: 13px; color: var(--faint); }
 
-  .menu { display: flex; flex-direction: column; gap: 10px; width: min(330px, 86vw); }
-
+  .menu { display: flex; flex-direction: column; gap: 9px; width: min(330px, 86vw); }
   .btn {
-    font-family: inherit; font-size: 19px; font-weight: 600;
-    color: var(--white); border: 0; border-radius: 999px;
-    padding: 16px 24px; min-height: 54px; cursor: pointer;
-    background: linear-gradient(140deg, var(--sun) 0%, var(--sun-deep) 55%, var(--coral) 100%);
-    box-shadow: var(--shadow-md);
-    transition: transform 0.16s ease, box-shadow 0.16s ease;
+    font-family: inherit; font-size: 19px; font-weight: 600; color: #fff;
+    border: 0; border-radius: 999px; padding: 15px 24px; min-height: 53px; cursor: pointer;
+    background: linear-gradient(140deg, var(--sun) 0%, var(--coral) 100%);
+    box-shadow: var(--sh-md);
+    transition: transform .16s ease, box-shadow .16s ease;
   }
-  .btn:active { transform: translateY(2px) scale(0.985); box-shadow: var(--shadow-sm); }
+  .btn:active { transform: translateY(2px) scale(.985); box-shadow: var(--sh-sm); }
   .btn:focus-visible { outline: 3px solid var(--lilac); outline-offset: 3px; }
   .btn-ghost {
-    background: var(--white); color: var(--ink);
-    box-shadow: var(--shadow-sm); border: 1px solid rgba(42, 49, 87, 0.09);
-    font-weight: 500;
+    background: var(--card); color: var(--ink); box-shadow: var(--sh-sm);
+    border: 1px solid var(--line); font-weight: 500;
   }
-  .btn-lilac { background: linear-gradient(140deg, #bdb0ff 0%, var(--lilac) 55%, #8b7bff 100%); }
-  .btn-teal  { background: linear-gradient(140deg, #45d3bb 0%, var(--teal) 60%, #17a892 100%); }
-  .btn-sm { font-size: 16px; min-height: 46px; padding: 12px 20px; }
+  .btn-lilac { background: linear-gradient(140deg, var(--lilac) 0%, var(--teal) 130%); }
+  .btn-teal { background: linear-gradient(140deg, var(--teal) 0%, var(--lilac) 130%); }
+  .btn-sm { font-size: 16px; min-height: 45px; padding: 11px 20px; }
 
-  /* ---------- daily missions ---------- */
-  .quests {
-    width: min(330px, 86vw);
-    background: var(--white);
-    border-radius: 18px;
-    padding: 14px 16px;
-    box-shadow: var(--shadow-sm);
-    text-align: start;
+  .panel {
+    width: min(330px, 86vw); background: var(--card); border-radius: 18px;
+    padding: 13px 15px; box-shadow: var(--sh-sm); text-align: start;
   }
-  .quests h3 {
-    font-size: 11px; letter-spacing: 0.08em; color: var(--ink-faint);
-    font-weight: 600; margin-bottom: 9px;
-  }
-  .quest { display: flex; align-items: center; gap: 9px; padding: 4px 0; font-size: 13px; }
+  .panel h3 { font-size: 11px; letter-spacing: .08em; color: var(--faint); font-weight: 600; margin-bottom: 8px; }
+  .quest { display: flex; align-items: center; gap: 9px; padding: 3px 0; font-size: 13px; }
   .quest .tick {
     flex: 0 0 auto; width: 17px; height: 17px; border-radius: 50%;
-    border: 2px solid var(--ink-faint);
-    display: grid; place-items: center;
-    font-size: 10px; color: var(--white);
+    border: 2px solid var(--faint); display: grid; place-items: center; font-size: 10px; color: #fff;
   }
   .quest.done .tick { background: var(--teal); border-color: var(--teal); }
-  .quest.done span { color: var(--ink-soft); text-decoration: line-through; }
-  .quest .prog { margin-inline-start: auto; font-family: var(--num); font-size: 11px; color: var(--ink-faint); }
+  .quest.done span { color: var(--soft); text-decoration: line-through; }
+  .quest .prog { margin-inline-start: auto; font-family: var(--num); font-size: 11px; color: var(--faint); }
+
+  /* style picker */
+  .styles { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .sty {
+    width: 40px; height: 40px; border-radius: 13px; cursor: pointer; padding: 0;
+    border: 3px solid transparent; position: relative; overflow: hidden;
+    box-shadow: var(--sh-sm);
+  }
+  .sty.sel { border-color: var(--ink); }
+  .sty:focus-visible { outline: 3px solid var(--lilac); outline-offset: 2px; }
+  .sty i { position: absolute; inset: 0; }
+  .sty b { position: absolute; inset-inline-end: 4px; bottom: 3px; width: 9px; height: 9px; border-radius: 50%; }
 
   .codebar { display: flex; gap: 7px; width: min(330px, 86vw); }
   .codebar input {
-    flex: 1 1 auto; min-width: 0;
-    font-family: var(--num); font-size: 13px; color: var(--ink);
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(42, 49, 87, 0.12);
-    border-radius: 12px; padding: 11px 13px; text-align: start;
+    flex: 1 1 auto; min-width: 0; font-family: var(--num); font-size: 13px; color: var(--ink);
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 11px 13px; text-align: start;
   }
-  .codebar input::placeholder { font-family: var(--ui); color: var(--ink-faint); }
+  .codebar input::placeholder { font-family: var(--ui); color: var(--faint); }
   .codebar input:focus-visible { outline: 2px solid var(--lilac); outline-offset: 1px; }
   .codebar.bad input { border-color: var(--coral); color: var(--coral); }
   .codebar button {
     font-family: inherit; font-size: 13px; font-weight: 600; color: var(--ink);
-    background: var(--white); border: 1px solid rgba(42, 49, 87, 0.1);
-    border-radius: 12px; padding: 11px 15px; cursor: pointer; box-shadow: var(--shadow-sm);
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 11px 15px; cursor: pointer; box-shadow: var(--sh-sm);
   }
 
-  /* ---------- about sheet ---------- */
   .sheet {
     width: min(430px, 92vw); max-height: 60vh; overflow-y: auto;
-    background: var(--white); border-radius: 26px; padding: 26px 24px;
-    box-shadow: var(--shadow-lg); text-align: start;
-    scrollbar-width: thin; scrollbar-color: var(--ink-faint) transparent;
-    -webkit-overflow-scrolling: touch;
+    background: var(--card); border-radius: 26px; padding: 24px 22px;
+    box-shadow: var(--sh-lg); text-align: start;
+    scrollbar-width: thin; scrollbar-color: var(--faint) transparent;
   }
   .sheet::-webkit-scrollbar { width: 6px; }
-  .sheet::-webkit-scrollbar-track { background: transparent; }
-  .sheet::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 3px; }
-  .sheet h2 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
-  .sheet .lede { color: var(--ink-soft); font-size: 15px; line-height: 1.65; margin-bottom: 18px; }
-  .sheet h3 { font-size: 12px; letter-spacing: 0.08em; color: var(--ink-faint); margin: 18px 0 8px; }
+  .sheet::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 3px; }
+  .sheet h2 { font-size: 23px; font-weight: 700; margin-bottom: 6px; }
+  .sheet .lede { color: var(--soft); font-size: 15px; line-height: 1.65; margin-bottom: 16px; }
+  .sheet h3 { font-size: 12px; letter-spacing: .08em; color: var(--faint); margin: 16px 0 8px; }
   .sheet p { font-size: 15px; line-height: 1.7; }
   .steps { list-style: none; display: flex; flex-direction: column; gap: 9px; }
   .steps li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.55; }
   .dot { flex: 0 0 auto; width: 11px; height: 11px; border-radius: 50%; margin-top: 5px; }
-  .signoff { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(42,49,87,0.09); font-size: 14px; color: var(--ink-soft); }
+  .signoff { margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--line); font-size: 14px; color: var(--soft); }
   .signoff b { color: var(--ink); font-weight: 600; }
-
-  .swatches { display: flex; gap: 10px; flex-wrap: wrap; }
-  .sw {
-    width: 44px; height: 44px; border-radius: 14px; cursor: pointer;
-    border: 3px solid transparent; background: none; padding: 0;
-    display: grid; place-items: center; position: relative;
-  }
-  .sw i { width: 26px; height: 26px; border-radius: 9px; display: block; }
-  .sw.sel { border-color: var(--ink); }
-  .sw.locked { opacity: 0.35; cursor: not-allowed; }
-  .sw small {
-    position: absolute; bottom: -15px; inset-inline: 0;
-    font-size: 9px; color: var(--ink-faint); font-family: var(--num);
-  }
-  .swatch-wrap { padding-bottom: 18px; }
-
-  .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; padding: 7px 0; }
+  .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; padding: 6px 0; }
   .toggle button {
-    font-family: inherit; font-size: 12px; font-weight: 600;
-    color: var(--ink); background: var(--white);
-    border: 1px solid rgba(42,49,87,0.12); border-radius: 999px;
+    font-family: inherit; font-size: 12px; font-weight: 600; color: var(--ink);
+    background: var(--card); border: 1px solid var(--line); border-radius: 999px;
     padding: 7px 14px; cursor: pointer;
   }
-  .toggle button.off { color: var(--ink-faint); }
+  .toggle button.off { color: var(--faint); }
 
-  /* ---------- game over card ---------- */
-  .card {
-    width: min(360px, 90vw); background: var(--white);
-    border-radius: 28px; padding: 26px 24px 22px;
-    box-shadow: var(--shadow-lg);
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  .howto { list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: 11px; }
+  .howto li { display: flex; gap: 11px; font-size: 14.5px; line-height: 1.5; }
+  .howto li::before {
+    counter-increment: s; content: counter(s);
+    flex: 0 0 auto; width: 23px; height: 23px; border-radius: 50%;
+    background: var(--sun); color: #fff; font-size: 12px; font-weight: 700;
+    display: grid; place-items: center;
   }
-  .card-label { font-size: 13px; letter-spacing: 0.12em; color: var(--ink-soft); }
+
+  .card {
+    width: min(360px, 90vw); background: var(--card); border-radius: 28px;
+    padding: 24px 22px 20px; box-shadow: var(--sh-lg);
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+  }
+  .card-label { font-size: 13px; letter-spacing: .12em; color: var(--soft); }
   .card-num {
-    font-family: var(--ui);
-    font-size: clamp(48px, 15vw, 76px);
-    font-weight: 700; line-height: 1.04;
+    font-size: clamp(46px, 14vw, 72px); font-weight: 700; line-height: 1.05;
     font-variant-numeric: tabular-nums; color: var(--ink);
   }
-  .card-sector { font-size: 14px; color: var(--ink-soft); }
+  .card-sector { font-size: 14px; color: var(--soft); }
   .ribbon {
-    font-size: 13px; font-weight: 600; color: var(--white);
+    font-size: 13px; font-weight: 600; color: #fff;
     background: linear-gradient(130deg, var(--sun) 0%, var(--coral) 100%);
     border-radius: 999px; padding: 6px 15px; margin: 5px 0 2px;
   }
   .ribbon[hidden] { display: none; }
-  .card-best { font-size: 14px; color: var(--ink-soft); margin-bottom: 12px; }
+  .card-best { font-size: 14px; color: var(--soft); margin-bottom: 11px; }
   .card-best b { color: var(--ink); font-weight: 700; }
   .card .btn { width: 100%; }
-  .card .btn + .btn { margin-top: 9px; }
+  .card .btn + .btn { margin-top: 8px; }
   .linky {
-    margin-top: 13px; font-family: inherit; font-size: 14px; font-weight: 500;
-    color: var(--ink-soft); background: none; border: 0;
-    border-bottom: 1px dashed var(--ink-faint); padding: 3px 1px; cursor: pointer;
+    margin-top: 12px; font-family: inherit; font-size: 14px; font-weight: 500;
+    color: var(--soft); background: none; border: 0;
+    border-bottom: 1px dashed var(--faint); padding: 3px 1px; cursor: pointer;
   }
-  .linky:focus-visible { outline: 2px solid var(--lilac); outline-offset: 3px; }
+  [hidden] { display: none !important; }
 
   @media (prefers-reduced-motion: reduce) {
-    .rise { animation: none; }
-    .veil { transition: none; }
+    .rise { animation: none; } .veil { transition: none; } #app { transition: none; }
   }
 </style>
 </head>
@@ -308,7 +252,7 @@
   <section id="home" class="veil">
     <div class="toprow">
       <button id="sound" class="chip" type="button">צליל פועל</button>
-      <button id="install" class="chip" type="button" hidden>התקן במסך הבית</button>
+      <button id="btnGet" class="chip" type="button">הורד לטלפון</button>
     </div>
 
     <div class="crown">
@@ -323,16 +267,42 @@
       <button id="btnAbout" class="btn btn-ghost btn-sm" type="button">קצת עלינו</button>
     </div>
 
-    <div class="quests">
+    <div class="panel">
       <h3>משימות היום</h3>
       <div id="questList"></div>
     </div>
+
+    <div class="styles" id="styles"></div>
 
     <form id="codebar" class="codebar">
       <input id="code" type="text" placeholder="קוד של חבר" autocomplete="off"
              autocapitalize="off" spellcheck="false" aria-label="קוד אתגר של חבר">
       <button id="load" type="submit">טען</button>
     </form>
+  </section>
+
+  <section id="getapp" class="veil">
+    <div class="sheet">
+      <h2>הורדה לטלפון</h2>
+      <p class="lede">המשחק נשמר כאפליקציה אמיתית — אייקון במסך הבית, מסך מלא בלי סרגל כתובת, ועובד גם בלי אינטרנט.</p>
+      <div id="installBox" hidden>
+        <div class="menu" style="width:100%"><button id="install" class="btn" type="button">התקן עכשיו</button></div>
+      </div>
+      <h3>אנדרואיד</h3>
+      <ol class="howto">
+        <li>פתח את התפריט (שלוש נקודות) בפינת הדפדפן.</li>
+        <li>בחר "הוספה למסך הבית" או "התקנת אפליקציה".</li>
+        <li>אשר. האייקון מופיע במסך הבית.</li>
+      </ol>
+      <h3>אייפון</h3>
+      <ol class="howto">
+        <li>לחץ על כפתור השיתוף בתחתית ספארי (ריבוע עם חץ למעלה).</li>
+        <li>גלול ובחר "הוסף למסך הבית".</li>
+        <li>לחץ "הוסף" בפינה.</li>
+      </ol>
+      <p class="signoff">חייב להיפתח ב<b>ספארי</b> באייפון — בכרום באייפון האפשרות לא קיימת.</p>
+    </div>
+    <div class="menu"><button id="btnGetBack" class="btn btn-ghost" type="button">אחורנית</button></div>
   </section>
 
   <section id="about" class="veil">
@@ -342,31 +312,22 @@
         מסלול דועך הוא משחק על שליטה אחת בלבד. אתה נעול במסלול סביב כוכב שקורס,
         ונגיעה במסך הופכת את כיוון התנועה שלך. זה הכל — ומשם זה רק נעשה קשה יותר.
       </p>
-
       <h3>איך משחקים</h3>
       <ul class="steps">
-        <li><span class="dot" style="background:#2a3157"></span><span>נוגעים בכל מקום במסך כדי להפוך כיוון. אין כפתורים.</span></li>
-        <li><span class="dot" style="background:#23bfa6"></span><span>אוספים כדורי פלזמה כדי להעלות את המכפיל.</span></li>
-        <li><span class="dot" style="background:#ff6b7a"></span><span>חולפים קרוב לסלעים בלי להתנגש — הזמן נמתח לרגע, והניקוד עולה.</span></li>
-        <li><span class="dot" style="background:#a99bff"></span><span>מגן סגול מופיע לעיתים נדירות. הוא סופג פגיעה אחת.</span></li>
-        <li><span class="dot" style="background:#ffb454"></span><span>שישה אזורים. כל אזור שומר על הסכנות של הקודם ומוסיף אחת.</span></li>
+        <li><span class="dot" style="background:var(--ink)"></span><span>נוגעים בכל מקום במסך כדי להפוך כיוון. אין כפתורים.</span></li>
+        <li><span class="dot" style="background:var(--teal)"></span><span>אוספים כדורי פלזמה כדי להעלות את המכפיל.</span></li>
+        <li><span class="dot" style="background:var(--coral)"></span><span>חולפים קרוב לסלעים בלי להתנגש — ככל שקרוב יותר, כך יותר נקודות.</span></li>
+        <li><span class="dot" style="background:var(--lilac)"></span><span>מגנים מופיעים על המסלול. כל אחד סופג פגיעה אחת.</span></li>
+        <li><span class="dot" style="background:var(--sun)"></span><span>שישה אזורים. כל אזור שומר על הסכנות של הקודם ומוסיף אחת.</span></li>
       </ul>
-
       <h3>אתגר יומי</h3>
-      <p>כל יום כולם מקבלים בדיוק את אותו שדה סלעים, לפי התאריך. אותה התחלה, אותם סלעים — רק מי שמשחק טוב יותר מנצח.</p>
-
-      <h3>ערכות צבע</h3>
-      <div class="swatch-wrap"><div id="swatches" class="swatches"></div></div>
-
+      <p>כל יום כולם מקבלים בדיוק את אותו שדה סלעים, לפי התאריך. אותם סלעים — רק מי שמשחק טוב יותר מנצח.</p>
       <h3>הגדרות</h3>
       <div class="toggle"><span>רטט בפגיעה</span><button id="tglHaptics" type="button">פועל</button></div>
       <div class="toggle"><span>מוזיקה</span><button id="tglMusic" type="button">פועלת</button></div>
-
       <p class="signoff">נבנה על ידי <b>עילי פרדי</b>.</p>
     </div>
-    <div class="menu">
-      <button id="btnBack" class="btn btn-ghost" type="button">חזרה</button>
-    </div>
+    <div class="menu"><button id="btnBack" class="btn btn-ghost" type="button">אחורנית</button></div>
   </section>
 
   <section id="over" class="veil">
@@ -378,7 +339,7 @@
       <p class="card-best">השיא: <b id="overBest">0</b></p>
       <button id="btnRevive" class="btn btn-teal" type="button" hidden>עוד חיים אחד</button>
       <button id="btnAgain" class="btn" type="button">שוב</button>
-      <button id="btnQuit" class="btn btn-ghost" type="button">די זה קשה</button>
+      <button id="btnQuit" class="btn btn-ghost" type="button">אחורנית</button>
       <button id="btnShare" class="linky" type="button">שתף את התוצאה</button>
     </div>
   </section>
@@ -390,54 +351,69 @@
 
   /* ============================================================
      מסלול דועך / ORBIT DECAY
-
      One input: touching anywhere reverses your direction around a
      collapsing star. Six sectors, each keeping the hazards before
      it and adding one more.
 
-     Everything that affects the world is driven by a seeded PRNG
-     plus a fixed-timestep tick counter, so a whole run is described
-     by its seed and the frames the player tapped on. That is what
-     makes both the shareable ghost replay and the daily challenge
-     (seed = today's date) nearly free.
-
-     Slow motion never adds or drops ticks - it only changes how
-     fast wall-clock time feeds the accumulator - so replays stay
-     exact.
+     Everything that affects the world comes from a seeded PRNG plus
+     a fixed-timestep tick counter, so a run is fully described by
+     its seed and the frames the player tapped on. That is what makes
+     the shareable ghost replay and the date-seeded daily challenge
+     nearly free.
      ============================================================ */
 
-  /* ---------- config ---------- */
   var U = 1000, CX = 500, CY = 500, ORBIT = 268;
   var STEP = 1000 / 60, W_BASE = 0.0265, SECTOR = 800;
+  var BOOST_N = 6, BOOST_W = 0.017;
   var REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  var C = {
-    sky: "#eef3ff", ink: "#2a3157", soft: "#737ba6", faint: "#aeb4d1",
-    sun: "#ffb454", coral: "#ff6b7a", teal: "#23bfa6", lilac: "#a99bff"
-  };
+  /* ---------- display styles, freely switchable ---------- */
+  var STYLES = [
+    { id: "day", name: "יום",
+      sky: "#eef3ff", bg1: "#fff4e9", bg2: "#e4ecff", veil: "rgba(238,243,255,0.76)",
+      ink: "#2a3157", soft: "#737ba6", faint: "#aeb4d1", card: "#ffffff", line: "rgba(42,49,87,0.10)",
+      sun: "#ffb454", coral: "#ff6b7a", teal: "#23bfa6", lilac: "#a99bff",
+      ship: "#2a3157", wash: "rgba(238,243,255,0.34)" },
+    { id: "sunset", name: "שקיעה",
+      sky: "#fff1ec", bg1: "#ffe0cf", bg2: "#ffd8e6", veil: "rgba(255,241,236,0.78)",
+      ink: "#4a2340", soft: "#9b6180", faint: "#d9aabd", card: "#fffaf7", line: "rgba(74,35,64,0.10)",
+      sun: "#ff9a5c", coral: "#ff4f80", teal: "#4ec5c1", lilac: "#b06ab3",
+      ship: "#4a2340", wash: "rgba(255,241,236,0.34)" },
+    { id: "sea", name: "ים",
+      sky: "#eaf7fa", bg1: "#d6f1f7", bg2: "#e3edff", veil: "rgba(234,247,250,0.78)",
+      ink: "#123a4a", soft: "#4b8296", faint: "#a4cbd7", card: "#ffffff", line: "rgba(18,58,74,0.10)",
+      sun: "#ffc75f", coral: "#ff7b6b", teal: "#14b8a6", lilac: "#7aa2ff",
+      ship: "#123a4a", wash: "rgba(234,247,250,0.34)" },
+    { id: "mint", name: "מנטה",
+      sky: "#eefaf3", bg1: "#dbf7e8", bg2: "#e8f2ff", veil: "rgba(238,250,243,0.78)",
+      ink: "#1d4034", soft: "#5c8a77", faint: "#a7ccbb", card: "#ffffff", line: "rgba(29,64,52,0.10)",
+      sun: "#ffbe55", coral: "#ff7a85", teal: "#12b886", lilac: "#8fa8ff",
+      ship: "#1d4034", wash: "rgba(238,250,243,0.34)" },
+    { id: "night", name: "לילה",
+      sky: "#10131f", bg1: "#1d2440", bg2: "#0b0e18", veil: "rgba(16,19,31,0.80)",
+      ink: "#e9edff", soft: "#98a2c8", faint: "#4d5679", card: "#1b2033", line: "rgba(255,255,255,0.11)",
+      sun: "#ffc061", coral: "#ff6b7a", teal: "#35d6b8", lilac: "#b3a4ff",
+      ship: "#e9edff", wash: "rgba(16,19,31,0.34)" }
+  ];
 
   var SECTORS = [
-    { name: "סחף",      blurb: "סלעים בקווים ישרים",         tint: "#2a3157" },
-    { name: "אש צולבת", blurb: "עכשיו זה מגיע משני הצדדים",  tint: "#5b64a8" },
-    { name: "פולסר",    blurb: "הכוכב יורה. שים לב לסריקה",   tint: "#ffb454" },
-    { name: "רסיסים",   blurb: "הגדולים מתפוצצים",            tint: "#ff8a5c" },
-    { name: "ליקוי",    blurb: "רואים רק מה שקרוב",           tint: "#a99bff" },
-    { name: "קריסה",    blurb: "המסלול נופל פנימה",           tint: "#ff6b7a" }
+    { name: "סחף",      blurb: "סלעים בקווים ישרים" },
+    { name: "אש צולבת", blurb: "עכשיו זה מגיע משני הצדדים" },
+    { name: "פולסר",    blurb: "הכוכב יורה. שים לב לסריקה" },
+    { name: "רסיסים",   blurb: "הגדולים מתפוצצים" },
+    { name: "ליקוי",    blurb: "רואים רק מה שקרוב" },
+    { name: "קריסה",    blurb: "המסלול נופל פנימה" }
   ];
-
-  var THEMES = [
-    { name: "לילה",  ship: "#2a3157", need: 0 },
-    { name: "אלמוג", ship: "#ff6b7a", need: 3000 },
-    { name: "טורקיז", ship: "#12a894", need: 10000 },
-    { name: "לילך",  ship: "#8b7bff", need: 25000 }
-  ];
+  var SEC_TINT = ["ink", "lilac", "sun", "coral", "lilac", "coral"];
 
   var $ = function (id) { return document.getElementById(id); };
-  var app = $("app");
-  var cv = $("screen"), ctx = cv.getContext("2d");
+  var app = $("app"), cv = $("screen"), ctx = cv.getContext("2d");
   var hc = $("hud"), h = hc.getContext("2d");
 
-  /* ---------- seeded rng ---------- */
+  var C = {};                       // live colours for the canvas
+  var styleIdx = 0;
+
+  /* ---------- rng ---------- */
   var _s = 1;
   function seedRng(n) { _s = n >>> 0; }
   function rnd() {
@@ -447,12 +423,7 @@
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   }
-  // Math.random is used only for cosmetics (sparks, shake, motes)
-
-  function todayKey() {
-    var d = new Date();
-    return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
-  }
+  function todayKey() { var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
   function hashStr(s) {
     var x = 2166136261 >>> 0;
     for (var i = 0; i < s.length; i++) { x ^= s.charCodeAt(i); x = Math.imul(x, 16777619) >>> 0; }
@@ -463,15 +434,45 @@
   function lsGet(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
-  // "orbit-decay-best" was the key before the Hebrew rebuild - carry it over
   var best = parseInt(lsGet("od-best", "0"), 10) || 0;
   var legacyBest = parseInt(lsGet("orbit-decay-best", "0"), 10) || 0;
   if (legacyBest > best) { best = legacyBest; lsSet("od-best", String(best)); }
   var hapticsOn = lsGet("od-haptics", "1") === "1";
   var musicOn = lsGet("od-music", "1") === "1";
-  var themeIdx = parseInt(lsGet("od-theme", "0"), 10) || 0;
-  if (!THEMES[themeIdx] || best < THEMES[themeIdx].need) themeIdx = 0;
-  function shipColor() { return THEMES[themeIdx].ship; }
+
+  /* ---------- apply a style ---------- */
+  function applyStyle(i, save) {
+    styleIdx = Math.max(0, Math.min(STYLES.length - 1, i));
+    var s = STYLES[styleIdx], r = document.documentElement.style;
+    ["sky", "bg1", "bg2", "veil", "ink", "soft", "faint", "card", "line", "sun", "coral", "teal", "lilac"]
+      .forEach(function (k) { r.setProperty("--" + k, s[k]); });
+    C = { sky: s.sky, ink: s.ink, soft: s.soft, faint: s.faint,
+          sun: s.sun, coral: s.coral, teal: s.teal, lilac: s.lilac, ship: s.ship, wash: s.wash };
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", s.sky);
+    if (save) lsSet("od-style", String(styleIdx));
+    if (cw) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = s.sky; ctx.fillRect(0, 0, cw, ch); }
+    paintStyles();
+  }
+  function paintStyles() {
+    var host = $("styles");
+    if (!host) return;
+    host.innerHTML = "";
+    STYLES.forEach(function (s, i) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "sty" + (i === styleIdx ? " sel" : "");
+      b.title = s.name;
+      b.setAttribute("aria-label", "סגנון " + s.name);
+      var bg = document.createElement("i");
+      bg.style.background = "linear-gradient(140deg," + s.bg1 + " 0%," + s.sky + " 55%," + s.bg2 + " 100%)";
+      var d = document.createElement("b");
+      d.style.background = s.sun;
+      b.appendChild(bg); b.appendChild(d);
+      b.addEventListener("click", function () { applyStyle(i, true); sfx.ui(); });
+      host.appendChild(b);
+    });
+  }
 
   /* ---------- sizing ---------- */
   var dpr = 1, cw = 0, ch = 0, S = 1, ox = 0, oy = 0, VW = 0, VH = 0;
@@ -490,13 +491,8 @@
   addEventListener("orientationchange", function () { setTimeout(fit, 140); });
   function toCss(p) { return { x: (ox + p.x * S) / dpr, y: (oy + p.y * S) / dpr }; }
 
-  /* ---------- haptics ----------
-     Android fires these; iOS Safari has no Vibration API, so it is
-     simply a no-op there                                          */
-  function buzz(pattern) {
-    if (!hapticsOn) return;
-    try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {}
-  }
+  /* ---------- haptics (Android; iOS Safari has no Vibration API) ---------- */
+  function buzz(p) { if (!hapticsOn) return; try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
 
   /* ---------- audio ---------- */
   var ac = null, muted = false, masterGain = null;
@@ -504,9 +500,7 @@
     if (!ac) {
       try {
         ac = new (window.AudioContext || window.webkitAudioContext)();
-        masterGain = ac.createGain();
-        masterGain.gain.value = 1;
-        masterGain.connect(ac.destination);
+        masterGain = ac.createGain(); masterGain.gain.value = 1; masterGain.connect(ac.destination);
       } catch (e) { return null; }
     }
     if (ac.state === "suspended") ac.resume();
@@ -516,8 +510,7 @@
     if (muted) return;
     var a = audio(); if (!a) return;
     try {
-      var t = a.currentTime;
-      var o = a.createOscillator(), gn = a.createGain();
+      var t = a.currentTime, o = a.createOscillator(), gn = a.createGain();
       o.type = type;
       o.frequency.setValueAtTime(f0, t);
       o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + dur);
@@ -531,7 +524,7 @@
   var sfx = {
     flip:   function ()  { tone("sine", 520, 360, 0.07, 0.05); },
     orb:    function (n) { tone("sine", 560 * Math.pow(1.06, Math.min(n, 14)), 980, 0.14, 0.085); },
-    graze:  function ()  { tone("triangle", 1500, 1900, 0.045, 0.03); },
+    graze:  function ()  { tone("triangle", 1500, 1900, 0.045, 0.028); },
     hit:    function ()  { tone("sawtooth", 190, 55, 0.32, 0.12); },
     dead:   function ()  { tone("sawtooth", 340, 40, 0.85, 0.13); },
     ahead:  function ()  { tone("sine", 660, 1320, 0.5, 0.1); },
@@ -542,30 +535,26 @@
     ui:     function ()  { tone("sine", 620, 820, 0.08, 0.05); }
   };
 
-  /* ---------- music ----------
-     one short scheduler; each sector switches on another layer     */
   var music = { timer: null, next: 0, step: 0 };
   var PENT = [0, 3, 5, 7, 10];
-  function noteFreq(semi) { return 220 * Math.pow(2, semi / 12); }
-  function blip(type, freq, t, dur, vol, dest) {
-    var a = ac; if (!a) return;
-    var o = a.createOscillator(), gn = a.createGain();
-    o.type = type;
-    o.frequency.setValueAtTime(freq, t);
+  function nf(s) { return 220 * Math.pow(2, s / 12); }
+  function blip(type, freq, t, dur, vol) {
+    if (!ac) return;
+    var o = ac.createOscillator(), gn = ac.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
     gn.gain.setValueAtTime(0.0001, t);
     gn.gain.exponentialRampToValueAtTime(vol, t + 0.02);
     gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.connect(gn); gn.connect(dest || masterGain);
+    o.connect(gn); gn.connect(masterGain);
     o.start(t); o.stop(t + dur + 0.02);
   }
   function musicStep(step, t) {
-    var sec = g ? g.sector : 0;
-    var deg = PENT[step % PENT.length];
-    if (step % 4 === 0) blip("sine", noteFreq(deg - 24), t, 0.42, 0.055);          // bass
-    if (sec >= 1 && step % 2 === 0) blip("triangle", noteFreq(deg + 12), t, 0.16, 0.028);
-    if (sec >= 2 && step % 8 === 0) blip("sawtooth", noteFreq(deg - 12), t, 0.7, 0.016);
-    if (sec >= 3 && step % 4 === 2) blip("square", noteFreq(deg + 24), t, 0.05, 0.015);
-    if (sec >= 5 && step % 2 === 1) blip("square", noteFreq(deg + 7), t, 0.07, 0.014);
+    var sec = g ? g.sector : 0, deg = PENT[step % PENT.length];
+    if (step % 4 === 0) blip("sine", nf(deg - 24), t, 0.42, 0.055);
+    if (sec >= 1 && step % 2 === 0) blip("triangle", nf(deg + 12), t, 0.16, 0.026);
+    if (sec >= 2 && step % 8 === 0) blip("sawtooth", nf(deg - 12), t, 0.7, 0.015);
+    if (sec >= 3 && step % 4 === 2) blip("square", nf(deg + 24), t, 0.05, 0.014);
+    if (sec >= 5 && step % 2 === 1) blip("square", nf(deg + 7), t, 0.07, 0.013);
   }
   function musicStart() {
     if (!musicOn || muted) return;
@@ -574,15 +563,10 @@
     music.timer = setInterval(function () {
       if (!ac) return;
       var dur = (g && g.sector >= 5) ? 0.115 : (g && g.sector >= 3 ? 0.13 : 0.15);
-      while (music.next < ac.currentTime + 0.25) {
-        musicStep(music.step, music.next);
-        music.next += dur; music.step++;
-      }
+      while (music.next < ac.currentTime + 0.25) { musicStep(music.step, music.next); music.next += dur; music.step++; }
     }, 90);
   }
-  function musicStop() {
-    if (music.timer) { clearInterval(music.timer); music.timer = null; }
-  }
+  function musicStop() { if (music.timer) { clearInterval(music.timer); music.timer = null; } }
 
   /* ---------- challenge codec ---------- */
   function encodeRun(r) {
@@ -609,8 +593,7 @@
     try { if (window.top !== window && window.top.location.href) return window.top.location.href; } catch (e) {}
     return location.href;
   }
-  function stripHash(u) { return u.split("#")[0]; }
-
+  function stripHash(u) { return u.split("#")[0].split("?")[0]; }
   var challenge = null;
   if (location.hash) challenge = decodeRun(location.hash);
 
@@ -627,10 +610,8 @@
     seedRng(hashStr("q" + key));
     var pool = QUEST_POOL.slice(), picked = [];
     for (var i = 0; i < 3 && pool.length; i++) {
-      var j = Math.floor(rnd() * pool.length);
-      var q = pool.splice(j, 1)[0];
-      var span = q.hi - q.lo;
-      var target = q.lo + Math.floor(rnd() * (span + 1));
+      var q = pool.splice(Math.floor(rnd() * pool.length), 1)[0];
+      var target = q.lo + Math.floor(rnd() * (q.hi - q.lo + 1));
       if (q.id === "score") target = Math.round(target / 500) * 500;
       picked.push({ id: q.id, target: target, label: q.label(target) });
     }
@@ -639,72 +620,56 @@
     paintQuests();
   }
   function paintQuests() {
-    var host = $("questList");
-    host.innerHTML = "";
+    var host = $("questList"); host.innerHTML = "";
     quests.forEach(function (q) {
-      var have = questProg[q.id] || 0;
-      var done = have >= q.target;
+      var have = questProg[q.id] || 0, done = have >= q.target;
       var row = document.createElement("div");
       row.className = "quest" + (done ? " done" : "");
-      var tick = document.createElement("span");
-      tick.className = "tick"; tick.textContent = done ? "✓" : "";
-      var txt = document.createElement("span");
-      txt.textContent = q.label;
-      var prog = document.createElement("span");
-      prog.className = "prog";
-      prog.textContent = Math.min(have, q.target) + "/" + q.target;
-      row.appendChild(tick); row.appendChild(txt); row.appendChild(prog);
+      var tick = document.createElement("span"); tick.className = "tick"; tick.textContent = done ? "✓" : "";
+      var txt = document.createElement("span"); txt.textContent = q.label;
+      var pr = document.createElement("span"); pr.className = "prog";
+      pr.textContent = Math.min(have, q.target) + "/" + q.target;
+      row.appendChild(tick); row.appendChild(txt); row.appendChild(pr);
       host.appendChild(row);
     });
   }
   function commitQuests() {
     var key = todayKey();
     var vals = { orbs: g.orbsGot, sector: g.sector + 1, score: g.score, graze: g.grazes };
-    quests.forEach(function (q) {
-      var v = vals[q.id] || 0;
-      if (v > (questProg[q.id] || 0)) questProg[q.id] = v;
-    });
+    quests.forEach(function (q) { if ((vals[q.id] || 0) > (questProg[q.id] || 0)) questProg[q.id] = vals[q.id]; });
     lsSet("od-quests-" + key, JSON.stringify(questProg));
     paintQuests();
   }
 
   /* ---------- state ---------- */
   var TITLE = 0, PLAY = 1, OVER = 2;
-  var g, ship, ghost, rocks, orbs, bits, run, shieldPk;
+  var g, ship, ghost, rocks, orbs, bits, run, shields;
   var orbit = ORBIT, view = "splash", dailyMode = false;
 
   var motes = [];
-  for (var mi = 0; mi < 34; mi++) motes.push({ x: Math.random() * U, y: Math.random() * U, d: Math.random() * 0.22 + 0.05 });
+  for (var mi = 0; mi < 44; mi++) {
+    motes.push({ x: Math.random() * U, y: Math.random() * U, d: Math.random() * 0.22 + 0.04, s: Math.random() * 2 + 1.4 });
+  }
 
   function reset(toTitle) {
-    var seed;
-    if (dailyMode) seed = hashStr("d" + todayKey());
-    else if (challenge) seed = challenge.seed;
-    else seed = (Math.random() * 0x7fffffff) >>> 0;
+    var seed = dailyMode ? hashStr("d" + todayKey()) : (challenge ? challenge.seed : (Math.random() * 0x7fffffff) >>> 0);
     seedRng(seed);
-
     g = {
       state: toTitle ? TITLE : PLAY,
       score: 0, lives: 3, combo: 1, t: 0,
       rockClock: 0, orbClock: 0, shieldClock: 0,
-      shake: 0, iframes: 0, flash: 0,
-      ahead: 0, passed: false,
-      sector: 0, banner: 0,
+      shake: 0, iframes: 0, flash: 0, pulse: 0,
+      ahead: 0, passed: false, sector: 0, banner: 0,
       beamA: rnd() * Math.PI * 2, beamDir: rnd() < 0.5 ? -1 : 1, beamPower: 0,
-      shield: false, revived: false, pulse: 0,
-      orbsGot: 0, grazes: 0
+      shield: 0, revived: false, orbsGot: 0, grazes: 0
     };
     ship = { a: -Math.PI / 2, dir: 1, boost: 0 };
     ghost = (challenge && !dailyMode) ? { a: -Math.PI / 2, dir: 1, boost: 0, idx: 0, alive: true } : null;
-    rocks = []; orbs = []; bits = []; shieldPk = null;
+    rocks = []; orbs = []; bits = []; shields = [];
     orbit = ORBIT;
     run = { seed: seed, score: 0, death: 0, sector: 0, flips: [] };
   }
 
-  /* ---------- mechanics ---------- */
-  // a short sharp kick on the flip reads as "the input landed" without
-  // smearing your position the way the old long boost did
-  var BOOST_N = 6, BOOST_W = 0.017;
   function angularVelocity(t) { return W_BASE + Math.min(t / 460000, 0.014); }
   function stepOrbiter(o, t) {
     var w = angularVelocity(t) + (o.boost > 0 ? BOOST_W * (o.boost / BOOST_N) : 0);
@@ -730,37 +695,27 @@
   /* ---------- screens ---------- */
   function show(name) {
     view = name;
-    ["splash", "home", "about", "over"].forEach(function (id) {
+    ["splash", "home", "about", "over", "getapp"].forEach(function (id) {
       $(id).classList.toggle("on", id === name);
     });
   }
-  function goHome() {
-    dailyMode = false;
-    musicStop();
-    reset(true); paintBest(); show("home");
-  }
-  function startGame(daily) {
-    sfx.ui();
-    dailyMode = !!daily;
-    reset(false);
-    show(null);
-    musicStart();
-  }
+  function goHome() { dailyMode = false; musicStop(); reset(true); paintBest(); show("home"); }
+  function startGame(daily) { sfx.ui(); dailyMode = !!daily; reset(false); show(null); musicStart(); }
+
   $("btnPlay").addEventListener("click", function () { startGame(false); });
   $("btnDaily").addEventListener("click", function () { startGame(true); });
   $("btnAgain").addEventListener("click", function () { startGame(dailyMode); });
   $("btnAbout").addEventListener("click", function () { sfx.ui(); show("about"); });
   $("btnBack").addEventListener("click", function () { sfx.ui(); show("home"); });
   $("btnQuit").addEventListener("click", function () { sfx.ui(); goHome(); });
-
+  $("btnGet").addEventListener("click", function () { sfx.ui(); show("getapp"); });
+  $("btnGetBack").addEventListener("click", function () { sfx.ui(); show("home"); });
   $("btnRevive").addEventListener("click", function () {
     sfx.ui();
     g.state = PLAY; g.lives = 1; g.iframes = 150; g.revived = true; g.combo = 1;
-    rocks = [];                     // clear the screen so the restart is fair
-    show(null);
-    musicStart();
+    rocks = [];
+    show(null); musicStart();
   });
-
   $("sound").addEventListener("click", function () {
     muted = !muted;
     this.textContent = muted ? "צליל מושתק" : "צליל פועל";
@@ -777,33 +732,9 @@
     musicOn = !musicOn;
     this.textContent = musicOn ? "פועלת" : "כבויה";
     this.classList.toggle("off", !musicOn);
-    lsSet("od-music", musicOn ? "1" : "0");
     if (!musicOn) musicStop(); else if (g.state === PLAY) musicStart();
+    lsSet("od-music", musicOn ? "1" : "0");
   });
-
-  /* ---------- themes ---------- */
-  function paintSwatches() {
-    var host = $("swatches");
-    host.innerHTML = "";
-    THEMES.forEach(function (th, i) {
-      var locked = best < th.need;
-      var b = document.createElement("button");
-      b.type = "button";
-      b.className = "sw" + (i === themeIdx ? " sel" : "") + (locked ? " locked" : "");
-      b.title = th.name;
-      var i2 = document.createElement("i");
-      i2.style.background = th.ship;
-      b.appendChild(i2);
-      var lab = document.createElement("small");
-      lab.textContent = locked ? th.need.toLocaleString() : th.name;
-      b.appendChild(lab);
-      if (!locked) b.addEventListener("click", function () {
-        themeIdx = i; lsSet("od-theme", String(i)); sfx.ui(); paintSwatches();
-      });
-      host.appendChild(b);
-    });
-  }
-
   function paintBest() {
     $("homeBest").textContent = best.toLocaleString();
     $("overBest").textContent = best.toLocaleString();
@@ -812,18 +743,13 @@
   /* ---------- input ---------- */
   function flip() {
     if (g.state !== PLAY) return;
-    ship.dir *= -1; ship.boost = BOOST_N;
-    g.pulse = 1;                                  // instant "you pressed it" ring
+    ship.dir *= -1; ship.boost = BOOST_N; g.pulse = 1;
     run.flips.push(g.t + 1);
     sfx.flip();
     var p = posOf(ship);
-    for (var i = 0; i < 5; i++) spark(p.x, p.y, shipColor(), 2.0, 0.4);
+    for (var i = 0; i < 5; i++) spark(p.x, p.y, C.ship, 2.0, 0.4);
   }
-  app.addEventListener("pointerdown", function (e) {
-    if (view !== null) return;
-    e.preventDefault();
-    flip();
-  });
+  app.addEventListener("pointerdown", function (e) { if (view !== null) return; e.preventDefault(); flip(); });
   addEventListener("keydown", function (e) {
     var k = e.key.toLowerCase();
     if (k !== " " && k !== "arrowleft" && k !== "arrowright" && k !== "enter") return;
@@ -833,22 +759,19 @@
     if (view === null) flip();
   });
 
-  /* ---------- rival code ---------- */
   var codebar = $("codebar"), codeIn = $("code"), loadBtn = $("load");
   codebar.addEventListener("submit", function (e) {
     e.preventDefault();
     if (codeIn.blur) codeIn.blur();
     var raw = codeIn.value.trim();
     if (!raw) { challenge = null; codebar.classList.remove("bad"); goHome(); return; }
-    var decoded = decodeRun(raw);
-    if (!decoded) {
-      codebar.classList.add("bad");
-      loadBtn.textContent = "לא תקין";
+    var d = decodeRun(raw);
+    if (!d) {
+      codebar.classList.add("bad"); loadBtn.textContent = "לא תקין";
       setTimeout(function () { codebar.classList.remove("bad"); loadBtn.textContent = "טען"; }, 2000);
       return;
     }
-    challenge = decoded;
-    codebar.classList.remove("bad");
+    challenge = d;
     loadBtn.textContent = "נטען";
     setTimeout(function () { loadBtn.textContent = "טען"; }, 2000);
     goHome();
@@ -860,51 +783,45 @@
     var base = stripHash(pageUrl());
     if (!lastRun || !lastRun.score) return "מסלול דועך - נגיעה אחת, שישה אזורים:\n" + base;
     var code = encodeRun(lastRun);
-    var head = lastRun.daily
-      ? "מסלול דועך - האתגר היומי: עשיתי " + lastRun.score.toLocaleString()
-      : "מסלול דועך - עשיתי " + lastRun.score.toLocaleString();
+    var head = lastRun.daily ? "מסלול דועך - האתגר היומי: עשיתי " + lastRun.score.toLocaleString()
+                             : "מסלול דועך - עשיתי " + lastRun.score.toLocaleString();
     return head + " והגעתי לאזור " + (lastRun.sector + 1) + " (" + SECTORS[lastRun.sector].name + ").\n" +
            "אותו שדה סלעים בדיוק, והרוח שלי טסה לידך:\n" + base + "#c=" + code + "\n" +
            "(אם הקישור מאבד את הקוד, הדבק אותו במשחק: " + code + ")";
   }
   function scoreCard() {
-    var W = 1080, H = 1080;
-    var c = document.createElement("canvas");
-    c.width = W; c.height = H;
-    var x = c.getContext("2d");
-    var bg = x.createLinearGradient(0, 0, W, H);
-    bg.addColorStop(0, "#fff4e9"); bg.addColorStop(0.55, "#eef3ff"); bg.addColorStop(1, "#e4ecff");
-    x.fillStyle = bg; x.fillRect(0, 0, W, H);
-    var gr = x.createRadialGradient(W / 2, H / 2, 30, W / 2, H / 2, 420);
-    gr.addColorStop(0, "rgba(255,208,130,0.85)");
-    gr.addColorStop(0.35, "rgba(255,180,84,0.35)");
-    gr.addColorStop(1, "rgba(255,145,56,0)");
-    x.fillStyle = gr; x.beginPath(); x.arc(W / 2, H / 2, 420, 0, 6.2832); x.fill();
-    x.strokeStyle = "#aeb4d1"; x.lineWidth = 4;
-    x.beginPath(); x.arc(W / 2, H / 2, 330, 0, 6.2832); x.stroke();
-    x.fillStyle = "#ffb454"; x.beginPath(); x.arc(W / 2, H / 2, 108, 0, 6.2832); x.fill();
-    x.save(); x.translate(W / 2, H / 2 - 330); x.rotate(0.5);
-    x.fillStyle = shipColor();
+    var W = 1080, c = document.createElement("canvas");
+    c.width = W; c.height = W;
+    var x = c.getContext("2d"), s = STYLES[styleIdx];
+    var bg = x.createLinearGradient(0, 0, W, W);
+    bg.addColorStop(0, s.bg1); bg.addColorStop(0.55, s.sky); bg.addColorStop(1, s.bg2);
+    x.fillStyle = bg; x.fillRect(0, 0, W, W);
+    var gr = x.createRadialGradient(W / 2, W / 2, 30, W / 2, W / 2, 420);
+    gr.addColorStop(0, s.sun); gr.addColorStop(0.35, s.sun + "66"); gr.addColorStop(1, s.sun + "00");
+    x.globalAlpha = 0.55; x.fillStyle = gr;
+    x.beginPath(); x.arc(W / 2, W / 2, 420, 0, 6.2832); x.fill();
+    x.globalAlpha = 1;
+    x.strokeStyle = s.faint; x.lineWidth = 4;
+    x.beginPath(); x.arc(W / 2, W / 2, 330, 0, 6.2832); x.stroke();
+    x.fillStyle = s.sun; x.beginPath(); x.arc(W / 2, W / 2, 108, 0, 6.2832); x.fill();
+    x.save(); x.translate(W / 2, W / 2 - 330); x.rotate(0.5);
+    x.fillStyle = s.ship;
     x.beginPath(); x.moveTo(0, -40); x.lineTo(26, 28); x.lineTo(0, 10); x.lineTo(-26, 28); x.closePath(); x.fill();
     x.restore();
     x.direction = "rtl"; x.textAlign = "center";
-    x.fillStyle = "#737ba6"; x.font = "500 40px system-ui, sans-serif";
-    x.fillText(lastRun && lastRun.daily ? "האתגר היומי" : "מסלול דועך", W / 2, 120);
-    x.fillStyle = "#2a3157"; x.font = "700 190px system-ui, sans-serif";
-    x.fillText((lastRun ? lastRun.score : 0).toLocaleString(), W / 2, 830);
-    x.fillStyle = "#737ba6"; x.font = "500 44px system-ui, sans-serif";
-    var sn = lastRun ? SECTORS[lastRun.sector].name : "";
-    x.fillText("אזור " + ((lastRun ? lastRun.sector : 0) + 1) + " · " + sn, W / 2, 890);
-    x.fillStyle = "#aeb4d1"; x.font = "500 34px system-ui, sans-serif";
-    x.fillText("ilayfredi.github.io/ilayfredi", W / 2, 990);
+    x.fillStyle = s.soft; x.font = "500 40px system-ui, sans-serif";
+    x.fillText(lastRun && lastRun.daily ? "האתגר היומי" : "מסלול דועך", W / 2, 118);
+    x.fillStyle = s.ink; x.font = "700 190px system-ui, sans-serif";
+    x.fillText((lastRun ? lastRun.score : 0).toLocaleString(), W / 2, 828);
+    x.fillStyle = s.soft; x.font = "500 44px system-ui, sans-serif";
+    x.fillText("אזור " + ((lastRun ? lastRun.sector : 0) + 1) + " · " + (lastRun ? SECTORS[lastRun.sector].name : ""), W / 2, 890);
+    x.fillStyle = s.faint; x.font = "500 34px system-ui, sans-serif";
+    x.fillText("ilayfredi.github.io/ilayfredi", W / 2, 986);
     return c;
   }
   $("btnShare").addEventListener("click", function () {
     var btn = this, msg = shareText();
-    function done(label) {
-      btn.textContent = label;
-      setTimeout(function () { btn.textContent = "שתף את התוצאה"; }, 2200);
-    }
+    function done(l) { btn.textContent = l; setTimeout(function () { btn.textContent = "שתף את התוצאה"; }, 2200); }
     function copyText() {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(msg).then(function () { done("הועתק"); }, function () { done("לא הצליח"); });
@@ -912,32 +829,30 @@
         try {
           var ta = document.createElement("textarea");
           ta.value = msg; ta.style.position = "fixed"; ta.style.top = "-1000px";
-          document.body.appendChild(ta); ta.select();
-          document.execCommand("copy"); document.body.removeChild(ta);
-          done("הועתק");
+          document.body.appendChild(ta); ta.select(); document.execCommand("copy");
+          document.body.removeChild(ta); done("הועתק");
         } catch (e) { done("לא הצליח"); }
       }
     }
     try {
       scoreCard().toBlob(function (blob) {
-        if (!blob) { copyText(); return; }
+        if (!blob) return copyText();
         var file = new File([blob], "orbit-decay.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           navigator.share({ files: [file], text: msg }).then(function () {}, copyText);
-        } else if (navigator.share) {
-          navigator.share({ text: msg }).then(function () {}, copyText);
-        } else { copyText(); }
+        } else if (navigator.share) { navigator.share({ text: msg }).then(function () {}, copyText); }
+        else copyText();
       }, "image/png");
     } catch (e) { copyText(); }
   });
 
   /* ---------- hazards ---------- */
-  function spawnRock(fromAngle, speedBias) {
+  function spawnRock(fromAngle, bias) {
     var sx = CX + Math.cos(fromAngle) * 760, sy = CY + Math.sin(fromAngle) * 760;
     var ta = rnd() * Math.PI * 2, tr = rnd() * 92;
     var tx = CX + Math.cos(ta) * tr, ty = CY + Math.sin(ta) * tr;
     var d = Math.hypot(tx - sx, ty - sy);
-    var sp = 3.0 + rnd() * 1.5 + Math.min(g.t / 5200, 2.6) + (speedBias || 0);
+    var sp = 3.0 + rnd() * 1.5 + Math.min(g.t / 5200, 2.6) + (bias || 0);
     rocks.push({ x: sx, y: sy, vx: (tx - sx) / d * sp, vy: (ty - sy) / d * sp,
                  r: 20 + rnd() * 20, ang: rnd() * 6.28, spin: (rnd() - 0.5) * 0.05,
                  grazed: false, split: false, seed: Math.floor(rnd() * 999) });
@@ -984,11 +899,7 @@
         orbit = ORBIT - 54 * into;
       } else orbit = ORBIT;
 
-      if (beamsLive()) {
-        g.beamPower = Math.min(1, g.beamPower + 1 / 110);
-        g.beamA += 0.0075 * g.beamDir;
-      }
-
+      if (beamsLive()) { g.beamPower = Math.min(1, g.beamPower + 1 / 110); g.beamA += 0.0075 * g.beamDir; }
       if (g.iframes > 0) g.iframes--;
       stepOrbiter(ship, g.t);
       g.score += 1 + g.sector;
@@ -1004,22 +915,24 @@
         g.passed = true; g.ahead = 110; sfx.ahead();
       }
 
-      // gentler opening so a first-timer is not buried immediately
-      var warm = Math.min(1, g.t / 260);
-      var rate = Math.max(13, (52 - g.t / 90) + (1 - warm) * 34);
+      // roomier field: slower ramp, a much higher floor, and the crossfire
+      // volley fires less often than it used to
+      var warm = Math.min(1, g.t / 300);
+      var rate = Math.max(27, (70 - g.t / 150) + (1 - warm) * 40);
       if (++g.rockClock > rate) {
         g.rockClock = 0;
         var from = rnd() * Math.PI * 2;
         spawnRock(from, 0);
-        if (g.sector >= 1 && rnd() < (g.sector >= 5 ? 0.85 : 0.5)) spawnRock(from + Math.PI, 0.3);
+        if (g.sector >= 1 && rnd() < (g.sector >= 5 ? 0.5 : 0.28)) spawnRock(from + Math.PI, 0.3);
       }
       if (++g.orbClock > 108) {
         g.orbClock = 0;
         orbs.push({ a: rnd() * Math.PI * 2, life: 470, drift: (rnd() - 0.5) * 0.004 });
       }
-      if (!shieldPk && !g.shield && ++g.shieldClock > 900 && rnd() < 0.02) {
+      // shields are common now, and you can stack up to three
+      if (++g.shieldClock > 300 && shields.length < 2 && g.shield < 3 && rnd() < 0.07) {
         g.shieldClock = 0;
-        shieldPk = { a: rnd() * Math.PI * 2, life: 420 };
+        shields.push({ a: rnd() * Math.PI * 2, life: 520 });
       }
     }
 
@@ -1028,7 +941,7 @@
       if (r.dead) continue;
       r.x += r.vx; r.y += r.vy; r.ang += r.spin;
       var dc = Math.hypot(r.x - CX, r.y - CY);
-      if (live && g.sector >= 3 && !r.split && r.r > 29 && dc < orbit + 46) { shatter(r); continue; }
+      if (live && g.sector >= 3 && !r.split && r.r > 34 && dc < orbit + 46) { shatter(r); continue; }
       if (dc < 62) { r.dead = true; for (var q = 0; q < 7; q++) spark(r.x, r.y, C.sun, 2.4, 0.7); }
       if (dc > 900) r.dead = true;
     }
@@ -1036,34 +949,33 @@
       orbs[o].a += orbs[o].drift;
       if (--orbs[o].life <= 0) orbs[o].dead = true;
     }
-    if (shieldPk && --shieldPk.life <= 0) shieldPk = null;
+    for (var sI = 0; sI < shields.length; sI++) if (--shields[sI].life <= 0) shields[sI].dead = true;
 
     if (live) {
       var p = posOf(ship);
-
       for (var k = 0; k < orbs.length; k++) {
         var ob = orbs[k];
         if (ob.dead) continue;
         var op = onRing(ob.a);
         if (Math.hypot(p.x - op.x, p.y - op.y) < 34) {
           ob.dead = true;
-          g.combo = Math.min(g.combo + 1, 25);
-          g.orbsGot++;
+          g.combo = Math.min(g.combo + 1, 25); g.orbsGot++;
           g.score += Math.round(55 * g.combo * (1 + g.sector * 0.4));
           sfx.orb(g.combo); buzz(8);
           for (var s = 0; s < 12; s++) spark(op.x, op.y, C.teal, 3, 1);
         }
       }
-
-      if (shieldPk) {
-        var shp = onRing(shieldPk.a);
+      for (var sJ = 0; sJ < shields.length; sJ++) {
+        var sh = shields[sJ];
+        if (sh.dead) continue;
+        var shp = onRing(sh.a);
         if (Math.hypot(p.x - shp.x, p.y - shp.y) < 36) {
-          shieldPk = null; g.shield = true;
+          sh.dead = true;
+          g.shield = Math.min(3, g.shield + 1);
           sfx.shield(); buzz([10, 30, 10]);
           for (var s2 = 0; s2 < 16; s2++) spark(shp.x, shp.y, C.lilac, 3, 1);
         }
       }
-
       for (var j = 0; j < rocks.length; j++) {
         var rk = rocks[j];
         if (rk.dead) continue;
@@ -1075,7 +987,6 @@
         }
         if (g.iframes <= 0 && dist < rk.r + 11) { rk.dead = true; takeHit(p); }
       }
-
       if (beamsLive() && g.beamPower >= 1 && g.iframes <= 0) {
         var n = beamCount();
         for (var b = 0; b < n; b++) {
@@ -1086,18 +997,18 @@
 
     for (var c = 0; c < bits.length; c++) {
       var bt = bits[c];
-      bt.x += bt.vx; bt.y += bt.vy;
-      bt.vx *= 0.96; bt.vy *= 0.96;
+      bt.x += bt.vx; bt.y += bt.vy; bt.vx *= 0.96; bt.vy *= 0.96;
       bt.life -= bt.decay;
     }
     rocks = rocks.filter(function (x) { return !x.dead; });
     orbs = orbs.filter(function (x) { return !x.dead; });
+    shields = shields.filter(function (x) { return !x.dead; });
     bits = bits.filter(function (x) { return x.life > 0; });
   }
 
   function takeHit(p) {
-    if (g.shield) {                                   // the shield eats one
-      g.shield = false; g.iframes = 70;
+    if (g.shield > 0) {
+      g.shield--; g.iframes = 70;
       g.shake = REDUCED ? 0 : 12; g.flash = 0.6;
       sfx.hit(); buzz(25);
       for (var s = 0; s < 18; s++) spark(p.x, p.y, C.lilac, 3.4, 1);
@@ -1107,39 +1018,39 @@
     g.shake = REDUCED ? 0 : 20; g.flash = 1;
     for (var b = 0; b < 26; b++) spark(p.x, p.y, C.coral, 4, 1.2);
     if (g.lives <= 0) {
-      sfx.dead(); buzz([60, 40, 90]);
-      musicStop();
+      sfx.dead(); buzz([60, 40, 90]); musicStop();
       run.score = g.score; run.death = g.t; run.sector = g.sector; run.daily = dailyMode;
       lastRun = run;
       commitQuests();
       g.wasBest = g.score > best;
       if (g.wasBest) { best = g.score; lsSet("od-best", String(best)); }
-      paintBest(); paintSwatches();
-      finishRun();                                     // straight to the card, no wait
+      paintBest();
+      finishRun();
     } else { sfx.hit(); buzz(35); }
   }
-
   function finishRun() {
     $("overScore").textContent = g.score.toLocaleString();
     $("overSector").textContent = "אזור " + (g.sector + 1) + " · " + SECTORS[g.sector].name;
-    var ribbon = $("overRibbon");
+    var rb = $("overRibbon");
     if (challenge && !dailyMode) {
-      ribbon.hidden = false;
-      ribbon.textContent = g.score > challenge.score ? "ניצחת את היריב" : "היריב עדיין מוביל";
-    } else if (g.wasBest) {
-      ribbon.hidden = false; ribbon.textContent = "שיא חדש";
-    } else ribbon.hidden = true;
+      rb.hidden = false;
+      rb.textContent = g.score > challenge.score ? "ניצחת את היריב" : "היריב עדיין מוביל";
+    } else if (g.wasBest) { rb.hidden = false; rb.textContent = "שיא חדש"; }
+    else rb.hidden = true;
     $("btnRevive").hidden = g.revived;
     g.state = OVER;
     show("over");
   }
 
   /* ---------- render ---------- */
-  function stroke(color, width, alpha, path) {
-    ctx.strokeStyle = color; ctx.globalAlpha = alpha; ctx.lineWidth = width;
+  function stroke(color, w, alpha, path) {
+    ctx.strokeStyle = color; ctx.globalAlpha = alpha; ctx.lineWidth = w;
     ctx.beginPath(); path(); ctx.stroke();
   }
-  function inked(color, path) { stroke(color, 12, 0.10, path); stroke(color, 3.2, 1, path); }
+  function fill(color, alpha, path) {
+    ctx.fillStyle = color; ctx.globalAlpha = alpha;
+    ctx.beginPath(); path(); ctx.fill();
+  }
   function chevron() { ctx.moveTo(0, -19); ctx.lineTo(12, 13); ctx.lineTo(0, 5); ctx.lineTo(-12, 13); ctx.closePath(); }
   function rockPath(r) {
     return function () {
@@ -1149,6 +1060,7 @@
         var x = r.x + Math.cos(a) * rad, y = r.y + Math.sin(a) * rad;
         if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
+      ctx.closePath();
     };
   }
   function drawBeams() {
@@ -1159,35 +1071,9 @@
       var ba = g.beamA + b * (Math.PI * 2 / n);
       var x1 = CX + Math.cos(ba - half) * reach, y1 = CY + Math.sin(ba - half) * reach;
       var x2 = CX + Math.cos(ba + half) * reach, y2 = CY + Math.sin(ba + half) * reach;
-      ctx.globalAlpha = 0.05 + 0.07 * pw; ctx.fillStyle = col;
-      ctx.beginPath(); ctx.moveTo(CX, CY); ctx.lineTo(x1, y1); ctx.lineTo(x2, y2); ctx.closePath(); ctx.fill();
-      stroke(col, 2, 0.16 + 0.34 * pw, function () {
+      fill(col, 0.05 + 0.07 * pw, function () { ctx.moveTo(CX, CY); ctx.lineTo(x1, y1); ctx.lineTo(x2, y2); ctx.closePath(); });
+      stroke(col, 2, 0.14 + 0.3 * pw, function () {
         ctx.moveTo(CX, CY); ctx.lineTo(CX + Math.cos(ba) * reach, CY + Math.sin(ba) * reach);
-      });
-    }
-  }
-
-  /* Marks where an incoming rock will cut the ring, so a one-input game
-     stays a decision instead of a reflex test. Only shows once the rock
-     is close enough that the prediction is worth acting on. */
-  function drawImpacts() {
-    for (var i = 0; i < rocks.length; i++) {
-      var r = rocks[i];
-      if (r.dead) continue;
-      var dx = r.x - CX, dy = r.y - CY;
-      var dc = Math.hypot(dx, dy);
-      if (dc <= orbit) continue;
-      var closing = -(dx * r.vx + dy * r.vy) / dc;      // inward speed
-      if (closing <= 0.1) continue;
-      var eta = (dc - orbit) / closing;
-      if (eta > 75) continue;
-      var px = r.x + r.vx * eta, py = r.y + r.vy * eta;
-      var a = Math.atan2(py - CY, px - CX);
-      var near = 1 - eta / 75;
-      var p1 = { x: CX + Math.cos(a) * (orbit - 13), y: CY + Math.sin(a) * (orbit - 13) };
-      var p2 = { x: CX + Math.cos(a) * (orbit + 13), y: CY + Math.sin(a) * (orbit + 13) };
-      stroke(C.coral, 2 + near * 2, 0.12 + near * 0.5, function () {
-        ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
       });
     }
   }
@@ -1196,78 +1082,78 @@
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.globalCompositeOperation = "source-over";
     ctx.globalAlpha = 1;
-    ctx.fillStyle = REDUCED ? "rgba(238,243,255,0.94)" : "rgba(238,243,255,0.34)";
+    ctx.fillStyle = REDUCED ? C.sky : C.wash;
     ctx.fillRect(0, 0, cw, ch);
 
     ctx.setTransform(S, 0, 0, S, ox, oy);
     if (g.shake > 1) ctx.translate((Math.random() - 0.5) * g.shake, (Math.random() - 0.5) * g.shake);
     ctx.lineJoin = "round"; ctx.lineCap = "round";
 
-    ctx.globalAlpha = 0.5; ctx.fillStyle = C.faint;
-    for (var m = 0; m < motes.length; m++) ctx.fillRect(motes[m].x, motes[m].y, 2.4, 2.4);
-
-    var dOrbit = orbit, dRocks = rocks, dRockN = rocks.length;
+    for (var m = 0; m < motes.length; m++) {
+      var mo = motes[m];
+      fill(C.faint, 0.45, function () { ctx.arc(mo.x, mo.y, mo.s * 0.6, 0, 6.2832); });
+    }
 
     drawBeams();
-    stroke(C.faint, 2, 0.85, function () { ctx.arc(CX, CY, dOrbit, 0, 6.2832); });
-    if (g.state === PLAY) drawImpacts();
 
+    // orbit track: a soft band with a crisp line inside it
+    stroke(C.faint, 9, 0.16, function () { ctx.arc(CX, CY, orbit, 0, 6.2832); });
+    stroke(C.faint, 1.6, 0.9, function () { ctx.arc(CX, CY, orbit, 0, 6.2832); });
+
+    // the star
     var pulse = 1 + Math.sin(g.t * 0.035) * 0.045;
-    var rad = (56 + (ORBIT - dOrbit) * 0.55) * pulse;
-    var grd = ctx.createRadialGradient(CX, CY, rad * 0.15, CX, CY, rad * 2.6);
-    grd.addColorStop(0, "rgba(255,208,130,0.95)");
-    grd.addColorStop(0.34, "rgba(255,180,84,0.45)");
-    grd.addColorStop(1, "rgba(255,145,56,0)");
-    ctx.globalAlpha = 1; ctx.fillStyle = grd;
-    ctx.beginPath(); ctx.arc(CX, CY, rad * 2.6, 0, 6.2832); ctx.fill();
-    ctx.fillStyle = C.sun;
-    ctx.beginPath(); ctx.arc(CX, CY, rad, 0, 6.2832); ctx.fill();
-    ctx.globalAlpha = 0.5; ctx.fillStyle = "#fff0d6";
-    ctx.beginPath(); ctx.arc(CX - rad * 0.2, CY - rad * 0.22, rad * 0.5, 0, 6.2832); ctx.fill();
+    var rad = (56 + (ORBIT - orbit) * 0.55) * pulse;
+    var grd = ctx.createRadialGradient(CX, CY, rad * 0.2, CX, CY, rad * 3.1);
+    grd.addColorStop(0, C.sun); grd.addColorStop(0.3, C.sun + "70"); grd.addColorStop(1, C.sun + "00");
+    ctx.globalAlpha = 0.75; ctx.fillStyle = grd;
+    ctx.beginPath(); ctx.arc(CX, CY, rad * 3.1, 0, 6.2832); ctx.fill();
+    stroke(C.sun, 2, 0.35, function () { ctx.arc(CX, CY, rad * 1.55, 0, 6.2832); });
+    fill(C.sun, 1, function () { ctx.arc(CX, CY, rad, 0, 6.2832); });
+    fill("#ffffff", 0.42, function () { ctx.arc(CX - rad * 0.24, CY - rad * 0.26, rad * 0.46, 0, 6.2832); });
 
-    for (var i = 0; i < dRockN; i++) inked(C.coral, rockPath(dRocks[i]));
+    for (var i = 0; i < rocks.length; i++) {
+      var rp = rockPath(rocks[i]);
+      fill(C.coral, 0.18, rp);
+      stroke(C.coral, 2.8, 0.95, rp);
+    }
 
     for (var o = 0; o < orbs.length; o++) {
       var ob = orbs[o], op = onRing(ob.a);
       var fade = ob.life < 90 ? (Math.floor(ob.life / 6) % 2 ? 0.3 : 1) : 1;
-      ctx.globalAlpha = 0.2 * fade; ctx.fillStyle = C.teal;
-      ctx.beginPath(); ctx.arc(op.x, op.y, 23, 0, 6.2832); ctx.fill();
-      ctx.globalAlpha = fade;
-      ctx.beginPath(); ctx.arc(op.x, op.y, 9.5, 0, 6.2832); ctx.fill();
+      fill(C.teal, 0.16 * fade, function () { ctx.arc(op.x, op.y, 25, 0, 6.2832); });
+      fill(C.teal, fade, function () { ctx.arc(op.x, op.y, 9.5, 0, 6.2832); });
+      fill("#ffffff", 0.5 * fade, function () { ctx.arc(op.x - 3, op.y - 3.4, 3.2, 0, 6.2832); });
     }
-    if (shieldPk) {
-      var sp2 = onRing(shieldPk.a);
-      var bl = shieldPk.life < 90 && Math.floor(shieldPk.life / 6) % 2;
-      ctx.globalAlpha = bl ? 0.3 : 1;
-      stroke(C.lilac, 3.5, ctx.globalAlpha, function () { ctx.arc(sp2.x, sp2.y, 14, 0, 6.2832); });
-      ctx.globalAlpha = (bl ? 0.1 : 0.25); ctx.fillStyle = C.lilac;
-      ctx.beginPath(); ctx.arc(sp2.x, sp2.y, 22, 0, 6.2832); ctx.fill();
+
+    for (var sI = 0; sI < shields.length; sI++) {
+      var sh = shields[sI], shp = onRing(sh.a);
+      var bl = sh.life < 90 && Math.floor(sh.life / 6) % 2 ? 0.3 : 1;
+      fill(C.lilac, 0.16 * bl, function () { ctx.arc(shp.x, shp.y, 24, 0, 6.2832); });
+      stroke(C.lilac, 3.4, bl, function () { ctx.arc(shp.x, shp.y, 13.5, 0, 6.2832); });
     }
 
     if (ghost && ghost.alive && g.state === PLAY) {
       var gp = posOf(ghost);
-      ctx.save(); ctx.translate(gp.x, gp.y);
-      ctx.rotate(ghost.a + (Math.PI / 2) * ghost.dir);
+      ctx.save(); ctx.translate(gp.x, gp.y); ctx.rotate(ghost.a + (Math.PI / 2) * ghost.dir);
       stroke(C.lilac, 3, 0.75, chevron);
       ctx.restore();
     }
 
     if (g.state !== OVER) {
       var sa = ship.a, sd = ship.dir;
-      var sx = CX + Math.cos(sa) * dOrbit, sy = CY + Math.sin(sa) * dOrbit;
-      if (g.pulse > 0) {                        // the flip acknowledgement
-        stroke(shipColor(), 2.5, g.pulse * 0.6, function () {
-          ctx.arc(sx, sy, 20 + (1 - g.pulse) * 40, 0, 6.2832);
-        });
+      var sx = CX + Math.cos(sa) * orbit, sy = CY + Math.sin(sa) * orbit;
+      if (g.pulse > 0) {
+        stroke(C.ship, 2.5, g.pulse * 0.55, function () { ctx.arc(sx, sy, 20 + (1 - g.pulse) * 40, 0, 6.2832); });
       }
       var blink = g.iframes > 0 && Math.floor(g.t / 4) % 2 === 0;
       if (!blink) {
         ctx.save(); ctx.translate(sx, sy); ctx.rotate(sa + (Math.PI / 2) * sd);
-        ctx.globalAlpha = 1; ctx.fillStyle = shipColor();
-        ctx.beginPath(); chevron(); ctx.fill();
-        stroke(shipColor(), 12, 0.1, chevron);
+        fill(C.ship, 1, chevron);
+        stroke(C.ship, 12, 0.09, chevron);
         ctx.restore();
-        if (g.shield) stroke(C.lilac, 3, 0.8, function () { ctx.arc(sx, sy, 28, 0, 6.2832); });
+        for (var q2 = 0; q2 < g.shield; q2++) {
+          stroke(C.lilac, 2.6, 0.75 - q2 * 0.18, function () { ctx.arc(sx, sy, 27 + q2 * 7, 0, 6.2832); });
+        }
       }
     }
 
@@ -1275,7 +1161,7 @@
       var bt = bits[c2];
       ctx.globalAlpha = Math.max(0, bt.life) * 0.85;
       ctx.fillStyle = bt.c;
-      ctx.fillRect(bt.x - 2, bt.y - 2, 4.5, 4.5);
+      ctx.beginPath(); ctx.arc(bt.x, bt.y, 2.6, 0, 6.2832); ctx.fill();
     }
 
     if (g.flash > 0) {
@@ -1283,26 +1169,21 @@
       ctx.globalAlpha = g.flash * 0.2; ctx.fillStyle = C.coral;
       ctx.fillRect(0, 0, cw, ch);
     }
-
     drawHud();
   }
 
   function drawHud() {
     h.setTransform(dpr, 0, 0, dpr, 0, 0);
     h.clearRect(0, 0, VW, VH);
-    h.globalAlpha = 1; h.textBaseline = "top";
-    h.direction = "rtl";
+    h.globalAlpha = 1; h.textBaseline = "top"; h.direction = "rtl";
 
     if (g.state === PLAY && g.sector >= 4) {
       var sp = toCss(posOf(ship));
       var r0 = Math.min(VW, VH) * 0.22, r1 = Math.min(VW, VH) * 0.62;
       var eg = h.createRadialGradient(sp.x, sp.y, r0, sp.x, sp.y, r1);
-      eg.addColorStop(0, "rgba(238,243,255,0)");
-      eg.addColorStop(0.55, "rgba(238,243,255,0.62)");
-      eg.addColorStop(1, "rgba(238,243,255,0.97)");
+      eg.addColorStop(0, C.sky + "00"); eg.addColorStop(0.55, C.sky + "9e"); eg.addColorStop(1, C.sky + "f7");
       h.fillStyle = eg; h.fillRect(0, 0, VW, VH);
     }
-
     if (g.state !== PLAY) return;
 
     var pad = 22, big = Math.min(38, VW * 0.098);
@@ -1313,13 +1194,10 @@
 
     var line = pad + big + 6;
     h.font = "600 " + Math.min(14, VW * 0.037) + "px system-ui, sans-serif";
-    h.fillStyle = SECTORS[g.sector].tint;
+    h.fillStyle = C[SEC_TINT[g.sector]];
     h.fillText("אזור " + (g.sector + 1) + " · " + SECTORS[g.sector].name, VW - pad, line);
     line += 22;
-    if (dailyMode) {
-      h.fillStyle = C.lilac;
-      h.fillText("אתגר יומי", VW - pad, line); line += 22;
-    }
+    if (dailyMode) { h.fillStyle = C.lilac; h.fillText("אתגר יומי", VW - pad, line); line += 22; }
     if (g.combo > 1) { h.fillStyle = C.teal; h.fillText("×" + g.combo, VW - pad, line); line += 22; }
     if (challenge && !dailyMode) {
       h.fillStyle = g.passed ? C.sun : C.faint;
@@ -1327,20 +1205,20 @@
     }
 
     for (var i = 0; i < 3; i++) {
-      h.globalAlpha = i < g.lives ? 1 : 0.2;
+      h.globalAlpha = i < g.lives ? 1 : 0.18;
       h.fillStyle = C.coral;
-      h.beginPath(); h.arc(pad + 9 + i * 26, pad + 12, 8, 0, 6.2832); h.fill();
-    }
-    if (g.shield) {
-      h.globalAlpha = 1; h.strokeStyle = C.lilac; h.lineWidth = 3;
-      h.beginPath(); h.arc(pad + 9 + 3 * 26, pad + 12, 8, 0, 6.2832); h.stroke();
+      h.beginPath(); h.arc(pad + 9 + i * 25, pad + 12, 8, 0, 6.2832); h.fill();
     }
     h.globalAlpha = 1;
+    for (var sK = 0; sK < g.shield; sK++) {
+      h.strokeStyle = C.lilac; h.lineWidth = 2.6;
+      h.beginPath(); h.arc(pad + 9 + (3 + sK) * 25, pad + 12, 7.5, 0, 6.2832); h.stroke();
+    }
 
     if (g.banner > 0) {
       h.globalAlpha = Math.min(1, g.banner / 34);
       h.textAlign = "center";
-      h.fillStyle = SECTORS[g.sector].tint;
+      h.fillStyle = C[SEC_TINT[g.sector]];
       h.font = "700 " + Math.min(40, VW * 0.1) + "px system-ui, sans-serif";
       h.fillText(SECTORS[g.sector].name, VW / 2, VH * 0.4);
       h.fillStyle = C.soft;
@@ -1363,7 +1241,6 @@
     if (app.clientWidth !== VW || app.clientHeight !== VH) fit();
     var dt = Math.min(now - prev, 120);
     prev = now;
-
     acc += dt;
     var steps = 0;
     while (acc >= STEP && steps < 5) { update(); acc -= STEP; steps++; }
@@ -1371,32 +1248,25 @@
     requestAnimationFrame(loop);
   }
 
-  /* ---------- install prompt ---------- */
+  /* ---------- install ---------- */
   var deferredPrompt = null;
   addEventListener("beforeinstallprompt", function (e) {
-    e.preventDefault();
-    deferredPrompt = e;
-    $("install").hidden = false;
+    e.preventDefault(); deferredPrompt = e;
+    $("installBox").hidden = false;
   });
   $("install").addEventListener("click", function () {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(function () {
-      deferredPrompt = null;
-      $("install").hidden = true;
-    });
+    deferredPrompt.userChoice.then(function () { deferredPrompt = null; $("installBox").hidden = true; });
   });
-
   if ("serviceWorker" in navigator) {
-    addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js").catch(function () {});
-    });
+    addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
   }
 
   /* ---------- boot ---------- */
+  applyStyle(parseInt(lsGet("od-style", "0"), 10) || 0, false);
   reset(true);
   paintBest();
-  paintSwatches();
   buildQuests();
   $("tglHaptics").textContent = hapticsOn ? "פועל" : "כבוי";
   $("tglHaptics").classList.toggle("off", !hapticsOn);
