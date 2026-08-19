@@ -1,8 +1,30 @@
-<title>Orbit Decay</title>
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>מסלול דועך</title>
+
+<meta name="description" content="משחק ארקייד בנגיעה אחת. אתה נעול במסלול סביב כוכב שקורס — נגיעה הופכת את הכיוון. שישה אזורים, אתגר יומי, ומרוץ מול הרוח של החברים שלך.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="מסלול דועך">
+<meta property="og:description" content="נגיעה אחת. שישה אזורים. כמה תחזיק?">
+<meta property="og:image" content="https://ilayfredi.github.io/ilayfredi/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://ilayfredi.github.io/ilayfredi/">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#eef3ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="מסלול דועך">
+
 <style>
   :root {
-    /* daylight palette - pastel cosmos, deliberately bright */
     --sky:       #eef3ff;
     --sky-warm:  #fff4e9;
     --ink:       #2a3157;
@@ -25,11 +47,7 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html, body {
-    height: 100%;
-    overflow: hidden;
-    overscroll-behavior: none;
-  }
+  html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 
   body {
     font-family: var(--ui);
@@ -63,25 +81,22 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 22px;
-    padding: 26px 22px calc(26px + env(safe-area-inset-bottom));
+    gap: 16px;
+    padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom));
     text-align: center;
+    overflow-y: auto;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.42s ease, visibility 0.42s;
   }
   .veil.on { opacity: 1; visibility: visible; }
 
-  #splash { background: linear-gradient(168deg, var(--sky-warm) 0%, var(--sky) 55%, #e6edff 100%); }
-  #home, #about, #over { background: rgba(238, 243, 255, 0.72); backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px); }
+  /* splash stays see-through so the orbit keeps drawing behind the name */
+  #splash { background: linear-gradient(168deg, rgba(255,244,233,0.86) 0%, rgba(238,243,255,0.8) 55%, rgba(230,237,255,0.88) 100%); }
+  #home, #about, #over { background: rgba(238, 243, 255, 0.74); backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px); }
 
   /* ---------- splash ---------- */
-  .splash-eyebrow {
-    font-size: 12px;
-    letter-spacing: 0.14em;
-    color: var(--ink-faint);
-    text-transform: uppercase;
-  }
+  .splash-eyebrow { font-size: 12px; letter-spacing: 0.14em; color: var(--ink-faint); }
   .signature {
     font-size: clamp(46px, 15vw, 92px);
     font-weight: 300;
@@ -94,221 +109,181 @@
     padding: 0 0.08em 0.06em;
   }
   .flourish {
-    width: min(230px, 62vw);
-    height: 2px;
-    border-radius: 2px;
+    width: min(230px, 62vw); height: 2px; border-radius: 2px;
     background: linear-gradient(90deg, transparent, var(--sun) 30%, var(--coral) 70%, transparent);
-    transform-origin: center;
   }
   .rise { animation: rise 1s cubic-bezier(0.16, 0.9, 0.3, 1) both; }
   .rise-2 { animation-delay: 0.16s; }
   .rise-3 { animation-delay: 0.34s; }
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: none; }
-  }
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 
   /* ---------- home ---------- */
-  .crown { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: -4vh; }
-  .crown-label {
-    font-size: 13px;
-    letter-spacing: 0.12em;
-    color: var(--ink-soft);
+  .toprow {
+    position: absolute;
+    top: calc(14px + env(safe-area-inset-top));
+    inset-inline: 16px;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
   }
+  .chip {
+    font-family: inherit; font-size: 12px; font-weight: 500;
+    color: var(--ink-soft); background: var(--white);
+    border: 1px solid rgba(42, 49, 87, 0.09);
+    border-radius: 999px; padding: 8px 13px; min-height: 36px;
+    cursor: pointer; box-shadow: var(--shadow-sm);
+  }
+  .chip:focus-visible { outline: 3px solid var(--lilac); outline-offset: 2px; }
+  .chip[hidden] { display: none; }
+
+  .crown { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .crown-label { font-size: 13px; letter-spacing: 0.12em; color: var(--ink-soft); }
   .crown-num {
     font-family: var(--ui);
-    font-size: clamp(58px, 19vw, 116px);
-    font-weight: 700;
-    line-height: 1;
+    font-size: clamp(52px, 17vw, 100px);
+    font-weight: 700; line-height: 1;
     font-variant-numeric: tabular-nums;
     background: linear-gradient(150deg, var(--ink) 0%, #5b64a8 60%, var(--lilac) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
   }
   .crown-sub { font-size: 13px; color: var(--ink-faint); }
 
-  .menu { display: flex; flex-direction: column; gap: 12px; width: min(330px, 84vw); }
+  .menu { display: flex; flex-direction: column; gap: 10px; width: min(330px, 86vw); }
 
   .btn {
-    font-family: inherit;
-    font-size: 19px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: var(--white);
-    border: 0;
-    border-radius: 999px;
-    padding: 17px 24px;
-    min-height: 56px;
-    cursor: pointer;
+    font-family: inherit; font-size: 19px; font-weight: 600;
+    color: var(--white); border: 0; border-radius: 999px;
+    padding: 16px 24px; min-height: 54px; cursor: pointer;
     background: linear-gradient(140deg, var(--sun) 0%, var(--sun-deep) 55%, var(--coral) 100%);
     box-shadow: var(--shadow-md);
-    transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
   }
   .btn:active { transform: translateY(2px) scale(0.985); box-shadow: var(--shadow-sm); }
   .btn:focus-visible { outline: 3px solid var(--lilac); outline-offset: 3px; }
-
   .btn-ghost {
-    background: var(--white);
-    color: var(--ink);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid rgba(42, 49, 87, 0.09);
+    background: var(--white); color: var(--ink);
+    box-shadow: var(--shadow-sm); border: 1px solid rgba(42, 49, 87, 0.09);
     font-weight: 500;
   }
-  .btn-teal { background: linear-gradient(140deg, #45d3bb 0%, var(--teal) 60%, #17a892 100%); }
+  .btn-lilac { background: linear-gradient(140deg, #bdb0ff 0%, var(--lilac) 55%, #8b7bff 100%); }
+  .btn-teal  { background: linear-gradient(140deg, #45d3bb 0%, var(--teal) 60%, #17a892 100%); }
+  .btn-sm { font-size: 16px; min-height: 46px; padding: 12px 20px; }
 
-  .chip {
-    position: absolute;
-    top: calc(16px + env(safe-area-inset-top));
-    inset-inline-start: 18px;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--ink-soft);
+  /* ---------- daily missions ---------- */
+  .quests {
+    width: min(330px, 86vw);
     background: var(--white);
-    border: 1px solid rgba(42, 49, 87, 0.09);
-    border-radius: 999px;
-    padding: 9px 15px;
-    min-height: 38px;
-    cursor: pointer;
+    border-radius: 18px;
+    padding: 14px 16px;
     box-shadow: var(--shadow-sm);
-  }
-  .chip:focus-visible { outline: 3px solid var(--lilac); outline-offset: 2px; }
-
-  .codebar { display: flex; gap: 7px; width: min(330px, 84vw); }
-  .codebar input {
-    flex: 1 1 auto;
-    min-width: 0;
-    font-family: var(--num);
-    font-size: 13px;
-    color: var(--ink);
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(42, 49, 87, 0.12);
-    border-radius: 12px;
-    padding: 12px 14px;
     text-align: start;
+  }
+  .quests h3 {
+    font-size: 11px; letter-spacing: 0.08em; color: var(--ink-faint);
+    font-weight: 600; margin-bottom: 9px;
+  }
+  .quest { display: flex; align-items: center; gap: 9px; padding: 4px 0; font-size: 13px; }
+  .quest .tick {
+    flex: 0 0 auto; width: 17px; height: 17px; border-radius: 50%;
+    border: 2px solid var(--ink-faint);
+    display: grid; place-items: center;
+    font-size: 10px; color: var(--white);
+  }
+  .quest.done .tick { background: var(--teal); border-color: var(--teal); }
+  .quest.done span { color: var(--ink-soft); text-decoration: line-through; }
+  .quest .prog { margin-inline-start: auto; font-family: var(--num); font-size: 11px; color: var(--ink-faint); }
+
+  .codebar { display: flex; gap: 7px; width: min(330px, 86vw); }
+  .codebar input {
+    flex: 1 1 auto; min-width: 0;
+    font-family: var(--num); font-size: 13px; color: var(--ink);
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(42, 49, 87, 0.12);
+    border-radius: 12px; padding: 11px 13px; text-align: start;
   }
   .codebar input::placeholder { font-family: var(--ui); color: var(--ink-faint); }
   .codebar input:focus-visible { outline: 2px solid var(--lilac); outline-offset: 1px; }
   .codebar.bad input { border-color: var(--coral); color: var(--coral); }
   .codebar button {
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--ink);
-    background: var(--white);
-    border: 1px solid rgba(42, 49, 87, 0.1);
-    border-radius: 12px;
-    padding: 12px 16px;
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
+    font-family: inherit; font-size: 13px; font-weight: 600; color: var(--ink);
+    background: var(--white); border: 1px solid rgba(42, 49, 87, 0.1);
+    border-radius: 12px; padding: 11px 15px; cursor: pointer; box-shadow: var(--shadow-sm);
   }
 
-  /* ---------- about ---------- */
+  /* ---------- about sheet ---------- */
   .sheet {
-    width: min(430px, 90vw);
-    max-height: 62vh;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--ink-faint) transparent;
+    width: min(430px, 92vw); max-height: 60vh; overflow-y: auto;
+    background: var(--white); border-radius: 26px; padding: 26px 24px;
+    box-shadow: var(--shadow-lg); text-align: start;
+    scrollbar-width: thin; scrollbar-color: var(--ink-faint) transparent;
     -webkit-overflow-scrolling: touch;
-    background: var(--white);
-    border-radius: 26px;
-    padding: 30px 26px;
-    box-shadow: var(--shadow-lg);
-    text-align: start;
   }
-  .sheet h2 {
-    font-size: 25px;
-    font-weight: 700;
-    margin-bottom: 6px;
-    letter-spacing: -0.01em;
-  }
-  .sheet .lede { color: var(--ink-soft); font-size: 15px; line-height: 1.65; margin-bottom: 20px; }
-  .sheet h3 {
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    color: var(--ink-faint);
-    margin: 20px 0 9px;
-  }
-  .sheet p { font-size: 15px; line-height: 1.7; color: var(--ink); }
-  .steps { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-  .steps li {
-    display: flex;
-    align-items: flex-start;
-    gap: 11px;
-    font-size: 15px;
-    line-height: 1.55;
-  }
-  .dot {
-    flex: 0 0 auto;
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    margin-top: 6px;
-    box-shadow: 0 0 0 4px rgba(255, 180, 84, 0.16);
-  }
-  .signoff {
-    margin-top: 24px;
-    padding-top: 18px;
-    border-top: 1px solid rgba(42, 49, 87, 0.09);
-    font-size: 14px;
-    color: var(--ink-soft);
-  }
-  .signoff b { color: var(--ink); font-weight: 600; }
   .sheet::-webkit-scrollbar { width: 6px; }
   .sheet::-webkit-scrollbar-track { background: transparent; }
-  .sheet::-webkit-scrollbar-thumb {
-    background: var(--ink-faint);
-    border-radius: 3px;
-  }
+  .sheet::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 3px; }
+  .sheet h2 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+  .sheet .lede { color: var(--ink-soft); font-size: 15px; line-height: 1.65; margin-bottom: 18px; }
+  .sheet h3 { font-size: 12px; letter-spacing: 0.08em; color: var(--ink-faint); margin: 18px 0 8px; }
+  .sheet p { font-size: 15px; line-height: 1.7; }
+  .steps { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  .steps li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.55; }
+  .dot { flex: 0 0 auto; width: 11px; height: 11px; border-radius: 50%; margin-top: 5px; }
+  .signoff { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(42,49,87,0.09); font-size: 14px; color: var(--ink-soft); }
+  .signoff b { color: var(--ink); font-weight: 600; }
 
-  /* ---------- game over ---------- */
+  .swatches { display: flex; gap: 10px; flex-wrap: wrap; }
+  .sw {
+    width: 44px; height: 44px; border-radius: 14px; cursor: pointer;
+    border: 3px solid transparent; background: none; padding: 0;
+    display: grid; place-items: center; position: relative;
+  }
+  .sw i { width: 26px; height: 26px; border-radius: 9px; display: block; }
+  .sw.sel { border-color: var(--ink); }
+  .sw.locked { opacity: 0.35; cursor: not-allowed; }
+  .sw small {
+    position: absolute; bottom: -15px; inset-inline: 0;
+    font-size: 9px; color: var(--ink-faint); font-family: var(--num);
+  }
+  .swatch-wrap { padding-bottom: 18px; }
+
+  .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; padding: 7px 0; }
+  .toggle button {
+    font-family: inherit; font-size: 12px; font-weight: 600;
+    color: var(--ink); background: var(--white);
+    border: 1px solid rgba(42,49,87,0.12); border-radius: 999px;
+    padding: 7px 14px; cursor: pointer;
+  }
+  .toggle button.off { color: var(--ink-faint); }
+
+  /* ---------- game over card ---------- */
   .card {
-    width: min(360px, 88vw);
-    background: var(--white);
-    border-radius: 28px;
-    padding: 30px 26px 26px;
+    width: min(360px, 90vw); background: var(--white);
+    border-radius: 28px; padding: 26px 24px 22px;
     box-shadow: var(--shadow-lg);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
   }
   .card-label { font-size: 13px; letter-spacing: 0.12em; color: var(--ink-soft); }
   .card-num {
     font-family: var(--ui);
-    font-size: clamp(52px, 17vw, 82px);
-    font-weight: 700;
-    line-height: 1.04;
-    font-variant-numeric: tabular-nums;
-    color: var(--ink);
+    font-size: clamp(48px, 15vw, 76px);
+    font-weight: 700; line-height: 1.04;
+    font-variant-numeric: tabular-nums; color: var(--ink);
   }
-  .card-sector { font-size: 14px; color: var(--ink-soft); margin-bottom: 2px; }
+  .card-sector { font-size: 14px; color: var(--ink-soft); }
   .ribbon {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--white);
+    font-size: 13px; font-weight: 600; color: var(--white);
     background: linear-gradient(130deg, var(--sun) 0%, var(--coral) 100%);
-    border-radius: 999px;
-    padding: 6px 15px;
-    margin: 5px 0 3px;
+    border-radius: 999px; padding: 6px 15px; margin: 5px 0 2px;
   }
-  .card-best { font-size: 14px; color: var(--ink-soft); margin-bottom: 14px; }
-  .card-best b { font-family: var(--num); color: var(--ink); font-weight: 700; }
+  .ribbon[hidden] { display: none; }
+  .card-best { font-size: 14px; color: var(--ink-soft); margin-bottom: 12px; }
+  .card-best b { color: var(--ink); font-weight: 700; }
   .card .btn { width: 100%; }
-  .card .btn + .btn { margin-top: 10px; }
+  .card .btn + .btn { margin-top: 9px; }
   .linky {
-    margin-top: 15px;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--ink-soft);
-    background: none;
-    border: 0;
-    border-bottom: 1px dashed var(--ink-faint);
-    padding: 3px 1px;
-    cursor: pointer;
+    margin-top: 13px; font-family: inherit; font-size: 14px; font-weight: 500;
+    color: var(--ink-soft); background: none; border: 0;
+    border-bottom: 1px dashed var(--ink-faint); padding: 3px 1px; cursor: pointer;
   }
   .linky:focus-visible { outline: 2px solid var(--lilac); outline-offset: 3px; }
 
@@ -317,30 +292,42 @@
     .veil { transition: none; }
   }
 </style>
+</head>
+<body>
 
-<div id="app" dir="rtl">
+<div id="app">
   <canvas id="screen"></canvas>
   <canvas id="hud"></canvas>
 
-  <!-- 1. splash -->
   <section id="splash" class="veil on">
     <span class="splash-eyebrow rise">מגישים</span>
     <h1 class="signature rise rise-2">עילי פרדי</h1>
     <div class="flourish rise rise-3"></div>
   </section>
 
-  <!-- 2. home -->
   <section id="home" class="veil">
-    <button id="sound" class="chip" type="button">צליל פועל</button>
+    <div class="toprow">
+      <button id="sound" class="chip" type="button">צליל פועל</button>
+      <button id="install" class="chip" type="button" hidden>התקן במסך הבית</button>
+    </div>
+
     <div class="crown">
       <span class="crown-label">השיא</span>
       <strong id="homeBest" class="crown-num">0</strong>
       <span class="crown-sub">מסלול דועך</span>
     </div>
+
     <div class="menu">
       <button id="btnPlay" class="btn" type="button">שחק</button>
-      <button id="btnAbout" class="btn btn-ghost" type="button">קצת עלינו</button>
+      <button id="btnDaily" class="btn btn-lilac btn-sm" type="button">אתגר יומי</button>
+      <button id="btnAbout" class="btn btn-ghost btn-sm" type="button">קצת עלינו</button>
     </div>
+
+    <div class="quests">
+      <h3>משימות היום</h3>
+      <div id="questList"></div>
+    </div>
+
     <form id="codebar" class="codebar">
       <input id="code" type="text" placeholder="קוד של חבר" autocomplete="off"
              autocapitalize="off" spellcheck="false" aria-label="קוד אתגר של חבר">
@@ -348,7 +335,6 @@
     </form>
   </section>
 
-  <!-- 3. about -->
   <section id="about" class="veil">
     <div class="sheet">
       <h2>קצת עלינו</h2>
@@ -359,31 +345,30 @@
 
       <h3>איך משחקים</h3>
       <ul class="steps">
-        <li><span class="dot" style="background:var(--ink)"></span>
-            <span>נוגעים בכל מקום במסך כדי להפוך כיוון. אין כפתורים.</span></li>
-        <li><span class="dot" style="background:var(--teal)"></span>
-            <span>אוספים את הכדורים הירוקים כדי להעלות את המכפיל.</span></li>
-        <li><span class="dot" style="background:var(--coral)"></span>
-            <span>חולפים קרוב לסלעים בלי להתנגש — ככל שקרוב יותר, כך יותר נקודות.</span></li>
-        <li><span class="dot" style="background:var(--sun)"></span>
-            <span>שישה אזורים. כל אזור שומר על הסכנות של הקודם ומוסיף אחת.</span></li>
+        <li><span class="dot" style="background:#2a3157"></span><span>נוגעים בכל מקום במסך כדי להפוך כיוון. אין כפתורים.</span></li>
+        <li><span class="dot" style="background:#23bfa6"></span><span>אוספים כדורי פלזמה כדי להעלות את המכפיל.</span></li>
+        <li><span class="dot" style="background:#ff6b7a"></span><span>חולפים קרוב לסלעים בלי להתנגש — הזמן נמתח לרגע, והניקוד עולה.</span></li>
+        <li><span class="dot" style="background:#a99bff"></span><span>מגן סגול מופיע לעיתים נדירות. הוא סופג פגיעה אחת.</span></li>
+        <li><span class="dot" style="background:#ffb454"></span><span>שישה אזורים. כל אזור שומר על הסכנות של הקודם ומוסיף אחת.</span></li>
       </ul>
 
-      <h3>האתגר</h3>
-      <p>
-        אחרי שנפסלים אפשר לשתף את הריצה. החבר שמקבל את הקוד מקבל בדיוק את אותו
-        שדה סלעים שלך, והרוח של הספינה שלך טסה לידו — כל תנועה שעשית, משוחזרת.
-      </p>
+      <h3>אתגר יומי</h3>
+      <p>כל יום כולם מקבלים בדיוק את אותו שדה סלעים, לפי התאריך. אותה התחלה, אותם סלעים — רק מי שמשחק טוב יותר מנצח.</p>
+
+      <h3>ערכות צבע</h3>
+      <div class="swatch-wrap"><div id="swatches" class="swatches"></div></div>
+
+      <h3>הגדרות</h3>
+      <div class="toggle"><span>רטט בפגיעה</span><button id="tglHaptics" type="button">פועל</button></div>
+      <div class="toggle"><span>מוזיקה</span><button id="tglMusic" type="button">פועלת</button></div>
 
       <p class="signoff">נבנה על ידי <b>עילי פרדי</b>.</p>
     </div>
-    <!-- kept outside the scrolling sheet so the way back is always in reach -->
     <div class="menu">
       <button id="btnBack" class="btn btn-ghost" type="button">חזרה</button>
     </div>
   </section>
 
-  <!-- 4. game over -->
   <section id="over" class="veil">
     <div class="card">
       <span class="card-label">התוצאה שלך</span>
@@ -391,6 +376,7 @@
       <p id="overSector" class="card-sector"></p>
       <p id="overRibbon" class="ribbon" hidden></p>
       <p class="card-best">השיא: <b id="overBest">0</b></p>
+      <button id="btnRevive" class="btn btn-teal" type="button" hidden>עוד חיים אחד</button>
       <button id="btnAgain" class="btn" type="button">שוב</button>
       <button id="btnQuit" class="btn btn-ghost" type="button">די זה קשה</button>
       <button id="btnShare" class="linky" type="button">שתף את התוצאה</button>
@@ -404,138 +390,198 @@
 
   /* ============================================================
      מסלול דועך / ORBIT DECAY
-     One input: touching anywhere reverses your direction of travel
-     around a collapsing star. Six sectors, each keeping the hazards
-     before it and adding one more.
 
-     Every hazard is driven by a seeded PRNG plus a fixed-timestep
-     tick counter, so a whole run is described by its seed and the
-     frames the player tapped on. That compresses into a short code,
-     which is what lets a friend replay your exact run as a ghost.
+     One input: touching anywhere reverses your direction around a
+     collapsing star. Six sectors, each keeping the hazards before
+     it and adding one more.
 
-     Rendering note: the field canvas is never cleared, only washed
-     with translucent sky, so moving things leave soft watercolour
-     trails. The HUD lives on a second canvas that IS cleared each
-     frame, because drawing the score on the persistent layer smears
-     the digits.
+     Everything that affects the world is driven by a seeded PRNG
+     plus a fixed-timestep tick counter, so a whole run is described
+     by its seed and the frames the player tapped on. That is what
+     makes both the shareable ghost replay and the daily challenge
+     (seed = today's date) nearly free.
+
+     Slow motion never adds or drops ticks - it only changes how
+     fast wall-clock time feeds the accumulator - so replays stay
+     exact.
      ============================================================ */
 
-  /* ---------- 1. config ---------- */
-  var U       = 1000;             // logical field, 1000 x 1000
-  var CX      = 500, CY = 500;
-  var ORBIT   = 268;
-  var STEP    = 1000 / 60;
-  var W_BASE  = 0.0265;
-  var SECTOR  = 800;              // ticks per sector (~13s)
+  /* ---------- config ---------- */
+  var U = 1000, CX = 500, CY = 500, ORBIT = 268;
+  var STEP = 1000 / 60, W_BASE = 0.0265, SECTOR = 800;
   var REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   var C = {
-    sky:   "#eef3ff",
-    ink:   "#2a3157",
-    soft:  "#737ba6",
-    faint: "#aeb4d1",
-    sun:   "#ffb454",
-    coral: "#ff6b7a",
-    teal:  "#23bfa6",
-    lilac: "#a99bff",
-    white: "#ffffff"
+    sky: "#eef3ff", ink: "#2a3157", soft: "#737ba6", faint: "#aeb4d1",
+    sun: "#ffb454", coral: "#ff6b7a", teal: "#23bfa6", lilac: "#a99bff"
   };
 
   var SECTORS = [
-    { name: "סחף",       blurb: "סלעים בקווים ישרים",        tint: C.ink },
-    { name: "אש צולבת",  blurb: "עכשיו זה מגיע משני הצדדים", tint: "#5b64a8" },
-    { name: "פולסר",     blurb: "הכוכב יורה. שים לב לסריקה",  tint: C.sun },
-    { name: "רסיסים",    blurb: "הגדולים מתפוצצים",           tint: "#ff8a5c" },
-    { name: "ליקוי",     blurb: "רואים רק מה שקרוב",          tint: C.lilac },
-    { name: "קריסה",     blurb: "המסלול נופל פנימה",          tint: C.coral }
+    { name: "סחף",      blurb: "סלעים בקווים ישרים",         tint: "#2a3157" },
+    { name: "אש צולבת", blurb: "עכשיו זה מגיע משני הצדדים",  tint: "#5b64a8" },
+    { name: "פולסר",    blurb: "הכוכב יורה. שים לב לסריקה",   tint: "#ffb454" },
+    { name: "רסיסים",   blurb: "הגדולים מתפוצצים",            tint: "#ff8a5c" },
+    { name: "ליקוי",    blurb: "רואים רק מה שקרוב",           tint: "#a99bff" },
+    { name: "קריסה",    blurb: "המסלול נופל פנימה",           tint: "#ff6b7a" }
+  ];
+
+  var THEMES = [
+    { name: "לילה",  ship: "#2a3157", need: 0 },
+    { name: "אלמוג", ship: "#ff6b7a", need: 3000 },
+    { name: "טורקיז", ship: "#12a894", need: 10000 },
+    { name: "לילך",  ship: "#8b7bff", need: 25000 }
   ];
 
   var $ = function (id) { return document.getElementById(id); };
   var app = $("app");
-  var cv  = $("screen"), ctx = cv.getContext("2d");
-  var hc  = $("hud"),    h   = hc.getContext("2d");
+  var cv = $("screen"), ctx = cv.getContext("2d");
+  var hc = $("hud"), h = hc.getContext("2d");
 
-  /* ---------- 2. seeded rng (gameplay only) ---------- */
+  /* ---------- seeded rng ---------- */
   var _s = 1;
   function seedRng(n) { _s = n >>> 0; }
-  function rnd() {                                  // mulberry32
+  function rnd() {
     _s = (_s + 0x6D2B79F5) >>> 0;
     var t = _s;
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   }
-  // Math.random stays in use for cosmetics only (sparks, shake, motes)
+  // Math.random is used only for cosmetics (sparks, shake, motes)
 
-  /* ---------- 3. sizing ----------
-     the canvas fills the whole viewport so a tap lands anywhere;
-     the 1000x1000 field is centred inside it                     */
+  function todayKey() {
+    var d = new Date();
+    return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+  }
+  function hashStr(s) {
+    var x = 2166136261 >>> 0;
+    for (var i = 0; i < s.length; i++) { x ^= s.charCodeAt(i); x = Math.imul(x, 16777619) >>> 0; }
+    return x >>> 0;
+  }
+
+  /* ---------- storage ---------- */
+  function lsGet(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  var best = parseInt(lsGet("od-best", "0"), 10) || 0;
+  var hapticsOn = lsGet("od-haptics", "1") === "1";
+  var musicOn = lsGet("od-music", "1") === "1";
+  var themeIdx = parseInt(lsGet("od-theme", "0"), 10) || 0;
+  if (!THEMES[themeIdx] || best < THEMES[themeIdx].need) themeIdx = 0;
+  function shipColor() { return THEMES[themeIdx].ship; }
+
+  /* ---------- sizing ---------- */
   var dpr = 1, cw = 0, ch = 0, S = 1, ox = 0, oy = 0, VW = 0, VH = 0;
   function fit() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     VW = app.clientWidth; VH = app.clientHeight;
     cw = Math.min(Math.round(VW * dpr), 1800);
     ch = Math.min(Math.round(VH * dpr), 1800);
-    cv.width = hc.width = cw;
-    cv.height = hc.height = ch;
+    cv.width = hc.width = cw; cv.height = hc.height = ch;
     S = Math.min(cw, ch) / U;
-    ox = (cw - U * S) / 2;
-    oy = (ch - U * S) / 2;
+    ox = (cw - U * S) / 2; oy = (ch - U * S) / 2;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.fillStyle = C.sky;
-    ctx.fillRect(0, 0, cw, ch);
+    ctx.fillStyle = C.sky; ctx.fillRect(0, 0, cw, ch);
   }
   addEventListener("resize", fit);
   addEventListener("orientationchange", function () { setTimeout(fit, 140); });
-
-  function field()  { ctx.setTransform(S, 0, 0, S, ox, oy); }
-  function device() { ctx.setTransform(1, 0, 0, 1, 0, 0); }
-  // logical field point -> css pixels, for HUD-space drawing
   function toCss(p) { return { x: (ox + p.x * S) / dpr, y: (oy + p.y * S) / dpr }; }
 
-  /* ---------- 4. audio ---------- */
-  var ac = null, muted = false;
+  /* ---------- haptics ----------
+     Android fires these; iOS Safari has no Vibration API, so it is
+     simply a no-op there                                          */
+  function buzz(pattern) {
+    if (!hapticsOn) return;
+    try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {}
+  }
+
+  /* ---------- audio ---------- */
+  var ac = null, muted = false, masterGain = null;
+  function audio() {
+    if (!ac) {
+      try {
+        ac = new (window.AudioContext || window.webkitAudioContext)();
+        masterGain = ac.createGain();
+        masterGain.gain.value = 1;
+        masterGain.connect(ac.destination);
+      } catch (e) { return null; }
+    }
+    if (ac.state === "suspended") ac.resume();
+    return ac;
+  }
   function tone(type, f0, f1, dur, vol) {
     if (muted) return;
+    var a = audio(); if (!a) return;
     try {
-      if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
-      if (ac.state === "suspended") ac.resume();
-      var t = ac.currentTime;
-      var o = ac.createOscillator(), gn = ac.createGain();
+      var t = a.currentTime;
+      var o = a.createOscillator(), gn = a.createGain();
       o.type = type;
       o.frequency.setValueAtTime(f0, t);
       o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + dur);
       gn.gain.setValueAtTime(0.0001, t);
       gn.gain.exponentialRampToValueAtTime(vol, t + 0.012);
       gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-      o.connect(gn); gn.connect(ac.destination);
+      o.connect(gn); gn.connect(masterGain);
       o.start(t); o.stop(t + dur + 0.02);
-    } catch (e) { /* no audio available - the game runs silent */ }
+    } catch (e) {}
   }
   var sfx = {
-    flip:   function ()  { tone("sine",     520, 360, 0.07, 0.05); },
-    orb:    function (n) { tone("sine",     560 * Math.pow(1.06, Math.min(n, 14)), 980, 0.14, 0.085); },
-    graze:  function ()  { tone("triangle", 1500, 1900, 0.04, 0.028); },
+    flip:   function ()  { tone("sine", 520, 360, 0.07, 0.05); },
+    orb:    function (n) { tone("sine", 560 * Math.pow(1.06, Math.min(n, 14)), 980, 0.14, 0.085); },
+    graze:  function ()  { tone("triangle", 1500, 1900, 0.045, 0.03); },
     hit:    function ()  { tone("sawtooth", 190, 55, 0.32, 0.12); },
     dead:   function ()  { tone("sawtooth", 340, 40, 0.85, 0.13); },
-    ahead:  function ()  { tone("sine",     660, 1320, 0.5, 0.1); },
-    sector: function ()  { tone("square",   260, 900, 0.45, 0.06); },
+    ahead:  function ()  { tone("sine", 660, 1320, 0.5, 0.1); },
+    sector: function ()  { tone("square", 260, 900, 0.45, 0.06); },
     charge: function ()  { tone("sawtooth", 90, 420, 1.0, 0.05); },
-    split:  function ()  { tone("square",   300, 130, 0.12, 0.045); },
-    ui:     function ()  { tone("sine",     620, 820, 0.08, 0.05); }
+    split:  function ()  { tone("square", 300, 130, 0.12, 0.045); },
+    shield: function ()  { tone("triangle", 700, 1400, 0.25, 0.08); },
+    ui:     function ()  { tone("sine", 620, 820, 0.08, 0.05); }
   };
 
-  /* ---------- 5. stored best ---------- */
-  var best = 0;
-  try { best = parseInt(localStorage.getItem("orbit-decay-best"), 10) || 0; } catch (e) {}
-  function saveBest() { try { localStorage.setItem("orbit-decay-best", String(best)); } catch (e) {} }
-  function paintBest() {
-    $("homeBest").textContent = best.toLocaleString();
-    $("overBest").textContent = best.toLocaleString();
+  /* ---------- music ----------
+     one short scheduler; each sector switches on another layer     */
+  var music = { timer: null, next: 0, step: 0 };
+  var PENT = [0, 3, 5, 7, 10];
+  function noteFreq(semi) { return 220 * Math.pow(2, semi / 12); }
+  function blip(type, freq, t, dur, vol, dest) {
+    var a = ac; if (!a) return;
+    var o = a.createOscillator(), gn = a.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, t);
+    gn.gain.setValueAtTime(0.0001, t);
+    gn.gain.exponentialRampToValueAtTime(vol, t + 0.02);
+    gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(gn); gn.connect(dest || masterGain);
+    o.start(t); o.stop(t + dur + 0.02);
+  }
+  function musicStep(step, t) {
+    var sec = g ? g.sector : 0;
+    var deg = PENT[step % PENT.length];
+    if (step % 4 === 0) blip("sine", noteFreq(deg - 24), t, 0.42, 0.055);          // bass
+    if (sec >= 1 && step % 2 === 0) blip("triangle", noteFreq(deg + 12), t, 0.16, 0.028);
+    if (sec >= 2 && step % 8 === 0) blip("sawtooth", noteFreq(deg - 12), t, 0.7, 0.016);
+    if (sec >= 3 && step % 4 === 2) blip("square", noteFreq(deg + 24), t, 0.05, 0.015);
+    if (sec >= 5 && step % 2 === 1) blip("square", noteFreq(deg + 7), t, 0.07, 0.014);
+  }
+  function musicStart() {
+    if (!musicOn || muted) return;
+    var a = audio(); if (!a || music.timer) return;
+    music.next = a.currentTime + 0.1; music.step = 0;
+    music.timer = setInterval(function () {
+      if (!ac) return;
+      var dur = (g && g.sector >= 5) ? 0.115 : (g && g.sector >= 3 ? 0.13 : 0.15);
+      while (music.next < ac.currentTime + 0.25) {
+        musicStep(music.step, music.next);
+        music.next += dur; music.step++;
+      }
+    }, 90);
+  }
+  function musicStop() {
+    if (music.timer) { clearInterval(music.timer); music.timer = null; }
   }
 
-  /* ---------- 6. challenge codec ----------
-     [seed, score, deathFrame, ...flipDeltas] -> base36, dot joined */
+  /* ---------- challenge codec ---------- */
   function encodeRun(r) {
     var out = [r.seed, r.score, r.death], prev = 0;
     for (var i = 0; i < r.flips.length; i++) { out.push(r.flips[i] - prev); prev = r.flips[i]; }
@@ -558,7 +604,6 @@
   }
   function pageUrl() {
     try { if (window.top !== window && window.top.location.href) return window.top.location.href; } catch (e) {}
-    if (document.referrer && /^https?:/.test(document.referrer)) return document.referrer;
     return location.href;
   }
   function stripHash(u) { return u.split("#")[0]; }
@@ -566,41 +611,132 @@
   var challenge = null;
   if (location.hash) challenge = decodeRun(location.hash);
 
-  /* ---------- 7. state ---------- */
-  var TITLE = 0, PLAY = 1, OVER = 2;         // simulation state
-  var g, ship, ghost, rocks, orbs, bits, run;
-  var orbit = ORBIT;
-  var view = "splash";                        // which overlay is up
+  /* ---------- daily missions ---------- */
+  var QUEST_POOL = [
+    { id: "orbs",   label: function (n) { return "אסוף " + n + " כדורי פלזמה"; }, lo: 10, hi: 22 },
+    { id: "sector", label: function (n) { return "הגע לאזור " + n; },              lo: 3,  hi: 5 },
+    { id: "score",  label: function (n) { return "עשה " + n.toLocaleString() + " נקודות בריצה"; }, lo: 2500, hi: 8000 },
+    { id: "graze",  label: function (n) { return "חלוף ליד " + n + " סלעים"; },     lo: 18, hi: 40 }
+  ];
+  var quests = [], questProg = {};
+  function buildQuests() {
+    var key = todayKey();
+    seedRng(hashStr("q" + key));
+    var pool = QUEST_POOL.slice(), picked = [];
+    for (var i = 0; i < 3 && pool.length; i++) {
+      var j = Math.floor(rnd() * pool.length);
+      var q = pool.splice(j, 1)[0];
+      var span = q.hi - q.lo;
+      var target = q.lo + Math.floor(rnd() * (span + 1));
+      if (q.id === "score") target = Math.round(target / 500) * 500;
+      picked.push({ id: q.id, target: target, label: q.label(target) });
+    }
+    quests = picked;
+    try { questProg = JSON.parse(lsGet("od-quests-" + key, "{}")) || {}; } catch (e) { questProg = {}; }
+    paintQuests();
+  }
+  function paintQuests() {
+    var host = $("questList");
+    host.innerHTML = "";
+    quests.forEach(function (q) {
+      var have = questProg[q.id] || 0;
+      var done = have >= q.target;
+      var row = document.createElement("div");
+      row.className = "quest" + (done ? " done" : "");
+      var tick = document.createElement("span");
+      tick.className = "tick"; tick.textContent = done ? "✓" : "";
+      var txt = document.createElement("span");
+      txt.textContent = q.label;
+      var prog = document.createElement("span");
+      prog.className = "prog";
+      prog.textContent = Math.min(have, q.target) + "/" + q.target;
+      row.appendChild(tick); row.appendChild(txt); row.appendChild(prog);
+      host.appendChild(row);
+    });
+  }
+  function commitQuests() {
+    var key = todayKey();
+    var vals = { orbs: g.orbsGot, sector: g.sector + 1, score: g.score, graze: g.grazes };
+    quests.forEach(function (q) {
+      var v = vals[q.id] || 0;
+      if (v > (questProg[q.id] || 0)) questProg[q.id] = v;
+    });
+    lsSet("od-quests-" + key, JSON.stringify(questProg));
+    paintQuests();
+  }
+
+  /* ---------- state ---------- */
+  var TITLE = 0, PLAY = 1, REPLAY = 2, OVER = 3;
+  var g, ship, ghost, rocks, orbs, bits, run, shieldPk;
+  var orbit = ORBIT, timeScale = 1, view = "splash", dailyMode = false;
 
   var motes = [];
-  for (var mi = 0; mi < 34; mi++) {
-    motes.push({ x: Math.random() * U, y: Math.random() * U, d: Math.random() * 0.22 + 0.05 });
+  for (var mi = 0; mi < 34; mi++) motes.push({ x: Math.random() * U, y: Math.random() * U, d: Math.random() * 0.22 + 0.05 });
+
+  /* replay ring buffer: [shipA, shipDir, orbit, nRocks, nOrbs, rocks*5, orbs*1] */
+  var RB_LEN = 190, MAXR = 48, MAXO = 8, RB_STRIDE = 5 + MAXR * 5 + MAXO;
+  var rb = [];
+  for (var ri = 0; ri < RB_LEN; ri++) rb.push(new Float32Array(RB_STRIDE));
+  var rbHead = 0, rbCount = 0, rbPlay = 0;
+
+  function rbPush() {
+    var f = rb[rbHead];
+    f[0] = ship.a; f[1] = ship.dir; f[2] = orbit;
+    var n = Math.min(rocks.length, MAXR), m = Math.min(orbs.length, MAXO);
+    f[3] = n; f[4] = m;
+    var i, k = 5;
+    for (i = 0; i < n; i++) {
+      var r = rocks[i];
+      f[k++] = r.x; f[k++] = r.y; f[k++] = r.r; f[k++] = r.ang; f[k++] = r.seed;
+    }
+    k = 5 + MAXR * 5;
+    for (i = 0; i < m; i++) f[k++] = orbs[i].a;
+    rbHead = (rbHead + 1) % RB_LEN;
+    rbCount = Math.min(rbCount + 1, RB_LEN);
+  }
+  var viewRocks = [], viewOrbs = [];
+  for (var vi = 0; vi < MAXR; vi++) viewRocks.push({ x: 0, y: 0, r: 0, ang: 0, seed: 0 });
+  function rbRead(i) {
+    var idx = (rbHead - rbCount + i + RB_LEN * 2) % RB_LEN;
+    var f = rb[idx];
+    var n = f[3] | 0, m = f[4] | 0, k = 5, j;
+    for (j = 0; j < n; j++) {
+      var o = viewRocks[j];
+      o.x = f[k++]; o.y = f[k++]; o.r = f[k++]; o.ang = f[k++]; o.seed = f[k++];
+    }
+    k = 5 + MAXR * 5;
+    viewOrbs.length = 0;
+    for (j = 0; j < m; j++) viewOrbs.push(f[k++]);
+    return { a: f[0], dir: f[1], orbit: f[2], n: n };
   }
 
   function reset(toTitle) {
-    var seed = challenge ? challenge.seed : (Math.random() * 0x7fffffff) >>> 0;
+    var seed;
+    if (dailyMode) seed = hashStr("d" + todayKey());
+    else if (challenge) seed = challenge.seed;
+    else seed = (Math.random() * 0x7fffffff) >>> 0;
     seedRng(seed);
+
     g = {
       state: toTitle ? TITLE : PLAY,
       score: 0, lives: 3, combo: 1, t: 0,
-      rockClock: 0, orbClock: 0,
+      rockClock: 0, orbClock: 0, shieldClock: 0,
       shake: 0, iframes: 0, flash: 0,
       ahead: 0, passed: false,
       sector: 0, banner: 0,
-      beamA: rnd() * Math.PI * 2,
-      beamDir: rnd() < 0.5 ? -1 : 1,
-      beamPower: 0
+      beamA: rnd() * Math.PI * 2, beamDir: rnd() < 0.5 ? -1 : 1, beamPower: 0,
+      shield: false, revived: false,
+      orbsGot: 0, grazes: 0
     };
-    ship  = { a: -Math.PI / 2, dir: 1, boost: 0 };
-    ghost = challenge ? { a: -Math.PI / 2, dir: 1, boost: 0, idx: 0, alive: true } : null;
-    rocks = []; orbs = []; bits = [];
-    orbit = ORBIT;
+    ship = { a: -Math.PI / 2, dir: 1, boost: 0 };
+    ghost = (challenge && !dailyMode) ? { a: -Math.PI / 2, dir: 1, boost: 0, idx: 0, alive: true } : null;
+    rocks = []; orbs = []; bits = []; shieldPk = null;
+    orbit = ORBIT; timeScale = 1;
+    rbHead = 0; rbCount = 0;
     run = { seed: seed, score: 0, death: 0, sector: 0, flips: [] };
   }
 
-  /* ---------- 8. orbital mechanics ----------
-     player and ghost run identical maths, which is what makes a
-     replay built from flip-times exact                          */
+  /* ---------- mechanics ---------- */
   function angularVelocity(t) { return W_BASE + Math.min(t / 460000, 0.014); }
   function stepOrbiter(o, t) {
     var w = angularVelocity(t) + (o.boost > 0 ? 0.020 * (o.boost / 10) : 0);
@@ -617,15 +753,13 @@
   }
   function spark(x, y, color, speed, life) {
     var a = Math.random() * Math.PI * 2, s = Math.random() * speed + 0.6;
-    bits.push({
-      x: x, y: y, vx: Math.cos(a) * s * 2.4, vy: Math.sin(a) * s * 2.4,
-      life: life || 1, decay: 0.02 + Math.random() * 0.02, c: color
-    });
+    bits.push({ x: x, y: y, vx: Math.cos(a) * s * 2.4, vy: Math.sin(a) * s * 2.4,
+                life: life || 1, decay: 0.02 + Math.random() * 0.02, c: color });
   }
   function beamCount() { return g.sector >= 5 ? 3 : 2; }
   function beamsLive() { return g.sector >= 2; }
 
-  /* ---------- 9. screens ---------- */
+  /* ---------- screens ---------- */
   function show(name) {
     view = name;
     ["splash", "home", "about", "over"].forEach(function (id) {
@@ -633,41 +767,91 @@
     });
   }
   function goHome() {
-    reset(true);
-    paintBest();
-    show("home");
+    dailyMode = false;
+    musicStop();
+    reset(true); paintBest(); show("home");
   }
-  function startGame() {
+  function startGame(daily) {
     sfx.ui();
+    dailyMode = !!daily;
     reset(false);
-    show(null);                       // no overlay: the field is the whole screen
+    show(null);
+    musicStart();
   }
-
-  $("btnPlay").addEventListener("click", startGame);
-  $("btnAgain").addEventListener("click", startGame);
+  $("btnPlay").addEventListener("click", function () { startGame(false); });
+  $("btnDaily").addEventListener("click", function () { startGame(true); });
+  $("btnAgain").addEventListener("click", function () { startGame(dailyMode); });
   $("btnAbout").addEventListener("click", function () { sfx.ui(); show("about"); });
   $("btnBack").addEventListener("click", function () { sfx.ui(); show("home"); });
   $("btnQuit").addEventListener("click", function () { sfx.ui(); goHome(); });
 
+  $("btnRevive").addEventListener("click", function () {
+    sfx.ui();
+    g.state = PLAY; g.lives = 1; g.iframes = 150; g.revived = true; g.combo = 1;
+    rocks = [];                     // clear the screen so the restart is fair
+    show(null);
+    musicStart();
+  });
+
   $("sound").addEventListener("click", function () {
     muted = !muted;
     this.textContent = muted ? "צליל מושתק" : "צליל פועל";
-    if (!muted) sfx.ui();
+    if (muted) musicStop(); else { sfx.ui(); if (g.state === PLAY) musicStart(); }
+  });
+  $("tglHaptics").addEventListener("click", function () {
+    hapticsOn = !hapticsOn;
+    this.textContent = hapticsOn ? "פועל" : "כבוי";
+    this.classList.toggle("off", !hapticsOn);
+    lsSet("od-haptics", hapticsOn ? "1" : "0");
+    if (hapticsOn) buzz(20);
+  });
+  $("tglMusic").addEventListener("click", function () {
+    musicOn = !musicOn;
+    this.textContent = musicOn ? "פועלת" : "כבויה";
+    this.classList.toggle("off", !musicOn);
+    lsSet("od-music", musicOn ? "1" : "0");
+    if (!musicOn) musicStop(); else if (g.state === PLAY) musicStart();
   });
 
-  /* ---------- 10. input ----------
-     during play the entire screen is the button                 */
+  /* ---------- themes ---------- */
+  function paintSwatches() {
+    var host = $("swatches");
+    host.innerHTML = "";
+    THEMES.forEach(function (th, i) {
+      var locked = best < th.need;
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "sw" + (i === themeIdx ? " sel" : "") + (locked ? " locked" : "");
+      b.title = th.name;
+      var i2 = document.createElement("i");
+      i2.style.background = th.ship;
+      b.appendChild(i2);
+      var lab = document.createElement("small");
+      lab.textContent = locked ? th.need.toLocaleString() : th.name;
+      b.appendChild(lab);
+      if (!locked) b.addEventListener("click", function () {
+        themeIdx = i; lsSet("od-theme", String(i)); sfx.ui(); paintSwatches();
+      });
+      host.appendChild(b);
+    });
+  }
+
+  function paintBest() {
+    $("homeBest").textContent = best.toLocaleString();
+    $("overBest").textContent = best.toLocaleString();
+  }
+
+  /* ---------- input ---------- */
   function flip() {
     if (g.state !== PLAY) return;
-    ship.dir *= -1;
-    ship.boost = 10;
-    run.flips.push(g.t + 1);          // takes effect on the next tick
+    ship.dir *= -1; ship.boost = 10;
+    run.flips.push(g.t + 1);
     sfx.flip();
     var p = posOf(ship);
-    for (var i = 0; i < 6; i++) spark(p.x, p.y, C.ink, 2.2, 0.5);
+    for (var i = 0; i < 6; i++) spark(p.x, p.y, shipColor(), 2.2, 0.5);
   }
   app.addEventListener("pointerdown", function (e) {
-    if (view !== null) return;        // an overlay owns the taps
+    if (view !== null) return;
     e.preventDefault();
     flip();
   });
@@ -680,7 +864,7 @@
     if (view === null) flip();
   });
 
-  /* ---------- 11. rival code ---------- */
+  /* ---------- rival code ---------- */
   var codebar = $("codebar"), codeIn = $("code"), loadBtn = $("load");
   codebar.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -701,77 +885,115 @@
     goHome();
   });
 
-  /* ---------- 12. share ---------- */
+  /* ---------- share ---------- */
   var lastRun = null;
   function shareText() {
     var base = stripHash(pageUrl());
-    if (lastRun && lastRun.score > 0) {
-      var code = encodeRun(lastRun);
-      return "מסלול דועך - עשיתי " + lastRun.score.toLocaleString() +
-             " והגעתי לאזור " + (lastRun.sector + 1) + " (" + SECTORS[lastRun.sector].name + ").\n" +
-             "אותו שדה סלעים בדיוק, והרוח שלי טסה לידך:\n" + base + "#c=" + code + "\n" +
-             "(אם הקישור מאבד את הקוד, הדבק אותו במשחק: " + code + ")";
-    }
-    return "מסלול דועך - נגיעה אחת, שישה אזורים:\n" + base;
+    if (!lastRun || !lastRun.score) return "מסלול דועך - נגיעה אחת, שישה אזורים:\n" + base;
+    var code = encodeRun(lastRun);
+    var head = lastRun.daily
+      ? "מסלול דועך - האתגר היומי: עשיתי " + lastRun.score.toLocaleString()
+      : "מסלול דועך - עשיתי " + lastRun.score.toLocaleString();
+    return head + " והגעתי לאזור " + (lastRun.sector + 1) + " (" + SECTORS[lastRun.sector].name + ").\n" +
+           "אותו שדה סלעים בדיוק, והרוח שלי טסה לידך:\n" + base + "#c=" + code + "\n" +
+           "(אם הקישור מאבד את הקוד, הדבק אותו במשחק: " + code + ")";
+  }
+  function scoreCard() {
+    var W = 1080, H = 1080;
+    var c = document.createElement("canvas");
+    c.width = W; c.height = H;
+    var x = c.getContext("2d");
+    var bg = x.createLinearGradient(0, 0, W, H);
+    bg.addColorStop(0, "#fff4e9"); bg.addColorStop(0.55, "#eef3ff"); bg.addColorStop(1, "#e4ecff");
+    x.fillStyle = bg; x.fillRect(0, 0, W, H);
+    var gr = x.createRadialGradient(W / 2, H / 2, 30, W / 2, H / 2, 420);
+    gr.addColorStop(0, "rgba(255,208,130,0.85)");
+    gr.addColorStop(0.35, "rgba(255,180,84,0.35)");
+    gr.addColorStop(1, "rgba(255,145,56,0)");
+    x.fillStyle = gr; x.beginPath(); x.arc(W / 2, H / 2, 420, 0, 6.2832); x.fill();
+    x.strokeStyle = "#aeb4d1"; x.lineWidth = 4;
+    x.beginPath(); x.arc(W / 2, H / 2, 330, 0, 6.2832); x.stroke();
+    x.fillStyle = "#ffb454"; x.beginPath(); x.arc(W / 2, H / 2, 108, 0, 6.2832); x.fill();
+    x.save(); x.translate(W / 2, H / 2 - 330); x.rotate(0.5);
+    x.fillStyle = shipColor();
+    x.beginPath(); x.moveTo(0, -40); x.lineTo(26, 28); x.lineTo(0, 10); x.lineTo(-26, 28); x.closePath(); x.fill();
+    x.restore();
+    x.direction = "rtl"; x.textAlign = "center";
+    x.fillStyle = "#737ba6"; x.font = "500 40px system-ui, sans-serif";
+    x.fillText(lastRun && lastRun.daily ? "האתגר היומי" : "מסלול דועך", W / 2, 120);
+    x.fillStyle = "#2a3157"; x.font = "700 190px system-ui, sans-serif";
+    x.fillText((lastRun ? lastRun.score : 0).toLocaleString(), W / 2, 830);
+    x.fillStyle = "#737ba6"; x.font = "500 44px system-ui, sans-serif";
+    var sn = lastRun ? SECTORS[lastRun.sector].name : "";
+    x.fillText("אזור " + ((lastRun ? lastRun.sector : 0) + 1) + " · " + sn, W / 2, 890);
+    x.fillStyle = "#aeb4d1"; x.font = "500 34px system-ui, sans-serif";
+    x.fillText("ilayfredi.github.io/ilayfredi", W / 2, 990);
+    return c;
   }
   $("btnShare").addEventListener("click", function () {
     var btn = this, msg = shareText();
-    function ok() {
-      btn.textContent = "הועתק";
-      setTimeout(function () { btn.textContent = "שתף את התוצאה"; }, 2000);
+    function done(label) {
+      btn.textContent = label;
+      setTimeout(function () { btn.textContent = "שתף את התוצאה"; }, 2200);
     }
-    function legacy() {
-      try {
-        var ta = document.createElement("textarea");
-        ta.value = msg; ta.style.position = "fixed"; ta.style.top = "-1000px";
-        document.body.appendChild(ta); ta.select();
-        document.execCommand("copy");
-        document.body.removeChild(ta); ok();
-      } catch (e) { btn.textContent = "לא הצליח"; }
+    function copyText() {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(msg).then(function () { done("הועתק"); }, function () { done("לא הצליח"); });
+      } else {
+        try {
+          var ta = document.createElement("textarea");
+          ta.value = msg; ta.style.position = "fixed"; ta.style.top = "-1000px";
+          document.body.appendChild(ta); ta.select();
+          document.execCommand("copy"); document.body.removeChild(ta);
+          done("הועתק");
+        } catch (e) { done("לא הצליח"); }
+      }
     }
-    if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) {
-      navigator.share({ text: msg }).then(function () {}, legacy);
-    } else if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(msg).then(ok, legacy);
-    } else { legacy(); }
+    try {
+      scoreCard().toBlob(function (blob) {
+        if (!blob) { copyText(); return; }
+        var file = new File([blob], "orbit-decay.png", { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], text: msg }).then(function () {}, copyText);
+        } else if (navigator.share) {
+          navigator.share({ text: msg }).then(function () {}, copyText);
+        } else { copyText(); }
+      }, "image/png");
+    } catch (e) { copyText(); }
   });
 
-  /* ---------- 13. hazards ---------- */
+  /* ---------- hazards ---------- */
   function spawnRock(fromAngle, speedBias) {
-    var sx = CX + Math.cos(fromAngle) * 760;
-    var sy = CY + Math.sin(fromAngle) * 760;
+    var sx = CX + Math.cos(fromAngle) * 760, sy = CY + Math.sin(fromAngle) * 760;
     var ta = rnd() * Math.PI * 2, tr = rnd() * 92;
     var tx = CX + Math.cos(ta) * tr, ty = CY + Math.sin(ta) * tr;
-    var d  = Math.hypot(tx - sx, ty - sy);
+    var d = Math.hypot(tx - sx, ty - sy);
     var sp = 3.0 + rnd() * 1.5 + Math.min(g.t / 5200, 2.6) + (speedBias || 0);
-    rocks.push({
-      x: sx, y: sy, vx: (tx - sx) / d * sp, vy: (ty - sy) / d * sp,
-      r: 20 + rnd() * 20, ang: rnd() * 6.28, spin: (rnd() - 0.5) * 0.05,
-      grazed: false, split: false, seed: Math.floor(rnd() * 999)
-    });
+    rocks.push({ x: sx, y: sy, vx: (tx - sx) / d * sp, vy: (ty - sy) / d * sp,
+                 r: 20 + rnd() * 20, ang: rnd() * 6.28, spin: (rnd() - 0.5) * 0.05,
+                 grazed: false, split: false, seed: Math.floor(rnd() * 999) });
   }
   function shatter(r) {
     var base = Math.atan2(r.vy, r.vx), sp = Math.hypot(r.vx, r.vy) * 1.1;
     for (var i = 0; i < 2; i++) {
       var a = base + (i === 0 ? -0.34 : 0.34);
-      rocks.push({
-        x: r.x, y: r.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
-        r: r.r * 0.58, ang: r.ang, spin: (i ? 1 : -1) * 0.06,
-        grazed: false, split: true, seed: (r.seed * 7 + i * 131) % 999
-      });
+      rocks.push({ x: r.x, y: r.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+                   r: r.r * 0.58, ang: r.ang, spin: (i ? 1 : -1) * 0.06,
+                   grazed: false, split: true, seed: (r.seed * 7 + i * 131) % 999 });
     }
     r.dead = true;
     for (var q = 0; q < 9; q++) spark(r.x, r.y, C.coral, 2.6, 0.7);
     sfx.split();
   }
 
-  /* ---------- 14. simulation ---------- */
+  /* ---------- simulation ---------- */
   function update() {
     g.t++;
     if (g.shake > 0) g.shake *= 0.88;
     if (g.flash > 0) g.flash -= 0.06;
     if (g.ahead > 0) g.ahead--;
     if (g.banner > 0) g.banner--;
+    if (timeScale < 1) timeScale = Math.min(1, timeScale + 0.028);
 
     for (var m = 0; m < motes.length; m++) {
       motes[m].y += motes[m].d;
@@ -779,20 +1001,19 @@
     }
 
     var live = g.state === PLAY;
-    if (g.state === TITLE) stepOrbiter(ship, g.t);   // menus stay alive
+    if (g.state === TITLE) stepOrbiter(ship, g.t);
 
     if (live) {
       var sec = Math.min(SECTORS.length - 1, Math.floor(g.t / SECTOR));
       if (sec !== g.sector) {
         g.sector = sec; g.banner = 130;
-        sfx.sector();
+        sfx.sector(); buzz([12, 40, 12]);
         if (sec === 2) sfx.charge();
       }
-
       if (g.sector >= 5) {
         var into = Math.min(1, (g.t - SECTOR * 5) / (SECTOR * 1.6));
         orbit = ORBIT - 54 * into;
-      } else { orbit = ORBIT; }
+      } else orbit = ORBIT;
 
       if (beamsLive()) {
         g.beamPower = Math.min(1, g.beamPower + 1 / 110);
@@ -810,11 +1031,13 @@
         stepOrbiter(ghost, g.t);
         if (g.t > challenge.death) ghost.alive = false;
       }
-      if (challenge && !g.passed && g.score > challenge.score) {
+      if (challenge && !dailyMode && !g.passed && g.score > challenge.score) {
         g.passed = true; g.ahead = 110; sfx.ahead();
       }
 
-      var rate = Math.max(13, 52 - g.t / 90);
+      // gentler opening so a first-timer is not buried immediately
+      var warm = Math.min(1, g.t / 260);
+      var rate = Math.max(13, (52 - g.t / 90) + (1 - warm) * 34);
       if (++g.rockClock > rate) {
         g.rockClock = 0;
         var from = rnd() * Math.PI * 2;
@@ -825,29 +1048,30 @@
         g.orbClock = 0;
         orbs.push({ a: rnd() * Math.PI * 2, life: 470, drift: (rnd() - 0.5) * 0.004 });
       }
+      if (!shieldPk && !g.shield && ++g.shieldClock > 900 && rnd() < 0.02) {
+        g.shieldClock = 0;
+        shieldPk = { a: rnd() * Math.PI * 2, life: 420 };
+      }
     }
 
-    // snapshot length so fragments born this tick wait for the next
     for (var i = 0, n0 = rocks.length; i < n0; i++) {
       var r = rocks[i];
       if (r.dead) continue;
       r.x += r.vx; r.y += r.vy; r.ang += r.spin;
       var dc = Math.hypot(r.x - CX, r.y - CY);
       if (live && g.sector >= 3 && !r.split && r.r > 29 && dc < orbit + 46) { shatter(r); continue; }
-      if (dc < 62) {
-        r.dead = true;
-        for (var q = 0; q < 7; q++) spark(r.x, r.y, C.sun, 2.4, 0.7);
-      }
+      if (dc < 62) { r.dead = true; for (var q = 0; q < 7; q++) spark(r.x, r.y, C.sun, 2.4, 0.7); }
       if (dc > 900) r.dead = true;
     }
-
     for (var o = 0; o < orbs.length; o++) {
       orbs[o].a += orbs[o].drift;
       if (--orbs[o].life <= 0) orbs[o].dead = true;
     }
+    if (shieldPk && --shieldPk.life <= 0) shieldPk = null;
 
     if (live) {
       var p = posOf(ship);
+
       for (var k = 0; k < orbs.length; k++) {
         var ob = orbs[k];
         if (ob.dead) continue;
@@ -855,28 +1079,43 @@
         if (Math.hypot(p.x - op.x, p.y - op.y) < 34) {
           ob.dead = true;
           g.combo = Math.min(g.combo + 1, 25);
+          g.orbsGot++;
           g.score += Math.round(55 * g.combo * (1 + g.sector * 0.4));
-          sfx.orb(g.combo);
+          sfx.orb(g.combo); buzz(8);
           for (var s = 0; s < 12; s++) spark(op.x, op.y, C.teal, 3, 1);
         }
       }
+
+      if (shieldPk) {
+        var shp = onRing(shieldPk.a);
+        if (Math.hypot(p.x - shp.x, p.y - shp.y) < 36) {
+          shieldPk = null; g.shield = true;
+          sfx.shield(); buzz([10, 30, 10]);
+          for (var s2 = 0; s2 < 16; s2++) spark(shp.x, shp.y, C.lilac, 3, 1);
+        }
+      }
+
       for (var j = 0; j < rocks.length; j++) {
         var rk = rocks[j];
         if (rk.dead) continue;
         var dist = Math.hypot(p.x - rk.x, p.y - rk.y);
         if (!rk.grazed && dist < rk.r + 52) {
-          rk.grazed = true;
+          rk.grazed = true; g.grazes++;
           g.score += Math.round(26 * g.combo * (1 + g.sector * 0.4));
           sfx.graze();
+          timeScale = Math.min(timeScale, 0.42);      // the world stretches for a beat
         }
         if (g.iframes <= 0 && dist < rk.r + 13) { rk.dead = true; takeHit(p); }
       }
+
       if (beamsLive() && g.beamPower >= 1 && g.iframes <= 0) {
         var n = beamCount();
         for (var b = 0; b < n; b++) {
           if (Math.abs(angleGap(ship.a, g.beamA + b * (Math.PI * 2 / n))) < 0.105) { takeHit(p); break; }
         }
       }
+
+      rbPush();
     }
 
     for (var c = 0; c < bits.length; c++) {
@@ -885,54 +1124,58 @@
       bt.vx *= 0.96; bt.vy *= 0.96;
       bt.life -= bt.decay;
     }
-
     rocks = rocks.filter(function (x) { return !x.dead; });
-    orbs  = orbs.filter(function (x) { return !x.dead; });
-    bits  = bits.filter(function (x) { return x.life > 0; });
+    orbs = orbs.filter(function (x) { return !x.dead; });
+    bits = bits.filter(function (x) { return x.life > 0; });
   }
 
   function takeHit(p) {
-    g.combo = 1;
-    g.lives--;
-    g.iframes = 96;
-    g.shake = REDUCED ? 0 : 20;
-    g.flash = 1;
+    if (g.shield) {                                   // the shield eats one
+      g.shield = false; g.iframes = 70;
+      g.shake = REDUCED ? 0 : 12; g.flash = 0.6;
+      sfx.hit(); buzz(25);
+      for (var s = 0; s < 18; s++) spark(p.x, p.y, C.lilac, 3.4, 1);
+      return;
+    }
+    g.combo = 1; g.lives--; g.iframes = 96;
+    g.shake = REDUCED ? 0 : 20; g.flash = 1;
     for (var b = 0; b < 26; b++) spark(p.x, p.y, C.coral, 4, 1.2);
     if (g.lives <= 0) {
-      g.state = OVER;
-      sfx.dead();
-      run.score = g.score; run.death = g.t; run.sector = g.sector;
+      sfx.dead(); buzz([60, 40, 90]);
+      musicStop();
+      run.score = g.score; run.death = g.t; run.sector = g.sector; run.daily = dailyMode;
       lastRun = run;
-      var isBest = g.score > best;
-      if (isBest) { best = g.score; saveBest(); }
-      paintBest();
-      $("overScore").textContent = g.score.toLocaleString();
-      $("overSector").textContent = "אזור " + (g.sector + 1) + " · " + SECTORS[g.sector].name;
-      var ribbon = $("overRibbon");
-      if (challenge) {
-        ribbon.hidden = false;
-        ribbon.textContent = g.score > challenge.score ? "ניצחת את היריב" : "היריב עדיין מוביל";
-      } else if (isBest) {
-        ribbon.hidden = false;
-        ribbon.textContent = "שיא חדש";
-      } else { ribbon.hidden = true; }
-      setTimeout(function () { show("over"); }, 700);
-    } else { sfx.hit(); }
+      commitQuests();
+      g.wasBest = g.score > best;
+      if (g.wasBest) { best = g.score; lsSet("od-best", String(best)); }
+      paintBest(); paintSwatches();
+      g.state = REPLAY;                                // the last moments, slowed down
+      rbPlay = Math.max(0, rbCount - 170);
+    } else { sfx.hit(); buzz(35); }
   }
 
-  /* ---------- 15. render ---------- */
+  function finishRun() {
+    $("overScore").textContent = g.score.toLocaleString();
+    $("overSector").textContent = "אזור " + (g.sector + 1) + " · " + SECTORS[g.sector].name;
+    var ribbon = $("overRibbon");
+    if (challenge && !dailyMode) {
+      ribbon.hidden = false;
+      ribbon.textContent = g.score > challenge.score ? "ניצחת את היריב" : "היריב עדיין מוביל";
+    } else if (g.wasBest) {
+      ribbon.hidden = false; ribbon.textContent = "שיא חדש";
+    } else ribbon.hidden = true;
+    $("btnRevive").hidden = g.revived;
+    g.state = OVER;
+    show("over");
+  }
+
+  /* ---------- render ---------- */
   function stroke(color, width, alpha, path) {
     ctx.strokeStyle = color; ctx.globalAlpha = alpha; ctx.lineWidth = width;
     ctx.beginPath(); path(); ctx.stroke();
   }
-  function inked(color, path) {            // soft halo + crisp line
-    stroke(color, 12, 0.10, path);
-    stroke(color, 3.2, 1, path);
-  }
-  function chevron() {
-    ctx.moveTo(0, -19); ctx.lineTo(12, 13); ctx.lineTo(0, 5); ctx.lineTo(-12, 13);
-    ctx.closePath();
-  }
+  function inked(color, path) { stroke(color, 12, 0.10, path); stroke(color, 3.2, 1, path); }
+  function chevron() { ctx.moveTo(0, -19); ctx.lineTo(12, 13); ctx.lineTo(0, 5); ctx.lineTo(-12, 13); ctx.closePath(); }
   function rockPath(r) {
     return function () {
       for (var i = 0; i <= 8; i++) {
@@ -943,7 +1186,6 @@
       }
     };
   }
-
   function drawBeams() {
     if (!beamsLive()) return;
     var n = beamCount(), pw = g.beamPower, half = 0.105, reach = 560;
@@ -952,160 +1194,180 @@
       var ba = g.beamA + b * (Math.PI * 2 / n);
       var x1 = CX + Math.cos(ba - half) * reach, y1 = CY + Math.sin(ba - half) * reach;
       var x2 = CX + Math.cos(ba + half) * reach, y2 = CY + Math.sin(ba + half) * reach;
-      ctx.globalAlpha = 0.05 + 0.07 * pw;
-      ctx.fillStyle = col;
-      ctx.beginPath();
-      ctx.moveTo(CX, CY); ctx.lineTo(x1, y1); ctx.lineTo(x2, y2); ctx.closePath();
-      ctx.fill();
-      // the trail smears the wedge wider than it is, so mark the true line
+      ctx.globalAlpha = 0.05 + 0.07 * pw; ctx.fillStyle = col;
+      ctx.beginPath(); ctx.moveTo(CX, CY); ctx.lineTo(x1, y1); ctx.lineTo(x2, y2); ctx.closePath(); ctx.fill();
       stroke(col, 2, 0.16 + 0.34 * pw, function () {
-        ctx.moveTo(CX, CY);
-        ctx.lineTo(CX + Math.cos(ba) * reach, CY + Math.sin(ba) * reach);
+        ctx.moveTo(CX, CY); ctx.lineTo(CX + Math.cos(ba) * reach, CY + Math.sin(ba) * reach);
       });
     }
   }
 
   function draw() {
-    // watercolour persistence: wash with sky, never clear
-    device();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.globalCompositeOperation = "source-over";
     ctx.globalAlpha = 1;
     ctx.fillStyle = REDUCED ? "rgba(238,243,255,0.94)" : "rgba(238,243,255,0.34)";
     ctx.fillRect(0, 0, cw, ch);
 
-    field();
+    ctx.setTransform(S, 0, 0, S, ox, oy);
     if (g.shake > 1) ctx.translate((Math.random() - 0.5) * g.shake, (Math.random() - 0.5) * g.shake);
-    ctx.lineJoin = "round";
-    ctx.lineCap = "round";
+    ctx.lineJoin = "round"; ctx.lineCap = "round";
 
-    ctx.globalAlpha = 0.5;
-    ctx.fillStyle = C.faint;
+    ctx.globalAlpha = 0.5; ctx.fillStyle = C.faint;
     for (var m = 0; m < motes.length; m++) ctx.fillRect(motes[m].x, motes[m].y, 2.4, 2.4);
 
-    drawBeams();
-    stroke(C.faint, 2, 0.85, function () { ctx.arc(CX, CY, orbit, 0, 6.2832); });
+    var replaying = g.state === REPLAY && rbCount > 0;
+    var snap = null, dOrbit = orbit, dRocks = rocks, dRockN = rocks.length;
+    if (replaying) {
+      snap = rbRead(Math.min(rbCount - 1, Math.floor(rbPlay)));
+      dOrbit = snap.orbit; dRocks = viewRocks; dRockN = snap.n;
+    }
 
-    // the star, swelling as the orbit falls in
+    if (!replaying) drawBeams();
+    stroke(C.faint, 2, 0.85, function () { ctx.arc(CX, CY, dOrbit, 0, 6.2832); });
+
     var pulse = 1 + Math.sin(g.t * 0.035) * 0.045;
-    var rad = (56 + (ORBIT - orbit) * 0.55) * pulse;
+    var rad = (56 + (ORBIT - dOrbit) * 0.55) * pulse;
     var grd = ctx.createRadialGradient(CX, CY, rad * 0.15, CX, CY, rad * 2.6);
     grd.addColorStop(0, "rgba(255,208,130,0.95)");
     grd.addColorStop(0.34, "rgba(255,180,84,0.45)");
     grd.addColorStop(1, "rgba(255,145,56,0)");
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = grd;
+    ctx.globalAlpha = 1; ctx.fillStyle = grd;
     ctx.beginPath(); ctx.arc(CX, CY, rad * 2.6, 0, 6.2832); ctx.fill();
     ctx.fillStyle = C.sun;
     ctx.beginPath(); ctx.arc(CX, CY, rad, 0, 6.2832); ctx.fill();
-    ctx.globalAlpha = 0.5;
-    ctx.fillStyle = "#fff0d6";
+    ctx.globalAlpha = 0.5; ctx.fillStyle = "#fff0d6";
     ctx.beginPath(); ctx.arc(CX - rad * 0.2, CY - rad * 0.22, rad * 0.5, 0, 6.2832); ctx.fill();
 
-    for (var i = 0; i < rocks.length; i++) inked(C.coral, rockPath(rocks[i]));
+    for (var i = 0; i < dRockN; i++) inked(C.coral, rockPath(dRocks[i]));
 
-    for (var o = 0; o < orbs.length; o++) {
-      var ob = orbs[o];
-      var op = onRing(ob.a);
-      var fade = ob.life < 90 ? (Math.floor(ob.life / 6) % 2 ? 0.3 : 1) : 1;
-      ctx.globalAlpha = 0.2 * fade;
-      ctx.fillStyle = C.teal;
-      ctx.beginPath(); ctx.arc(op.x, op.y, 23, 0, 6.2832); ctx.fill();
-      ctx.globalAlpha = fade;
-      ctx.beginPath(); ctx.arc(op.x, op.y, 9.5, 0, 6.2832); ctx.fill();
+    if (replaying) {
+      for (var vo = 0; vo < viewOrbs.length; vo++) {
+        var vp = { x: CX + Math.cos(viewOrbs[vo]) * dOrbit, y: CY + Math.sin(viewOrbs[vo]) * dOrbit };
+        ctx.globalAlpha = 0.2; ctx.fillStyle = C.teal;
+        ctx.beginPath(); ctx.arc(vp.x, vp.y, 23, 0, 6.2832); ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.beginPath(); ctx.arc(vp.x, vp.y, 9.5, 0, 6.2832); ctx.fill();
+      }
+    } else {
+      for (var o = 0; o < orbs.length; o++) {
+        var ob = orbs[o], op = onRing(ob.a);
+        var fade = ob.life < 90 ? (Math.floor(ob.life / 6) % 2 ? 0.3 : 1) : 1;
+        ctx.globalAlpha = 0.2 * fade; ctx.fillStyle = C.teal;
+        ctx.beginPath(); ctx.arc(op.x, op.y, 23, 0, 6.2832); ctx.fill();
+        ctx.globalAlpha = fade;
+        ctx.beginPath(); ctx.arc(op.x, op.y, 9.5, 0, 6.2832); ctx.fill();
+      }
+      if (shieldPk) {
+        var sp2 = onRing(shieldPk.a);
+        var bl = shieldPk.life < 90 && Math.floor(shieldPk.life / 6) % 2;
+        ctx.globalAlpha = bl ? 0.3 : 1;
+        stroke(C.lilac, 3.5, ctx.globalAlpha, function () { ctx.arc(sp2.x, sp2.y, 14, 0, 6.2832); });
+        ctx.globalAlpha = (bl ? 0.1 : 0.25); ctx.fillStyle = C.lilac;
+        ctx.beginPath(); ctx.arc(sp2.x, sp2.y, 22, 0, 6.2832); ctx.fill();
+      }
     }
 
     if (ghost && ghost.alive && g.state === PLAY) {
       var gp = posOf(ghost);
-      ctx.save();
-      ctx.translate(gp.x, gp.y);
+      ctx.save(); ctx.translate(gp.x, gp.y);
       ctx.rotate(ghost.a + (Math.PI / 2) * ghost.dir);
       stroke(C.lilac, 3, 0.75, chevron);
       ctx.restore();
     }
 
     if (g.state !== OVER) {
-      var p = posOf(ship);
-      var blink = g.iframes > 0 && Math.floor(g.t / 4) % 2 === 0;
+      var sa = replaying ? snap.a : ship.a;
+      var sd = replaying ? snap.dir : ship.dir;
+      var sx = CX + Math.cos(sa) * dOrbit, sy = CY + Math.sin(sa) * dOrbit;
+      var blink = !replaying && g.iframes > 0 && Math.floor(g.t / 4) % 2 === 0;
       if (!blink) {
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(ship.a + (Math.PI / 2) * ship.dir);
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = C.ink;
+        ctx.save(); ctx.translate(sx, sy); ctx.rotate(sa + (Math.PI / 2) * sd);
+        ctx.globalAlpha = 1; ctx.fillStyle = shipColor();
         ctx.beginPath(); chevron(); ctx.fill();
-        stroke(C.ink, 12, 0.1, chevron);
+        stroke(shipColor(), 12, 0.1, chevron);
         ctx.restore();
+        if (g.shield && !replaying) {
+          stroke(C.lilac, 3, 0.8, function () { ctx.arc(sx, sy, 28, 0, 6.2832); });
+        }
       }
     }
 
-    for (var c = 0; c < bits.length; c++) {
-      var bt = bits[c];
+    for (var c2 = 0; c2 < bits.length; c2++) {
+      var bt = bits[c2];
       ctx.globalAlpha = Math.max(0, bt.life) * 0.85;
       ctx.fillStyle = bt.c;
       ctx.fillRect(bt.x - 2, bt.y - 2, 4.5, 4.5);
     }
 
     if (g.flash > 0) {
-      device();
-      ctx.globalAlpha = g.flash * 0.2;
-      ctx.fillStyle = C.coral;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.globalAlpha = g.flash * 0.2; ctx.fillStyle = C.coral;
       ctx.fillRect(0, 0, cw, ch);
     }
 
-    drawHud();
+    drawHud(replaying);
   }
 
-  /* HUD is drawn in css pixels on its own cleared layer */
-  function drawHud() {
+  function drawHud(replaying) {
     h.setTransform(dpr, 0, 0, dpr, 0, 0);
     h.clearRect(0, 0, VW, VH);
-    h.globalAlpha = 1;
-    h.textBaseline = "top";
+    h.globalAlpha = 1; h.textBaseline = "top";
+    h.direction = "rtl";
 
-    if (g.state === PLAY && g.sector >= 4) {          // ליקוי: fog of daylight
+    if (g.state === PLAY && g.sector >= 4) {
       var sp = toCss(posOf(ship));
       var r0 = Math.min(VW, VH) * 0.22, r1 = Math.min(VW, VH) * 0.62;
       var eg = h.createRadialGradient(sp.x, sp.y, r0, sp.x, sp.y, r1);
       eg.addColorStop(0, "rgba(238,243,255,0)");
       eg.addColorStop(0.55, "rgba(238,243,255,0.62)");
       eg.addColorStop(1, "rgba(238,243,255,0.97)");
-      h.fillStyle = eg;
-      h.fillRect(0, 0, VW, VH);
+      h.fillStyle = eg; h.fillRect(0, 0, VW, VH);
     }
 
+    if (replaying) {
+      h.textAlign = "center";
+      h.fillStyle = C.soft;
+      h.font = "600 " + Math.min(20, VW * 0.05) + "px system-ui, sans-serif";
+      h.fillText("הרגע האחרון", VW / 2, VH * 0.08);
+      return;
+    }
     if (g.state !== PLAY) return;
 
-    var pad = 18 + 4;
-    var big = Math.min(38, VW * 0.098);
-
-    h.textAlign = "right";                             // rtl: score in the top-right
+    var pad = 22, big = Math.min(38, VW * 0.098);
+    h.textAlign = "right";
     h.font = "700 " + big + "px system-ui, -apple-system, sans-serif";
     h.fillStyle = C.ink;
     h.fillText(g.score.toLocaleString(), VW - pad, pad);
 
-    h.font = "600 " + Math.min(14, VW * 0.037) + "px " + "system-ui, sans-serif";
+    var line = pad + big + 6;
+    h.font = "600 " + Math.min(14, VW * 0.037) + "px system-ui, sans-serif";
     h.fillStyle = SECTORS[g.sector].tint;
-    h.fillText("אזור " + (g.sector + 1) + " · " + SECTORS[g.sector].name, VW - pad, pad + big + 6);
-
-    if (g.combo > 1) {
-      h.fillStyle = C.teal;
-      h.fillText("×" + g.combo, VW - pad, pad + big + 28);
+    h.fillText("אזור " + (g.sector + 1) + " · " + SECTORS[g.sector].name, VW - pad, line);
+    line += 22;
+    if (dailyMode) {
+      h.fillStyle = C.lilac;
+      h.fillText("אתגר יומי", VW - pad, line); line += 22;
     }
-    if (challenge) {
+    if (g.combo > 1) { h.fillStyle = C.teal; h.fillText("×" + g.combo, VW - pad, line); line += 22; }
+    if (challenge && !dailyMode) {
       h.fillStyle = g.passed ? C.sun : C.faint;
-      h.fillText("יריב " + challenge.score.toLocaleString(), VW - pad, pad + big + (g.combo > 1 ? 50 : 28));
+      h.fillText("יריב " + challenge.score.toLocaleString(), VW - pad, line);
     }
 
-    for (var i = 0; i < 3; i++) {                      // lives, top-left
+    for (var i = 0; i < 3; i++) {
       h.globalAlpha = i < g.lives ? 1 : 0.2;
       h.fillStyle = C.coral;
       h.beginPath(); h.arc(pad + 9 + i * 26, pad + 12, 8, 0, 6.2832); h.fill();
     }
+    if (g.shield) {
+      h.globalAlpha = 1; h.strokeStyle = C.lilac; h.lineWidth = 3;
+      h.beginPath(); h.arc(pad + 9 + 3 * 26, pad + 12, 8, 0, 6.2832); h.stroke();
+    }
     h.globalAlpha = 1;
 
     if (g.banner > 0) {
-      var fade = Math.min(1, g.banner / 34);
-      h.globalAlpha = fade;
+      h.globalAlpha = Math.min(1, g.banner / 34);
       h.textAlign = "center";
       h.fillStyle = SECTORS[g.sector].tint;
       h.font = "700 " + Math.min(40, VW * 0.1) + "px system-ui, sans-serif";
@@ -1117,37 +1379,70 @@
     }
     if (g.ahead > 0) {
       h.globalAlpha = Math.min(1, g.ahead / 30);
-      h.textAlign = "center";
-      h.fillStyle = C.sun;
+      h.textAlign = "center"; h.fillStyle = C.sun;
       h.font = "700 " + Math.min(30, VW * 0.075) + "px system-ui, sans-serif";
       h.fillText("עברת אותו!", VW / 2, VH * 0.26);
       h.globalAlpha = 1;
     }
   }
 
-  /* ---------- 16. fixed-timestep loop ----------
-     the sim must advance in equal ticks or replays desync on
-     high-refresh screens                                        */
+  /* ---------- loop ---------- */
   var acc = 0, prev = performance.now();
   function loop(now) {
-    // covers a phone's address bar sliding away, an orientation flip, and
-    // the case where the page first laid out at zero size in a hidden tab
     if (app.clientWidth !== VW || app.clientHeight !== VH) fit();
-
     var dt = Math.min(now - prev, 120);
     prev = now;
-    acc += dt;
+
+    if (g.state === REPLAY) {
+      rbPlay += 0.3;                       // slow motion, ~3.5x stretched
+      if (rbPlay >= rbCount - 1) finishRun();
+      draw();
+      requestAnimationFrame(loop);
+      return;
+    }
+
+    acc += dt * timeScale;                 // slow-mo bends wall time, never the tick count
     var steps = 0;
     while (acc >= STEP && steps < 5) { update(); acc -= STEP; steps++; }
     draw();
     requestAnimationFrame(loop);
   }
 
+  /* ---------- install prompt ---------- */
+  var deferredPrompt = null;
+  addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    $("install").hidden = false;
+  });
+  $("install").addEventListener("click", function () {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function () {
+      deferredPrompt = null;
+      $("install").hidden = true;
+    });
+  });
+
+  if ("serviceWorker" in navigator) {
+    addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
+    });
+  }
+
   /* ---------- boot ---------- */
   reset(true);
   paintBest();
+  paintSwatches();
+  buildQuests();
+  $("tglHaptics").textContent = hapticsOn ? "פועל" : "כבוי";
+  $("tglHaptics").classList.toggle("off", !hapticsOn);
+  $("tglMusic").textContent = musicOn ? "פועלת" : "כבויה";
+  $("tglMusic").classList.toggle("off", !musicOn);
   fit();
   requestAnimationFrame(loop);
   setTimeout(function () { if (view === "splash") show("home"); }, 2000);
 })();
 </script>
+</body>
+</html>
