@@ -2,7 +2,8 @@
    The whole game is one HTML file, so a plain precache makes it work
    offline and satisfies the installability requirement. */
 var VERSION = "od-v7";
-var ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
+var ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png",
+              "./f-rubik-he.woff2", "./f-rubik-la.woff2", "./f-title-he.woff2", "./f-title-la.woff2"];
 
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(VERSION).then(function (c) { return c.addAll(ASSETS); }).then(function () {
