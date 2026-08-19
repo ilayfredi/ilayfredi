@@ -1,7 +1,7 @@
 /* Orbit Decay service worker.
    The whole game is one HTML file, so a plain precache makes it work
    offline and satisfies the installability requirement. */
-var VERSION = "od-v5";
+var VERSION = "od-v6";
 var ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", function (e) {

@@ -244,7 +244,7 @@
     background: var(--ground, transparent);
     border: 1px solid var(--line); border-radius: 12px; padding: 8px 4px;
   }
-  .stats b { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stats b { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; direction: ltr; }
   .stats span { font-size: 11px; color: var(--soft); }
   .card-best { font-size: 14px; color: var(--soft); margin-bottom: 11px; }
   .card-best b { color: var(--ink); font-weight: 700; }
@@ -279,7 +279,7 @@
       <span class="badge">אגדה חיה</span>
     </div>
     <p id="praise" class="praise rise rise-4">האיש שהפך נגיעה אחת למשחק שלם</p>
-    <span class="skip rise rise-4">גע כדי להתחיל</span>
+    <span class="skip rise rise-4">גע כדי לדלג</span>
   </section>
 
   <section id="home" class="veil">
@@ -1277,8 +1277,10 @@
     }
     if (g.state !== PLAY) return;
 
-    // floating score numbers, drawn on the cleared layer so they stay crisp
+    // floating score numbers, drawn on the cleared layer so they stay crisp.
+    // LTR so the plus sign stays in front of the digits instead of flipping.
     h.textAlign = "center";
+    h.direction = "ltr";
     for (var pi = 0; pi < pops.length; pi++) {
       var pp = pops[pi], sc = toCss({ x: pp.x, y: pp.y });
       h.globalAlpha = Math.max(0, Math.min(1, pp.life * 1.6));
@@ -1286,6 +1288,7 @@
       h.font = "700 " + Math.min(17, VW * 0.043) + "px system-ui, sans-serif";
       h.fillText(pp.txt, sc.x, sc.y);
     }
+    h.direction = "rtl";
     h.globalAlpha = 1;
 
     var pad = 22, big = Math.min(38, VW * 0.098);
@@ -1309,7 +1312,11 @@
     h.fillText("אזור " + (g.sector + 1) + " · " + SECTORS[g.sector].name, VW - pad, line);
     line += 22;
     if (dailyMode) { h.fillStyle = C.lilac; h.fillText("אתגר יומי", VW - pad, line); line += 22; }
-    if (g.combo > 1) { h.fillStyle = C.teal; h.fillText("×" + g.combo, VW - pad, line); line += 22; }
+    if (g.combo > 1) {
+      h.direction = "ltr";
+      h.fillStyle = C.teal; h.fillText("×" + g.combo, VW - pad, line);
+      h.direction = "rtl"; line += 22;
+    }
     if (challenge && !dailyMode) {
       h.fillStyle = g.passed ? C.sun : C.faint;
       h.fillText("יריב " + challenge.score.toLocaleString(), VW - pad, line);
