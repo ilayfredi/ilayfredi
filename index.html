@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>שטויות בחלל</title>
+<title>אבודים בחלל</title>
 
 <meta name="description" content="משחק ארקייד בנגיעה אחת. אתה נעול במסלול סביב כוכב שקורס — נגיעה הופכת את הכיוון. עשרה אזורים, אתגר יומי, ומרוץ מול הרוח של החברים שלך.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="שטויות בחלל">
+<meta property="og:title" content="אבודים בחלל">
 <meta property="og:description" content="נגיעה אחת. עשרה אזורים. כמה תחזיק?">
 <meta property="og:image" content="https://ilayfredi.github.io/ilayfredi/preview.png">
 <meta property="og:image:width" content="1200">
@@ -23,7 +23,7 @@
 <meta name="theme-color" content="#eef3ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="שטויות בחלל">
+<meta name="apple-mobile-web-app-title" content="אבודים בחלל">
 
 <style>
   /* Self-hosted so the type is right on first paint and still works offline.
@@ -323,7 +323,7 @@
 
   <section id="splash" class="veil on">
     <div class="sp-top">
-      <h1 class="gametitle" data-i18n="title">שטויות בחלל</h1>
+      <h1 class="gametitle" data-i18n="title">אבודים בחלל</h1>
       <div class="flourish"></div>
     </div>
     <div class="sp-bottom">
@@ -349,7 +349,7 @@
     <div class="crown">
       <span class="crown-label" data-i18n="bestLabel">השיא</span>
       <strong id="homeBest" class="crown-num">0</strong>
-      <span class="crown-sub" data-i18n="title">שטויות בחלל</span>
+      <span class="crown-sub" data-i18n="title">אבודים בחלל</span>
     </div>
 
     <div class="menu">
@@ -440,7 +440,7 @@
   "use strict";
 
   /* ============================================================
-     שטויות בחלל / SPACE NONSENSE
+     אבודים בחלל / LOST IN SPACE
      One input: touching anywhere reverses your direction around a
      collapsing star. Ten sectors, each keeping the hazards before
      it and adding one more.
@@ -457,7 +457,7 @@
   var L = {
     he: {
       dir: "rtl", htmlLang: "he", other: "EN", otherName: "English",
-      title: "שטויות בחלל", author: "עילי פרדי",
+      title: "אבודים בחלל", author: "עילי פרדי",
       madeBy: "נוצר מהראש של", skip: "גע כדי לדלג",
       badge1: "גאון של החלל", badge2: "אלוף בלתי מעורער", badge3: "אגדה חיה",
       praise: ["האיש שהפך נגיעה אחת למשחק שלם", "עשרה אזורים, אפס פשרות",
@@ -478,7 +478,7 @@
       ios2: 'גלול ובחר "הוסף למסך הבית".',
       ios3: 'לחץ "הוסף" בפינה.',
       getNote: "באייפון זה חייב להיפתח בספארי — בכרום באייפון האפשרות לא קיימת.",
-      aboutLede: "שטויות בחלל הוא משחק על שליטה אחת בלבד. אתה נעול במסלול סביב כוכב שקורס, ונגיעה במסך הופכת את כיוון התנועה שלך. זה הכל — ומשם זה רק נעשה קשה יותר.",
+      aboutLede: "אבודים בחלל הוא משחק על שליטה אחת בלבד. אתה נעול במסלול סביב כוכב שקורס, ונגיעה במסך הופכת את כיוון התנועה שלך. זה הכל — ומשם זה רק נעשה קשה יותר.",
       howTitle: "איך משחקים",
       how1: "נוגעים בכל מקום במסך כדי להפוך כיוון. אין כפתורים.",
       how2: "אוספים כדורי פלזמה כדי להעלות את המכפיל.",
@@ -510,9 +510,9 @@
       qSector: function (n) { return "הגע לאזור " + n; },
       qScore: function (n) { return "עשה " + n.toLocaleString() + " נקודות בריצה"; },
       qGraze: function (n) { return "חלוף ליד " + n + " סלעים"; },
-      shPlain: function (u) { return "שטויות בחלל - נגיעה אחת, עשרה אזורים:\n" + u; },
+      shPlain: function (u) { return "אבודים בחלל - נגיעה אחת, עשרה אזורים:\n" + u; },
       shRun: function (s, d, z, zn, u, c) {
-        return "שטויות בחלל - " + (d ? "האתגר היומי: " : "") + "עשיתי " + s +
+        return "אבודים בחלל - " + (d ? "האתגר היומי: " : "") + "עשיתי " + s +
                " והגעתי לאזור " + z + " (" + zn + ").\n" +
                "אותו שדה סלעים בדיוק, והרוח שלי טסה לידך:\n" + u + "#c=" + c + "\n" +
                "(אם הקישור מאבד את הקוד, הדבק אותו במשחק: " + c + ")";
@@ -520,7 +520,7 @@
     },
     en: {
       dir: "ltr", htmlLang: "en", other: "עב", otherName: "עברית",
-      title: "Space Nonsense", author: "Ilay Fredi",
+      title: "Lost in Space", author: "Ilay Fredi",
       madeBy: "Dreamed up by", skip: "tap to skip",
       badge1: "Certified space genius", badge2: "Undisputed champion", badge3: "Living legend",
       praise: ["The one who turned a single tap into a whole game", "Ten sectors, zero compromises",
@@ -541,7 +541,7 @@
       ios2: 'Scroll and choose "Add to Home Screen".',
       ios3: 'Tap "Add" in the corner.',
       getNote: "On iPhone this only works in Safari — Chrome on iOS has no such option.",
-      aboutLede: "Space Nonsense is a game about a single control. You are locked in orbit around a collapsing star, and touching the screen reverses your direction. That is all of it — and from there it only gets harder.",
+      aboutLede: "Lost in Space is a game about a single control. You are locked in orbit around a collapsing star, and touching the screen reverses your direction. That is all of it — and from there it only gets harder.",
       howTitle: "How to play",
       how1: "Touch anywhere to reverse direction. There are no buttons.",
       how2: "Collect plasma orbs to raise your multiplier.",
@@ -573,9 +573,9 @@
       qSector: function (n) { return "Reach sector " + n; },
       qScore: function (n) { return "Score " + n.toLocaleString() + " in one run"; },
       qGraze: function (n) { return "Skim past " + n + " rocks"; },
-      shPlain: function (u) { return "Space Nonsense - one tap, ten sectors:\n" + u; },
+      shPlain: function (u) { return "Lost in Space - one tap, ten sectors:\n" + u; },
       shRun: function (s, d, z, zn, u, c) {
-        return "Space Nonsense - " + (d ? "daily challenge: " : "") + "I scored " + s +
+        return "Lost in Space - " + (d ? "daily challenge: " : "") + "I scored " + s +
                " and reached sector " + z + " (" + zn + ").\n" +
                "Same debris field, my ghost racing beside you:\n" + u + "#c=" + c + "\n" +
                "(if the link drops the code, paste this into the game: " + c + ")";
