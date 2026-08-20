@@ -266,6 +266,26 @@
   }
   .toggle button.off { color: var(--faint); }
 
+  /* world select */
+  .wgrid { display: grid; gap: 9px; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); margin-top: 6px; }
+  .wc {
+    position: relative; border: 2px solid var(--line); background: var(--card);
+    border-radius: 13px; overflow: hidden; padding: 0; cursor: pointer;
+    font-family: inherit; text-align: center; color: var(--ink);
+  }
+  .wc canvas { display: block; width: 100%; aspect-ratio: 1; }
+  .wc .wn2 { display: block; font-size: 11.5px; font-weight: 700; padding: 5px 4px 2px; line-height: 1.2; }
+  .wc .wr { display: block; font-size: 10px; font-family: var(--num); color: var(--soft); padding-bottom: 6px; }
+  .wc.sel { border-color: var(--sun); }
+  .wc.lock canvas { filter: grayscale(1) brightness(.45); }
+  .wc.lock .wn2 { color: var(--faint); }
+  .wc .badge2 {
+    position: absolute; top: 5px; inset-inline-start: 5px;
+    font-family: var(--num); font-size: 9.5px; font-weight: 700;
+    background: rgba(0,0,0,.5); color: #fff; border-radius: 999px; padding: 2px 6px;
+  }
+  .wc:focus-visible { outline: 3px solid var(--lilac); outline-offset: 2px; }
+
   .howto { list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: 11px; }
   .howto li { display: flex; gap: 11px; font-size: 14.5px; line-height: 1.5; }
   .howto li::before {
@@ -355,6 +375,7 @@
     <div class="menu">
       <button id="btnPlay" class="btn" type="button" data-i18n="play">שחק</button>
       <button id="btnDaily" class="btn btn-lilac btn-sm" type="button" data-i18n="daily">אתגר יומי</button>
+      <button id="btnWorlds" class="btn btn-teal btn-sm" type="button" data-i18n="worldsBtn">בחירת עולם</button>
       <button id="btnAbout" class="btn btn-ghost btn-sm" type="button" data-i18n="about">קצת עלינו</button>
     </div>
 
@@ -370,6 +391,15 @@
              data-i18n-ph="codePh" data-i18n-aria="codeAria">
       <button id="load" type="submit" data-i18n="loadBtn">טען</button>
     </form>
+  </section>
+
+  <section id="worlds" class="veil">
+    <div class="sheet">
+      <h2 data-i18n="worldsTitle">בחירת עולם</h2>
+      <p class="lede" data-i18n="worldsLede">כל עולם מחליף את כל המראה של המשחק. כדי לפתוח את הבא, צריך להגיע לניקוד בעולם שלפניו.</p>
+      <div id="worldGrid" class="wgrid"></div>
+    </div>
+    <div class="menu"><button id="btnWorldsBack" class="btn btn-ghost" type="button" data-i18n="back">אחורנית</button></div>
   </section>
 
   <section id="getapp" class="veil">
@@ -464,6 +494,9 @@
                "מתכנת, מעצב, ואלוף המסלול", "כל סלע כאן עבר את האישור שלו"],
       bestLabel: "השיא", bestColon: "השיא:",
       play: "שחק", daily: "אתגר יומי", about: "קצת עלינו",
+      worldsBtn: "בחירת עולם", worldsTitle: "בחירת עולם",
+      worldsLede: "כל עולם מחליף את כל המראה של המשחק. כדי לפתוח את הבא, צריך להגיע לניקוד בעולם שלפניו.",
+      inUse: "בשימוש", ready: "פתוח", newWorld: "נפתח עולם חדש!",
       questsTitle: "משימות היום",
       codePh: "קוד של חבר", codeAria: "קוד אתגר של חבר",
       loadBtn: "טען", loaded: "נטען", badCode: "לא תקין",
@@ -527,6 +560,9 @@
                "Coder, designer, master of the orbit", "Every rock here got his personal approval"],
       bestLabel: "BEST", bestColon: "Best:",
       play: "Play", daily: "Daily challenge", about: "About",
+      worldsBtn: "Choose world", worldsTitle: "Choose world",
+      worldsLede: "Every world re-skins the entire game. To open the next one, reach its score in the world before it.",
+      inUse: "in use", ready: "open", newWorld: "New world unlocked!",
       questsTitle: "Today's missions",
       codePh: "friend's code", codeAria: "A friend's challenge code",
       loadBtn: "Load", loaded: "Loaded", badCode: "Invalid",
@@ -681,18 +717,554 @@
     sfx.ui();
   }
 
+  /* ============================================================
+     WORLDS
+     World 0 is the original look and keeps the five colour styles.
+     Worlds 1-10 each carry a fixed palette plus a few draw hooks:
+       back(t)         extra background art
+       core(rad, t)    whatever sits in the middle
+       haz(rock, t)    one hazard
+       plr(x, y, a)    the player, already positioned
+     Anything a world leaves out falls back to the classic look, so
+     each entry only spells out what actually makes it different.
+
+     need = score required in the PREVIOUS world to unlock this one
+     diff = hazard density and speed multiplier
+     mul  = what a point is worth here
+     ============================================================ */
+  function rad2(x, y, r, a, b) {
+    var g2 = ctx.createRadialGradient(x, y, 1, x, y, r);
+    g2.addColorStop(0, a); g2.addColorStop(1, b);
+    ctx.globalAlpha = 1; ctx.fillStyle = g2;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832); ctx.fill();
+  }
+  function dots(seedMul, n, col, alpha, sz, drift) {
+    ctx.globalAlpha = alpha; ctx.fillStyle = col;
+    for (var i = 0; i < n; i++) {
+      var x = (i * seedMul) % U, y = ((i * 131) + (drift || 0)) % U;
+      ctx.fillRect(x, y, sz, sz);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  var WORLDS = [
+    { id: "base", he: "הרגיל", en: "Classic", need: 0, diff: 1.00, mul: 1.00, styles: true },
+
+    { id: "clock", he: "שעון עתיק", en: "Clockwork", need: 150000, diff: 1.08, mul: 1.10,
+      p: { sky: "#f3ead6", bg1: "#f7f0dd", bg2: "#e6dcc2", veil: "rgba(243,234,214,0.80)",
+           ink: "#3a2f1a", soft: "#7d6b45", faint: "#a8946a", card: "#fffdf6", line: "rgba(58,47,26,0.14)",
+           sun: "#b08d4e", coral: "#8c4a3a", teal: "#3f7a5e", lilac: "#7a6a9a", ship: "#2f2617",
+           wash: "rgba(243,234,214,0.34)" },
+      back: function () { dots(83, 90, "#6b5836", 0.07, 1.5); },
+      ring: function (r) {
+        stroke(C.faint, 1.6, 0.9, function () { ctx.arc(CX, CY, r + 18, 0, 6.2832); });
+        stroke(C.ink, 1, 0.5, function () { ctx.arc(CX, CY, r, 0, 6.2832); });
+        for (var i = 0; i < 60; i++) {
+          var a = (i / 60) * Math.PI * 2, big = i % 5 === 0;
+          stroke(C.ink, big ? 2.4 : 1, big ? 0.85 : 0.4, function () {
+            ctx.moveTo(CX + Math.cos(a) * (r + 18), CY + Math.sin(a) * (r + 18));
+            ctx.lineTo(CX + Math.cos(a) * (r + (big ? 5 : 11)), CY + Math.sin(a) * (r + (big ? 5 : 11)));
+          });
+        }
+      },
+      core: function (rad, t) { gearShape(CX, CY, rad, 10, t * 0.5, C.sun); },
+      haz: function (r, t) { gearShape(r.x, r.y, r.r * 0.9, 8, t * (r.seed % 2 ? -0.8 : 0.8), C.coral); },
+      plr: function (x, y, a) {
+        stroke(C.ink, 3.4, 0.85, function () { ctx.moveTo(CX, CY); ctx.lineTo(x, y); });
+        fill("#a11f1f", 1, function () { ctx.arc(x, y, 8, 0, 6.2832); });
+      } },
+
+    { id: "orrery", he: "אוריירי פליז", en: "Brass Orrery", need: 185000, diff: 1.16, mul: 1.20,
+      p: { sky: "#120f07", bg1: "#241d0c", bg2: "#0d0b06", veil: "rgba(18,15,7,0.82)",
+           ink: "#f4dfae", soft: "#b39355", faint: "#7d6532", card: "#221b0d", line: "rgba(224,178,92,0.22)",
+           sun: "#e8b95a", coral: "#ffeabe", teal: "#9fd8c0", lilac: "#d0a860", ship: "#c96a3a",
+           wash: "rgba(18,15,7,0.32)" },
+      back: function () { dots(89, 80, "#ffd98a", 0.07, 1.6); },
+      ring: function (r) {
+        [r + 34, r, r - 34].forEach(function (rr, k) {
+          stroke(k === 1 ? C.sun : C.faint, k === 1 ? 3 : 1.5, k === 1 ? 0.95 : 0.35,
+            function () { ctx.arc(CX, CY, rr, 0, 6.2832); });
+        });
+      },
+      core: function (rad, t) {
+        rad2(CX, CY, rad * 2.4, "rgba(255,205,110,.55)", "rgba(255,160,40,0)");
+        fill(C.sun, 1, function () { ctx.arc(CX, CY, rad, 0, 6.2832); });
+        for (var i = 0; i < 12; i++) {
+          var a = (i / 12) * Math.PI * 2 + t * 0.12;
+          stroke("#7a5a1e", 1.2, 0.8, function () {
+            ctx.moveTo(CX + Math.cos(a) * rad * 0.35, CY + Math.sin(a) * rad * 0.35);
+            ctx.lineTo(CX + Math.cos(a) * rad * 0.95, CY + Math.sin(a) * rad * 0.95);
+          });
+        }
+      },
+      haz: function (r) { comet(r, "rgba(255,235,190,"); },
+      plr: null },
+
+    { id: "helm", he: "הגה של ספינה", en: "Ship's Helm", need: 225000, diff: 1.26, mul: 1.35,
+      p: { sky: "#1d2b38", bg1: "#2b3d4d", bg2: "#141f29", veil: "rgba(29,43,56,0.82)",
+           ink: "#f0e2c4", soft: "#a99172", faint: "#6d7f8e", card: "#22303d", line: "rgba(240,226,196,0.16)",
+           sun: "#d9a441", coral: "#cfd6d9", teal: "#f2c94c", lilac: "#8fb3c9", ship: "#e8c88a",
+           wash: "rgba(29,43,56,0.32)" },
+      back: function (t) {
+        for (var i = 0; i < 8; i++) {
+          var a = (i / 8) * Math.PI * 2 + t * 0.0012;
+          stroke("#2c3f4f", 6, 0.5, function () {
+            ctx.moveTo(CX, CY);
+            ctx.lineTo(CX + Math.cos(a) * (ORBIT + 22), CY + Math.sin(a) * (ORBIT + 22));
+          });
+        }
+      },
+      ring: function (r) {
+        stroke("#8a5a2b", 16, 1, function () { ctx.arc(CX, CY, r, 0, 6.2832); });
+        stroke("#a97038", 10, 1, function () { ctx.arc(CX, CY, r, 0, 6.2832); });
+        for (var i = 0; i < 30; i++) {
+          var b = (i / 30) * Math.PI * 2;
+          stroke("rgba(60,35,12,.45)", 1.4, 1, function () {
+            ctx.moveTo(CX + Math.cos(b) * (r - 7), CY + Math.sin(b) * (r - 7));
+            ctx.lineTo(CX + Math.cos(b) * (r + 7), CY + Math.sin(b) * (r + 7));
+          });
+        }
+      },
+      core: function (rad) {
+        rad2(CX, CY, rad * 1.9, "rgba(255,200,110,.5)", "rgba(255,200,110,0)");
+        fill(C.sun, 1, function () { ctx.arc(CX, CY, rad, 0, 6.2832); });
+        fill("#8a6420", 1, function () { ctx.arc(CX, CY, rad * 0.55, 0, 6.2832); });
+        fill("#f0cd7d", 1, function () { ctx.arc(CX - rad * 0.24, CY - rad * 0.28, rad * 0.28, 0, 6.2832); });
+      },
+      haz: function (r) { spearShape(r, "#cfd6d9", "#7a4a1e"); },
+      plr: function (x, y, a) {
+        ctx.save(); ctx.translate(x, y); ctx.rotate(a);
+        fill(C.ship, 1, function () { ctx.rect(-5, -17, 10, 32); });
+        fill("#a9803f", 1, function () { ctx.rect(-5, -17, 10, 7); });
+        ctx.restore();
+      } },
+
+    { id: "space", he: "חלל אמיתי", en: "Deep Space", need: 275000, diff: 1.36, mul: 1.50,
+      p: { sky: "#070c1c", bg1: "#0b1330", bg2: "#160d28", veil: "rgba(7,12,28,0.82)",
+           ink: "#e9eeff", soft: "#93a0c8", faint: "#4a5478", card: "#111834", line: "rgba(233,238,255,0.14)",
+           sun: "#ffcf7d", coral: "#b9a693", teal: "#78ffdc", lilac: "#9db8ff", ship: "#cfd8ee",
+           wash: "rgba(7,12,28,0.30)" },
+      back: function (t) {
+        rad2(CX * 0.45, CY * 1.5, 260, "rgba(120,60,190,.26)", "rgba(120,60,190,0)");
+        rad2(CX * 1.6, CY * 0.4, 210, "rgba(40,120,190,.22)", "rgba(40,120,190,0)");
+        dots(97, 110, "#ffffff", 0.5, 1.8, Math.floor(t * 0.02));
+      },
+      core: function (rad) {
+        rad2(CX, CY, rad * 3.4, "rgba(255,238,200,.95)", "rgba(255,140,40,0)");
+        fill("#fff6df", 1, function () { ctx.arc(CX, CY, rad * 0.95, 0, 6.2832); });
+      },
+      haz: function (r, t) {
+        var lit = Math.atan2(CY - r.y, CX - r.x), rp = rockPath(r);
+        fill("#4a423b", 1, rp);
+        ctx.save(); ctx.beginPath(); rp(); ctx.clip();
+        var lg = ctx.createLinearGradient(r.x + Math.cos(lit) * r.r, r.y + Math.sin(lit) * r.r,
+                                          r.x - Math.cos(lit) * r.r, r.y - Math.sin(lit) * r.r);
+        lg.addColorStop(0, "#b9a693"); lg.addColorStop(0.55, "#6b5f57"); lg.addColorStop(1, "#2b2521");
+        ctx.globalAlpha = 1; ctx.fillStyle = lg;
+        ctx.fillRect(r.x - r.r * 1.4, r.y - r.r * 1.4, r.r * 2.8, r.r * 2.8);
+        fill("rgba(30,25,22,.5)", 1, function () { ctx.arc(r.x - r.r * 0.25, r.y + r.r * 0.15, r.r * 0.26, 0, 6.2832); });
+        ctx.restore();
+      },
+      plr: function (x, y, a) {
+        ctx.save(); ctx.translate(x, y); ctx.rotate(a - Math.PI / 2);
+        fill("#cfd8ee", 1, function () { ctx.rect(-5, -4, 10, 8); });
+        fill("#5b8fd6", 1, function () { ctx.rect(-17, -2, 10, 4); ctx.rect(7, -2, 10, 4); });
+        ctx.restore();
+      } },
+
+    { id: "arena", he: "זירה", en: "The Arena", need: 330000, diff: 1.48, mul: 1.65,
+      p: { sky: "#2c2116", bg1: "#4a3a24", bg2: "#241a10", veil: "rgba(44,33,22,0.82)",
+           ink: "#f3e2c2", soft: "#b09370", faint: "#8a7250", card: "#33271a", line: "rgba(243,226,194,0.16)",
+           sun: "#ffae3c", coral: "#d6dbe0", teal: "#e8c34a", lilac: "#c98a5a", ship: "#b8404a",
+           wash: "rgba(44,33,22,0.32)" },
+      back: function () { dots(71, 100, "#d8c39a", 0.1, 2); },
+      ring: function (r) {
+        stroke("#6b5334", 14, 1, function () { ctx.arc(CX, CY, r + 26, 0, 6.2832); });
+        for (var i = 0; i < 12; i++) {
+          var a = (i / 12) * Math.PI * 2;
+          rad2(CX + Math.cos(a) * (r + 26), CY + Math.sin(a) * (r + 26), 16,
+               "rgba(255,170,60,.75)", "rgba(255,120,20,0)");
+        }
+        ctx.setLineDash([6, 8]);
+        stroke(C.soft, 1.6, 0.4, function () { ctx.arc(CX, CY, r, 0, 6.2832); });
+        ctx.setLineDash([]);
+      },
+      core: function (rad, t) {
+        rad2(CX, CY, rad * 2.6, "rgba(255,190,80,.6)", "rgba(255,90,20,0)");
+        for (var i = 0; i < 7; i++) {
+          var f = t * 3 + i, fh = rad * (0.9 + Math.sin(f) * 0.34);
+          ctx.globalAlpha = 1;
+          ctx.fillStyle = i % 2 ? "rgba(255,190,70,.85)" : "rgba(255,120,40,.8)";
+          ctx.beginPath();
+          ctx.moveTo(CX - rad * 0.5 + i * rad * 0.16, CY + rad * 0.6);
+          ctx.quadraticCurveTo(CX - rad * 0.42 + i * rad * 0.16 + Math.sin(f) * 5,
+                               CY + rad * 0.6 - fh, CX - rad * 0.3 + i * rad * 0.16, CY + rad * 0.6);
+          ctx.fill();
+        }
+        fill("#3a2c1c", 1, function () { ctx.rect(CX - rad * 0.85, CY + rad * 0.5, rad * 1.7, rad * 0.28); });
+      },
+      haz: function (r) { spearShape(r, "#d6dbe0", "#8a6236"); },
+      plr: function (x, y, a) {
+        ctx.save(); ctx.translate(x, y); ctx.rotate(a);
+        fill("#2b2f38", 1, function () { ctx.arc(0, -5, 6, 0, 6.2832); });
+        fill(C.ship, 1, function () { ctx.rect(-6, 1, 12, 14); });
+        stroke("#d6dbe0", 2.4, 1, function () { ctx.moveTo(7, -2); ctx.lineTo(17, -12); });
+        ctx.restore();
+      } },
+
+    { id: "cell", he: "מיקרוסקופ", en: "Microscope", need: 390000, diff: 1.60, mul: 1.80,
+      p: { sky: "#06201d", bg1: "#0f3a34", bg2: "#03110f", veil: "rgba(6,32,29,0.82)",
+           ink: "#d8fff4", soft: "#6fb8a6", faint: "#3d7a6c", card: "#0c2a26", line: "rgba(216,255,244,0.15)",
+           sun: "#7dffd9", coral: "#ff6b8f", teal: "#fff082", lilac: "#b48cff", ship: "#ffffff",
+           wash: "rgba(6,32,29,0.30)" },
+      back: function (t) {
+        for (var i = 0; i < 22; i++) {
+          ctx.globalAlpha = 0.12; ctx.fillStyle = "#7dffd9";
+          ctx.beginPath();
+          ctx.arc((i * 97) % U, ((i * 53 + Math.sin(t + i) * 14) % U + U) % U, 3 + (i % 4), 0, 6.2832);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      },
+      ring: function (r) {
+        stroke(C.sun, 9, 0.16, function () { ctx.arc(CX, CY, r, 0, 6.2832); });
+        stroke(C.sun, 1.2, 0.45, function () { ctx.arc(CX, CY, r, 0, 6.2832); });
+      },
+      core: function (rad, t) {
+        fill("rgba(110,220,255,.20)", 1, function () { blobPath(CX, CY, rad * 1.7, 2, t * 0.4); });
+        fill("rgba(150,120,255,.85)", 1, function () { blobPath(CX, CY, rad, 5, t * 0.6); });
+        fill("rgba(220,190,255,.9)", 1, function () { ctx.arc(CX - rad * 0.3, CY - rad * 0.22, rad * 0.24, 0, 6.2832); });
+      },
+      haz: function (r, t) {
+        for (var s = 0; s < 12; s++) {
+          var a = (s / 12) * Math.PI * 2 + t * 0.5 + r.seed;
+          stroke(C.coral, 2, 1, function () {
+            ctx.moveTo(r.x + Math.cos(a) * r.r * 0.7, r.y + Math.sin(a) * r.r * 0.7);
+            ctx.lineTo(r.x + Math.cos(a) * r.r * 1.2, r.y + Math.sin(a) * r.r * 1.2);
+          });
+        }
+        fill("#c8325c", 1, function () { ctx.arc(r.x, r.y, r.r * 0.7, 0, 6.2832); });
+      },
+      plr: function (x, y, a, t) {
+        fill("rgba(255,255,255,.92)", 1, function () { blobPath(x, y, 13, 3, t); });
+        fill("rgba(190,225,255,.9)", 1, function () { ctx.arc(x - 3, y - 3, 4.5, 0, 6.2832); });
+      } },
+
+    { id: "vinyl", he: "תקליט", en: "Turntable", need: 455000, diff: 1.74, mul: 2.00,
+      p: { sky: "#120a1c", bg1: "#22103a", bg2: "#0d0716", veil: "rgba(18,10,28,0.82)",
+           ink: "#ffe6f6", soft: "#b98cc4", faint: "#6a4a7a", card: "#1a1030", line: "rgba(255,230,246,0.16)",
+           sun: "#ff2e88", coral: "#5af0ff", teal: "#5affd2", lilac: "#c77dff", ship: "#e9ecff",
+           wash: "rgba(18,10,28,0.30)" },
+      back: function (t) {
+        rad2(CX * 0.4, CY * 0.4, 260, "rgba(255,60,180,.18)", "rgba(255,60,180,0)");
+        rad2(CX * 1.6, CY * 1.6, 260, "rgba(60,220,255,.16)", "rgba(60,220,255,0)");
+        ctx.save(); ctx.translate(CX, CY); ctx.rotate(t * 0.02);
+        fill("#14121a", 1, function () { ctx.arc(0, 0, ORBIT + 24, 0, 6.2832); });
+        for (var g2 = 60; g2 < ORBIT + 22; g2 += 9) {
+          stroke("rgba(255,255,255,.05)", 1, 1, function () { ctx.arc(0, 0, g2, 0, 6.2832); });
+        }
+        ctx.restore();
+      },
+      core: function (rad, t) {
+        ctx.save(); ctx.translate(CX, CY); ctx.rotate(t * 0.02);
+        fill(C.sun, 1, function () { ctx.arc(0, 0, rad, 0, 6.2832); });
+        fill("#12111a", 1, function () { ctx.arc(0, 0, rad * 0.16, 0, 6.2832); });
+        ctx.restore();
+      },
+      haz: function (r, t) {
+        var a = Math.atan2(CY - r.y, CX - r.x);
+        ctx.save(); ctx.translate(r.x, r.y); ctx.rotate(a + 0.4);
+        fill(C.sun, 0.32, function () { ctx.ellipse(0, 0, r.r * 1.5, r.r * 0.5, 0, 0, 6.2832); });
+        fill("#1a1622", 1, function () {
+          ctx.moveTo(-r.r * 1.2, -2); ctx.lineTo(2, -r.r * 0.45);
+          ctx.lineTo(r.r * 1.1, 1); ctx.lineTo(1, r.r * 0.45); ctx.closePath();
+        });
+        stroke(C.coral, 1.5, 0.9, function () {
+          ctx.moveTo(-r.r * 1.2, -2); ctx.lineTo(2, -r.r * 0.45);
+          ctx.lineTo(r.r * 1.1, 1); ctx.lineTo(1, r.r * 0.45); ctx.closePath();
+        });
+        ctx.restore();
+      },
+      plr: function (x, y, a) {
+        ctx.save(); ctx.translate(x, y); ctx.rotate(a);
+        stroke(C.ship, 3.2, 1, function () { ctx.moveTo(0, -15); ctx.lineTo(0, 7); });
+        fill(C.coral, 1, function () { ctx.arc(0, 9, 5, 0, 6.2832); });
+        ctx.restore();
+      } },
+
+    { id: "storm", he: "עין הסערה", en: "Storm Eye", need: 530000, diff: 1.88, mul: 2.20,
+      p: { sky: "#2b343e", bg1: "#38424c", bg2: "#1a2028", veil: "rgba(43,52,62,0.82)",
+           ink: "#eaf4ff", soft: "#9fb0c2", faint: "#69798a", card: "#212932", line: "rgba(234,244,255,0.16)",
+           sun: "#8cbeeb", coral: "#f6fbff", teal: "#fff5b4", lilac: "#b9cfe4", ship: "#e7eef7",
+           wash: "rgba(43,52,62,0.30)" },
+      back: function (t) {
+        for (var b = 0; b < 7; b++) {
+          ctx.save(); ctx.translate(CX, CY); ctx.rotate(t * 0.012 + b);
+          stroke("rgba(190,205,220," + (0.05 + b * 0.012) + ")", 22, 1,
+                 function () { ctx.arc(0, 0, 56 + b * 26, 0.4, 4.2); });
+          ctx.restore();
+        }
+      },
+      core: function (rad) {
+        rad2(CX, CY, rad * 2.4, "rgba(140,190,235,.5)", "rgba(90,140,190,0)");
+        fill("#0e1a26", 1, function () { ctx.arc(CX, CY, rad, 0, 6.2832); });
+        stroke("rgba(220,240,255,.5)", 2, 1, function () { ctx.arc(CX, CY, rad, 0, 6.2832); });
+      },
+      haz: function (r, t) {
+        var a = Math.atan2(CY - r.y, CX - r.x);
+        var fl = Math.sin(t * (5.5 + (r.seed % 5) * 1.3) + r.seed);
+        var on = 0.3 + Math.max(0, fl) * 0.7;
+        ctx.save(); ctx.translate(r.x, r.y); ctx.rotate(a);
+        function bolt() {
+          ctx.moveTo(-r.r * 1.1, -r.r * 0.55); ctx.lineTo(-3, -1);
+          ctx.lineTo(-8, 2); ctx.lineTo(r.r, r.r * 0.6);
+        }
+        stroke("#bcd8ff", 7, on * 0.35, bolt);
+        stroke("#f6fbff", 1.9, on, bolt);
+        ctx.restore();
+      },
+      plr: function (x, y, a) {
+        ctx.save(); ctx.translate(x, y); ctx.rotate(a);
+        fill(C.ship, 1, function () {
+          ctx.moveTo(0, -13); ctx.lineTo(4.5, 4); ctx.lineTo(0, 9); ctx.lineTo(-4.5, 4); ctx.closePath();
+        });
+        fill(C.ship, 1, function () { ctx.rect(-14, 0, 28, 3.6); ctx.rect(-6, 9, 12, 2.8); });
+        ctx.restore();
+      } },
+
+    { id: "neon", he: "ניאון טוקיו", en: "Neon Tokyo", need: 610000, diff: 2.05, mul: 2.40,
+      p: { sky: "#0a0616", bg1: "#1a0733", bg2: "#050310", veil: "rgba(10,6,22,0.84)",
+           ink: "#eaf6ff", soft: "#9a86c8", faint: "#5b4880", card: "#150c28", line: "rgba(234,246,255,0.16)",
+           sun: "#ff2d96", coral: "#ff5470", teal: "#5affb4", lilac: "#5af0ff", ship: "#5af0ff",
+           wash: "rgba(10,6,22,0.30)" },
+      back: function (t) {
+        ctx.globalAlpha = 1;
+        for (var x = 0; x <= U; x += 40) stroke("rgba(255,45,150,.06)", 1, 1, function () { ctx.moveTo(x, 0); ctx.lineTo(x, U); });
+        for (var y = 0; y <= U; y += 40) stroke("rgba(255,45,150,.06)", 1, 1, function () { ctx.moveTo(0, y); ctx.lineTo(U, y); });
+        for (var r = 0; r < 34; r++) {
+          var rx = (r * 47 + t * 4) % U, ry = (r * 91 + t * 19) % U;
+          stroke("rgba(150,200,255,.22)", 1, 1, function () { ctx.moveTo(rx, ry); ctx.lineTo(rx - 3, ry + 16); });
+        }
+      },
+      core: function (rad, t) {
+        var pul = 1 + Math.sin(t * 0.05) * 0.08;
+        rad2(CX, CY, rad * 3, "rgba(255,45,150,.55)", "rgba(120,0,255,0)");
+        stroke(C.sun, 3, 1, function () { ctx.arc(CX, CY, rad * pul, 0, 6.2832); });
+        stroke(C.lilac, 1.8, 1, function () { ctx.arc(CX, CY, rad * 0.62 * pul, 0, 6.2832); });
+      },
+      haz: function (r, t) {
+        var bob = Math.sin(t * 0.05 + r.seed) * 2;
+        ctx.save(); ctx.translate(r.x, r.y + bob);
+        [-1, 1].forEach(function (sd) {
+          var rx = sd * r.r * 0.75, ry = -r.r * 0.5;
+          stroke(C.lilac, 4.5, 0.28, function () { ctx.arc(rx, ry, 5.5, 0, 6.2832); });
+          var rot = t * 0.6 + sd;
+          stroke(C.lilac, 1.6, 0.95, function () {
+            ctx.moveTo(rx - Math.cos(rot) * 6, ry - Math.sin(rot) * 6);
+            ctx.lineTo(rx + Math.cos(rot) * 6, ry + Math.sin(rot) * 6);
+          });
+        });
+        fill("#1a0f2e", 1, function () { ctx.rect(-r.r * 0.62, -r.r * 0.42, r.r * 1.24, r.r * 0.84); });
+        stroke(C.coral, 2, 1, function () { ctx.rect(-r.r * 0.62, -r.r * 0.42, r.r * 1.24, r.r * 0.84); });
+        fill("#ffe14d", 1, function () { ctx.arc(0, 0, 2.8, 0, 6.2832); });
+        fill("#ffe14d", 0.45, function () { ctx.moveTo(0, 2); ctx.lineTo(-8, 26); ctx.lineTo(8, 26); ctx.closePath(); });
+        ctx.restore();
+      },
+      plr: null },
+
+    { id: "hole", he: "חור שחור", en: "Black Hole", need: 700000, diff: 2.25, mul: 2.70,
+      p: { sky: "#05040c", bg1: "#160b2c", bg2: "#04030a", veil: "rgba(5,4,12,0.84)",
+           ink: "#f0e6ff", soft: "#a08fc8", faint: "#5b4a80", card: "#120a24", line: "rgba(240,230,255,0.16)",
+           sun: "#ffd9a0", coral: "#c07bff", teal: "#96ffff", lilac: "#be78ff", ship: "#ffffff",
+           wash: "rgba(5,4,12,0.28)" },
+      back: function () {
+        for (var i = 0; i < 90; i++) {
+          var sx = (i * 61.7) % U, sy = (i * 113.3) % U;
+          var dx = sx - CX, dy = sy - CY, d = Math.hypot(dx, dy) || 1;
+          var w = Math.max(0, 1 - d / 300) * 46;
+          ctx.globalAlpha = 0.45; ctx.fillStyle = "#cdd6ff";
+          ctx.fillRect(sx + dx / d * w, sy + dy / d * w, 1.8, 1.8);
+        }
+        ctx.globalAlpha = 1;
+      },
+      core: function (rad, t) {
+        for (var k = 5; k >= 1; k--) {
+          ctx.save(); ctx.translate(CX, CY); ctx.rotate(t * 0.01); ctx.scale(1, 0.34);
+          stroke("rgba(190,120,255," + (0.1 * k) + ")", 24 - k * 3, 1,
+                 function () { ctx.arc(0, 0, rad * 0.9 + k * 16, 0, 6.2832); });
+          ctx.restore();
+        }
+        ctx.save(); ctx.translate(CX, CY); ctx.scale(1, 0.34);
+        stroke("rgba(255,225,180,.9)", 6, 1, function () { ctx.arc(0, 0, rad * 0.82, 0, 6.2832); });
+        ctx.restore();
+        fill("#000000", 1, function () { ctx.arc(CX, CY, rad * 0.55, 0, 6.2832); });
+        stroke("rgba(255,210,150,.55)", 2, 1, function () { ctx.arc(CX, CY, rad * 0.57, 0, 6.2832); });
+      },
+      haz: function (r) {
+        var a = Math.atan2(CY - r.y, CX - r.x);
+        ctx.save(); ctx.translate(r.x, r.y); ctx.rotate(a);
+        fill(C.coral, 0.85, function () { ctx.ellipse(0, 0, r.r * 1.1, r.r * 0.3, 0, 0, 6.2832); });
+        fill(C.coral, 0.28, function () { ctx.ellipse(-r.r, 0, r.r * 1.4, r.r * 0.18, 0, 0, 6.2832); });
+        ctx.restore();
+      },
+      plr: function (x, y, a) {
+        rad2(x, y, 20, "rgba(255,255,255,.7)", "rgba(180,200,255,0)");
+        ctx.save(); ctx.translate(x, y); ctx.rotate(a);
+        fill("#ffffff", 1, chevron);
+        ctx.restore();
+      } }
+  ];
+
+  /* shapes a few worlds share */
+  function gearShape(x, y, rad, teeth, rot, col) {
+    ctx.globalAlpha = 1; ctx.fillStyle = col; ctx.beginPath();
+    for (var i = 0; i < teeth * 2; i++) {
+      var a = (i / (teeth * 2)) * Math.PI * 2 + rot, rr = i % 2 ? rad : rad * 1.28;
+      var px = x + Math.cos(a) * rr, py = y + Math.sin(a) * rr;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath(); ctx.fill();
+    fill(C.sky, 1, function () { ctx.arc(x, y, rad * 0.38, 0, 6.2832); });
+  }
+  function spearShape(r, tip, shaft) {
+    var a = Math.atan2(CY - r.y, CX - r.x);
+    ctx.save(); ctx.translate(r.x, r.y); ctx.rotate(a);
+    stroke(shaft, 3.4, 1, function () { ctx.moveTo(-r.r * 1.3, 0); ctx.lineTo(r.r * 0.9, 0); });
+    fill(tip, 1, function () {
+      ctx.moveTo(r.r * 0.9 + 11, 0); ctx.lineTo(r.r * 0.9 - 2, -5.5); ctx.lineTo(r.r * 0.9 - 2, 5.5); ctx.closePath();
+    });
+    ctx.restore();
+  }
+  function comet(r, rgbPrefix) {
+    var a = Math.atan2(CY - r.y, CX - r.x);
+    ctx.save(); ctx.translate(r.x, r.y); ctx.rotate(a);
+    var tg = ctx.createLinearGradient(-r.r * 2.2, 0, r.r * 0.3, 0);
+    tg.addColorStop(0, rgbPrefix + "0)"); tg.addColorStop(1, rgbPrefix + ".75)");
+    ctx.globalAlpha = 1; ctx.fillStyle = tg;
+    ctx.beginPath();
+    ctx.moveTo(-r.r * 2.2, -4); ctx.lineTo(r.r * 0.3, 0); ctx.lineTo(-r.r * 2.2, 4); ctx.closePath(); ctx.fill();
+    fill("#fff6dd", 1, function () { ctx.arc(0, 0, r.r * 0.45, 0, 6.2832); });
+    ctx.restore();
+  }
+  function blobPath(x, y, rad, seed, t) {
+    for (var i = 0; i <= 12; i++) {
+      var a = (i / 12) * Math.PI * 2 + t * 0.3 + seed;
+      var rr = rad * (0.78 + (((seed + i * 47) % 11) / 34));
+      var px = x + Math.cos(a) * rr, py = y + Math.sin(a) * rr;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+  }
+
+  /* ---------- world state ---------- */
+  var worldIdx = 0, WD = WORLDS[0];
+  function wBest(i) { return parseInt(lsGet("od-wbest-" + i, "0"), 10) || 0; }
+  function wSetBest(i, v) { lsSet("od-wbest-" + i, String(v)); }
+  function wOpen(i) { return i === 0 || wBest(i - 1) >= WORLDS[i].need; }
+  function wName(i) { return lang === "en" ? WORLDS[i].en : WORLDS[i].he; }
+
+  function applyWorld(i, save) {
+    worldIdx = Math.max(0, Math.min(WORLDS.length - 1, i));
+    WD = WORLDS[worldIdx];
+    if (save) lsSet("od-world", String(worldIdx));
+    if (WD.styles) applyStyle(styleIdx, false);
+    else applyPalette(WD.p);
+    var sw = $("styles"); if (sw) sw.style.display = WD.styles ? "" : "none";
+    paintWorlds();
+    paintBest();
+  }
+
+  /* draws one small live preview per world on the select screen */
+  var wThumbs = [];
+  function paintWorlds() {
+    var host = $("worldGrid");
+    if (!host) return;
+    host.innerHTML = ""; wThumbs = [];
+    WORLDS.forEach(function (w, i) {
+      var open = wOpen(i);
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "wc" + (i === worldIdx ? " sel" : "") + (open ? "" : " lock");
+      b.innerHTML = '<span class="badge2">' + (i + 1) + '</span><canvas></canvas>' +
+        '<span class="wn2">' + wName(i) + '</span>' +
+        '<span class="wr">' + (open ? (i === worldIdx ? t("inUse") : t("ready"))
+                                    : "🔒 " + w.need.toLocaleString()) + '</span>';
+      host.appendChild(b);
+      wThumbs.push({ el: b.querySelector("canvas"), i: i });
+      b.addEventListener("click", function () {
+        if (!wOpen(i)) {
+          b.classList.add("shake");
+          setTimeout(function () { b.classList.remove("shake"); }, 400);
+          sfx.hit();
+          return;
+        }
+        applyWorld(i, true); sfx.ui();
+      });
+    });
+    sizeThumbs();
+  }
+  function sizeThumbs() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    wThumbs.forEach(function (o) {
+      var w = o.el.clientWidth || 90;
+      o.el.width = o.el.height = Math.round(w * dpr);
+      o.k = o.el.width / U;
+      o.c = o.el.getContext("2d");
+    });
+  }
+  /* the previews reuse the real renderers, pointed at a scratch context */
+  function drawThumbs(t) {
+    if (view !== "worlds") return;
+    var realCtx = ctx, realWD = WD, realC = C;
+    wThumbs.forEach(function (o) {
+      if (!o.c) return;
+      var w = WORLDS[o.i];
+      ctx = o.c; WD = w; C = w.styles ? paletteOf(STYLES[styleIdx]) : paletteOf(w.p);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.fillStyle = C.sky; ctx.fillRect(0, 0, o.el.width, o.el.height);
+      ctx.setTransform(o.k, 0, 0, o.k, 0, 0);
+      ctx.lineJoin = "round"; ctx.lineCap = "round";
+      ctx.save();
+      if (WD.back) WD.back(t);
+      if (WD.ring) WD.ring(ORBIT);
+      else { stroke(C.faint, 1.6, 0.9, function () { ctx.arc(CX, CY, ORBIT, 0, 6.2832); }); }
+      if (WD.core) WD.core(56, t);
+      else {
+        fill(C.sun, 1, function () { ctx.arc(CX, CY, 56, 0, 6.2832); });
+      }
+      var demo = { x: CX + 190, y: CY - 60, r: 30, ang: t * 0.02, seed: 5 };
+      if (WD.haz) WD.haz(demo, t);
+      else { fill(C.coral, 0.18, rockPath(demo)); stroke(C.coral, 2.8, 0.95, rockPath(demo)); }
+      var pa = t * 0.012, px = CX + Math.cos(pa) * ORBIT, py = CY + Math.sin(pa) * ORBIT;
+      if (WD.plr) WD.plr(px, py, pa + Math.PI / 2, t);
+      else {
+        ctx.save(); ctx.translate(px, py); ctx.rotate(pa + Math.PI / 2);
+        fill(C.ship, 1, chevron); ctx.restore();
+      }
+      ctx.restore();
+    });
+    ctx = realCtx; WD = realWD; C = realC;
+  }
+  function paletteOf(s) {
+    return { sky: s.sky, ink: s.ink, soft: s.soft, faint: s.faint, sun: s.sun,
+             coral: s.coral, teal: s.teal, lilac: s.lilac, ship: s.ship, wash: s.wash };
+  }
+
   /* ---------- style ---------- */
-  function applyStyle(i, save) {
-    styleIdx = Math.max(0, Math.min(STYLES.length - 1, i));
-    var s = STYLES[styleIdx], r = document.documentElement.style;
+  function applyPalette(s) {
+    var r = document.documentElement.style;
     ["sky", "bg1", "bg2", "veil", "ink", "soft", "faint", "card", "line", "sun", "coral", "teal", "lilac"]
       .forEach(function (k) { r.setProperty("--" + k, s[k]); });
     C = { sky: s.sky, ink: s.ink, soft: s.soft, faint: s.faint, sun: s.sun,
           coral: s.coral, teal: s.teal, lilac: s.lilac, ship: s.ship, wash: s.wash };
     var meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute("content", s.sky);
-    if (save) lsSet("od-style", String(styleIdx));
     if (cw) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = s.sky; ctx.fillRect(0, 0, cw, ch); }
+  }
+  function applyStyle(i, save) {
+    styleIdx = Math.max(0, Math.min(STYLES.length - 1, i));
+    applyPalette(STYLES[styleIdx]);
+    if (save) lsSet("od-style", String(styleIdx));
     paintStyles();
   }
   function paintStyles() {
@@ -727,6 +1299,7 @@
     ctx.fillStyle = C.sky; ctx.fillRect(0, 0, cw, ch);
   }
   addEventListener("resize", fit);
+  addEventListener("resize", function () { sizeThumbs(); });
   addEventListener("orientationchange", function () { setTimeout(fit, 140); });
   function toCss(p) { return { x: (ox + p.x * S) / dpr, y: (oy + p.y * S) / dpr }; }
 
@@ -806,24 +1379,38 @@
   function musicStop() { if (music.timer) { clearInterval(music.timer); music.timer = null; } }
 
   /* ---------- challenge codec ---------- */
+  /* A code now leads with "w<world>." so a friend races in the same world
+     you played - otherwise the difficulty would change the debris field and
+     the ghost would fly a path that never matches. Codes without the prefix
+     are the older format and simply mean world 0. */
   function encodeRun(r) {
     var out = [r.seed, r.score, r.death], prev = 0;
     for (var i = 0; i < r.flips.length; i++) { out.push(r.flips[i] - prev); prev = r.flips[i]; }
-    return out.map(function (n) { return (n >>> 0).toString(36); }).join(".");
+    return "w" + (r.world || 0).toString(36) + "." +
+           out.map(function (n) { return (n >>> 0).toString(36); }).join(".");
   }
   function decodeRun(code) {
     try {
       var m = /[#&?]c=([^&\s]+)/.exec(code);
       var body = (m ? m[1] : code).trim();
       try { body = decodeURIComponent(body); } catch (e2) {}
-      if (!/^[0-9a-z.]+$/i.test(body)) return null;
+      if (!/^w?[0-9a-z.]+$/i.test(body)) return null;
+
+      var world = 0;
+      if (/^w/i.test(body)) {
+        var cut = body.indexOf(".");
+        if (cut < 2) return null;
+        world = parseInt(body.slice(1, cut), 36);
+        if (!isFinite(world) || world < 0 || world >= WORLDS.length) return null;
+        body = body.slice(cut + 1);
+      }
       var p = body.split(".").map(function (s) { return parseInt(s, 36); });
       if (p.length < 3 || p.length > 4000) return null;
       for (var v = 0; v < p.length; v++) if (!isFinite(p[v]) || p[v] < 0) return null;
       if (p[2] > 5000000) return null;
       var flips = [], acc = 0;
       for (var i = 3; i < p.length; i++) { acc += p[i]; flips.push(acc); }
-      return { seed: p[0] >>> 0, score: p[1], death: p[2], flips: flips };
+      return { seed: p[0] >>> 0, score: p[1], death: p[2], world: world, flips: flips };
     } catch (e) { return null; }
   }
   function pageUrl() {
@@ -952,17 +1539,27 @@
   /* ---------- screens ---------- */
   function show(name) {
     view = name;
-    ["splash", "home", "about", "over", "getapp"].forEach(function (id) {
+    ["splash", "home", "about", "over", "getapp", "worlds"].forEach(function (id) {
       $(id).classList.toggle("on", id === name);
     });
   }
   function goHome() { dailyMode = false; musicStop(); reset(true); paintBest(); show("home"); }
-  function startGame(daily) { sfx.ui(); dailyMode = !!daily; reset(false); show(null); musicStart(); }
+  function startGame(daily) {
+    sfx.ui();
+    dailyMode = !!daily;
+    // the daily runs in world 1 for everyone, otherwise scores are not comparable;
+    // a friend code drags you into the world it was recorded in
+    if (dailyMode && worldIdx !== 0) applyWorld(0, false);
+    else if (!dailyMode && challenge && challenge.world !== worldIdx) applyWorld(challenge.world || 0, false);
+    reset(false); show(null); musicStart();
+  }
 
   $("btnPlay").addEventListener("click", function () { startGame(false); });
   $("btnDaily").addEventListener("click", function () { startGame(true); });
   $("btnAgain").addEventListener("click", function () { startGame(dailyMode); });
   $("btnAbout").addEventListener("click", function () { sfx.ui(); show("about"); });
+  $("btnWorlds").addEventListener("click", function () { sfx.ui(); show("worlds"); paintWorlds(); });
+  $("btnWorldsBack").addEventListener("click", function () { sfx.ui(); show("home"); });
   $("btnBack").addEventListener("click", function () { sfx.ui(); show("home"); });
   $("btnQuit").addEventListener("click", function () { sfx.ui(); goHome(); });
   $("btnGet").addEventListener("click", function () { sfx.ui(); show("getapp"); });
@@ -1110,7 +1707,7 @@
     var ta = rnd() * Math.PI * 2, tr = rnd() * 92;
     var tx = CX + Math.cos(ta) * tr, ty = CY + Math.sin(ta) * tr;
     var d = Math.hypot(tx - sx, ty - sy);
-    var sp = 3.0 + rnd() * 1.5 + Math.min(g.t / 5200, 2.6) + (bias || 0);
+    var sp = (3.0 + rnd() * 1.5 + Math.min(g.t / 5200, 2.6) + (bias || 0)) * (1 + ((WD.diff || 1) - 1) * 0.45);
     rocks.push({ x: sx, y: sy, vx: (tx - sx) / d * sp, vy: (ty - sy) / d * sp,
                  r: 20 + rnd() * 20, ang: rnd() * 6.28, spin: (rnd() - 0.5) * 0.05,
                  grazed: false, split: false, seed: Math.floor(rnd() * 999) });
@@ -1164,7 +1761,7 @@
       if (beamsLive()) { g.beamPower = Math.min(1, g.beamPower + 1 / 110); g.beamA += 0.0075 * g.beamDir; }
       if (g.iframes > 0) g.iframes--;
       stepOrbiter(ship, g.t);
-      g.score += 1 + g.sector;
+      g.score += Math.round((1 + g.sector) * (WD.mul || 1));
 
       if (ghost && ghost.alive) {
         while (ghost.idx < challenge.flips.length && challenge.flips[ghost.idx] === g.t) {
@@ -1181,7 +1778,8 @@
       }
 
       var warm = Math.min(1, g.t / 320);
-      var rate = Math.max(19, (66 - g.t / 118) + (1 - warm) * 42);
+      var D = WD.diff || 1;
+      var rate = Math.max(14, ((66 - g.t / 118) + (1 - warm) * 42) / D);
       if (++g.rockClock > rate) {
         g.rockClock = 0;
         var from = rnd() * Math.PI * 2;
@@ -1229,7 +1827,7 @@
           ob.dead = true;
           g.combo = Math.min(g.combo + 1, 25); g.orbsGot++;
           if (g.combo > g.bestCombo) g.bestCombo = g.combo;
-          var gain = Math.round(55 * g.combo * (1 + g.sector * 0.4));
+          var gain = Math.round(55 * g.combo * (1 + g.sector * 0.4) * (WD.mul || 1));
           g.score += gain;
           pop(op.x, op.y, "+" + gain, C.teal);
           sfx.orb(g.combo); buzz(8);
@@ -1253,7 +1851,7 @@
         var dist = Math.hypot(p.x - rk.x, p.y - rk.y);
         if (!rk.grazed && dist < rk.r + 52) {
           rk.grazed = true; g.grazes++;
-          var gz = Math.round(26 * g.combo * (1 + g.sector * 0.4));
+          var gz = Math.round(26 * g.combo * (1 + g.sector * 0.4) * (WD.mul || 1));
           g.score += gz;
           pop(rk.x, rk.y, "+" + gz, C.coral);
           sfx.graze();
@@ -1292,11 +1890,18 @@
     for (var b = 0; b < 26; b++) spark(p.x, p.y, C.coral, 4, 1.2);
     if (g.lives <= 0) {
       sfx.dead(); buzz([60, 40, 90]); musicStop();
-      run.score = g.score; run.death = g.t; run.sector = g.sector; run.daily = dailyMode;
+      run.score = g.score; run.death = g.t; run.sector = g.sector; run.daily = dailyMode; run.world = worldIdx;
       lastRun = run;
       commitQuests();
       g.wasBest = g.score > best;
       if (g.wasBest) { best = g.score; lsSet("od-best", String(best)); }
+      // per-world record is what opens the next world
+      var wr = worldIdx;
+      if (g.score > wBest(wr)) {
+        var wasOpen = wr + 1 < WORLDS.length ? wOpen(wr + 1) : true;
+        wSetBest(wr, g.score);
+        g.unlocked = (wr + 1 < WORLDS.length && !wasOpen && wOpen(wr + 1)) ? wr + 1 : -1;
+      } else g.unlocked = -1;
       paintBest();
       finishRun();
     } else { sfx.hit(); buzz(35); }
@@ -1365,25 +1970,38 @@
     if (g.shake > 1) ctx.translate((Math.random() - 0.5) * g.shake, (Math.random() - 0.5) * g.shake);
     ctx.lineJoin = "round"; ctx.lineCap = "round";
 
-    for (var m = 0; m < motes.length; m++) {
-      var mo = motes[m];
-      fill(C.faint, 0.45, function () { ctx.arc(mo.x, mo.y, mo.s * 0.6, 0, 6.2832); });
+    // each world may take over the background, the ring, the core,
+    // the hazards and the player; anything it skips falls back here
+    if (WD.back) WD.back(g.t);
+    else {
+      for (var m = 0; m < motes.length; m++) {
+        var mo = motes[m];
+        fill(C.faint, 0.45, function () { ctx.arc(mo.x, mo.y, mo.s * 0.6, 0, 6.2832); });
+      }
     }
     drawBeams();
-    stroke(C.faint, 9, 0.16, function () { ctx.arc(CX, CY, orbit, 0, 6.2832); });
-    stroke(C.faint, 1.6, 0.9, function () { ctx.arc(CX, CY, orbit, 0, 6.2832); });
+
+    if (WD.ring) WD.ring(orbit);
+    else {
+      stroke(C.faint, 9, 0.16, function () { ctx.arc(CX, CY, orbit, 0, 6.2832); });
+      stroke(C.faint, 1.6, 0.9, function () { ctx.arc(CX, CY, orbit, 0, 6.2832); });
+    }
 
     var pulse = 1 + Math.sin(g.t * 0.035) * 0.045;
     var rad = (56 + (ORBIT - orbit) * 0.55) * pulse;
-    var grd = ctx.createRadialGradient(CX, CY, rad * 0.2, CX, CY, rad * 3.1);
-    grd.addColorStop(0, C.sun); grd.addColorStop(0.3, C.sun + "70"); grd.addColorStop(1, C.sun + "00");
-    ctx.globalAlpha = 0.75; ctx.fillStyle = grd;
-    ctx.beginPath(); ctx.arc(CX, CY, rad * 3.1, 0, 6.2832); ctx.fill();
-    stroke(C.sun, 2, 0.35, function () { ctx.arc(CX, CY, rad * 1.55, 0, 6.2832); });
-    fill(C.sun, 1, function () { ctx.arc(CX, CY, rad, 0, 6.2832); });
-    fill("#ffffff", 0.42, function () { ctx.arc(CX - rad * 0.24, CY - rad * 0.26, rad * 0.46, 0, 6.2832); });
+    if (WD.core) WD.core(rad, g.t);
+    else {
+      var grd = ctx.createRadialGradient(CX, CY, rad * 0.2, CX, CY, rad * 3.1);
+      grd.addColorStop(0, C.sun); grd.addColorStop(0.3, C.sun + "70"); grd.addColorStop(1, C.sun + "00");
+      ctx.globalAlpha = 0.75; ctx.fillStyle = grd;
+      ctx.beginPath(); ctx.arc(CX, CY, rad * 3.1, 0, 6.2832); ctx.fill();
+      stroke(C.sun, 2, 0.35, function () { ctx.arc(CX, CY, rad * 1.55, 0, 6.2832); });
+      fill(C.sun, 1, function () { ctx.arc(CX, CY, rad, 0, 6.2832); });
+      fill("#ffffff", 0.42, function () { ctx.arc(CX - rad * 0.24, CY - rad * 0.26, rad * 0.46, 0, 6.2832); });
+    }
 
     for (var i = 0; i < rocks.length; i++) {
+      if (WD.haz) { WD.haz(rocks[i], g.t); continue; }
       var rp = rockPath(rocks[i]);
       fill(C.coral, 0.18, rp);
       stroke(C.coral, 2.8, 0.95, rp);
@@ -1415,10 +2033,13 @@
       }
       var blink = g.iframes > 0 && Math.floor(g.t / 4) % 2 === 0;
       if (!blink) {
-        ctx.save(); ctx.translate(sx, sy); ctx.rotate(sa + (Math.PI / 2) * sd);
-        fill(C.ship, 1, chevron);
-        stroke(C.ship, 12, 0.09, chevron);
-        ctx.restore();
+        if (WD.plr) WD.plr(sx, sy, sa + (Math.PI / 2) * sd, g.t);
+        else {
+          ctx.save(); ctx.translate(sx, sy); ctx.rotate(sa + (Math.PI / 2) * sd);
+          fill(C.ship, 1, chevron);
+          stroke(C.ship, 12, 0.09, chevron);
+          ctx.restore();
+        }
         for (var q2 = 0; q2 < g.shield; q2++) {
           stroke(C.lilac, 2.6, 0.75 - q2 * 0.18, function () { ctx.arc(sx, sy, 27 + q2 * 7, 0, 6.2832); });
         }
@@ -1548,6 +2169,7 @@
     var steps = 0;
     while (acc >= STEP && steps < 5) { update(); acc -= STEP; steps++; }
     draw();
+    drawThumbs(g.t);
     requestAnimationFrame(loop);
   }
 
@@ -1568,6 +2190,8 @@
 
   /* ---------- boot ---------- */
   applyStyle(parseInt(lsGet("od-style", "0"), 10) || 0, false);
+  var bootW = parseInt(lsGet("od-world", "0"), 10) || 0;
+  applyWorld(wOpen(bootW) ? bootW : 0, false);
   reset(true);
   applyLang(false);
   fit();
