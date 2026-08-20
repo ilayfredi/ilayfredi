@@ -269,11 +269,15 @@
   /* world select */
   .wgrid { display: grid; gap: 9px; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); margin-top: 6px; }
   .wc {
+    display: block;
     position: relative; border: 2px solid var(--line); background: var(--card);
     border-radius: 13px; overflow: hidden; padding: 0; cursor: pointer;
     font-family: inherit; text-align: center; color: var(--ink);
   }
-  .wc canvas { display: block; width: 100%; aspect-ratio: 1; }
+  /* a canvas inside a button ignores aspect-ratio, so the square comes
+     from a padded wrapper instead */
+  .wthumb { display: block; position: relative; width: 100%; padding-bottom: 100%; }
+  .wthumb canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   .wc .wn2 { display: block; font-size: 11.5px; font-weight: 700; padding: 5px 4px 2px; line-height: 1.2; }
   .wc .wr { display: block; font-size: 10px; font-family: var(--num); color: var(--soft); padding-bottom: 6px; }
   .wc.sel { border-color: var(--sun); }
@@ -1185,7 +1189,7 @@
       var b = document.createElement("button");
       b.type = "button";
       b.className = "wc" + (i === worldIdx ? " sel" : "") + (open ? "" : " lock");
-      b.innerHTML = '<span class="badge2">' + (i + 1) + '</span><canvas></canvas>' +
+      b.innerHTML = '<span class="badge2">' + (i + 1) + '</span><span class="wthumb"><canvas></canvas></span>' +
         '<span class="wn2">' + wName(i) + '</span>' +
         '<span class="wr">' + (open ? (i === worldIdx ? t("inUse") : t("ready"))
                                     : "🔒 " + w.need.toLocaleString()) + '</span>';
@@ -1206,7 +1210,7 @@
   function sizeThumbs() {
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     wThumbs.forEach(function (o) {
-      var w = o.el.clientWidth || 90;
+      var w = (o.el.parentNode && o.el.parentNode.clientWidth) || o.el.clientWidth || 90;
       o.el.width = o.el.height = Math.round(w * dpr);
       o.k = o.el.width / U;
       o.c = o.el.getContext("2d");
