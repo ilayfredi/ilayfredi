@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>אבודים בחלל</title>
+<title>אבוד בחלל</title>
 
 <meta name="description" content="משחק ארקייד בנגיעה אחת. אתה נעול במסלול סביב כוכב שקורס — נגיעה הופכת את הכיוון. עשרה אזורים, אתגר יומי, ומרוץ מול הרוח של החברים שלך.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="אבודים בחלל">
+<meta property="og:title" content="אבוד בחלל">
 <meta property="og:description" content="נגיעה אחת. עשרה אזורים. כמה תחזיק?">
-<meta property="og:image" content="https://ilayfredi.github.io/ilayfredi/preview.png">
+<meta property="og:image" content="https://ilayfredi.github.io/lost-in-space/preview.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:url" content="https://ilayfredi.github.io/ilayfredi/">
+<meta property="og:url" content="https://ilayfredi.github.io/lost-in-space/">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="manifest" href="manifest.webmanifest">
@@ -23,7 +23,7 @@
 <meta name="theme-color" content="#eef3ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="אבודים בחלל">
+<meta name="apple-mobile-web-app-title" content="אבוד בחלל">
 
 <style>
   /* Self-hosted so the type is right on first paint and still works offline.
@@ -347,7 +347,7 @@
 
   <section id="splash" class="veil on">
     <div class="sp-top">
-      <h1 class="gametitle" data-i18n="title">אבודים בחלל</h1>
+      <h1 class="gametitle" data-i18n="title">אבוד בחלל</h1>
       <div class="flourish"></div>
     </div>
     <div class="sp-bottom">
@@ -373,7 +373,7 @@
     <div class="crown">
       <span class="crown-label" data-i18n="bestLabel">השיא</span>
       <strong id="homeBest" class="crown-num">0</strong>
-      <span class="crown-sub" data-i18n="title">אבודים בחלל</span>
+      <span class="crown-sub" data-i18n="title">אבוד בחלל</span>
     </div>
 
     <div class="menu">
@@ -474,7 +474,7 @@
   "use strict";
 
   /* ============================================================
-     אבודים בחלל / LOST IN SPACE
+     אבוד בחלל / LOST IN SPACE
      One input: touching anywhere reverses your direction around a
      collapsing star. Ten sectors, each keeping the hazards before
      it and adding one more.
@@ -491,7 +491,7 @@
   var L = {
     he: {
       dir: "rtl", htmlLang: "he", other: "EN", otherName: "English",
-      title: "אבודים בחלל", author: "עילי פרדי",
+      title: "אבוד בחלל", author: "עילי פרדי",
       madeBy: "נוצר מהראש של", skip: "גע כדי לדלג",
       badge1: "גאון של החלל", badge2: "אלוף בלתי מעורער", badge3: "אגדה חיה",
       praise: ["האיש שהפך נגיעה אחת למשחק שלם", "עשרה אזורים, אפס פשרות",
@@ -515,7 +515,7 @@
       ios2: 'גלול ובחר "הוסף למסך הבית".',
       ios3: 'לחץ "הוסף" בפינה.',
       getNote: "באייפון זה חייב להיפתח בספארי — בכרום באייפון האפשרות לא קיימת.",
-      aboutLede: "אבודים בחלל הוא משחק על שליטה אחת בלבד. אתה נעול במסלול סביב כוכב שקורס, ונגיעה במסך הופכת את כיוון התנועה שלך. זה הכל — ומשם זה רק נעשה קשה יותר.",
+      aboutLede: "אבוד בחלל הוא משחק על שליטה אחת בלבד. אתה נעול במסלול סביב כוכב שקורס, ונגיעה במסך הופכת את כיוון התנועה שלך. זה הכל — ומשם זה רק נעשה קשה יותר.",
       howTitle: "איך משחקים",
       how1: "נוגעים בכל מקום במסך כדי להפוך כיוון. אין כפתורים.",
       how2: "אוספים כדורי פלזמה כדי להעלות את המכפיל.",
@@ -547,9 +547,9 @@
       qSector: function (n) { return "הגע לאזור " + n; },
       qScore: function (n) { return "עשה " + n.toLocaleString() + " נקודות בריצה"; },
       qGraze: function (n) { return "חלוף ליד " + n + " סלעים"; },
-      shPlain: function (u) { return "אבודים בחלל - נגיעה אחת, עשרה אזורים:\n" + u; },
+      shPlain: function (u) { return "אבוד בחלל - נגיעה אחת, עשרה אזורים:\n" + u; },
       shRun: function (s, d, z, zn, u, c) {
-        return "אבודים בחלל - " + (d ? "האתגר היומי: " : "") + "עשיתי " + s +
+        return "אבוד בחלל - " + (d ? "האתגר היומי: " : "") + "עשיתי " + s +
                " והגעתי לאזור " + z + " (" + zn + ").\n" +
                "אותו שדה סלעים בדיוק, והרוח שלי טסה לידך:\n" + u + "#c=" + c + "\n" +
                "(אם הקישור מאבד את הקוד, הדבק אותו במשחק: " + c + ")";
@@ -1675,7 +1675,7 @@
     x.fillText(t("zone") + " " + ((lastRun ? lastRun.sector : 0) + 1) + " · " + (lastRun ? SECTORS()[lastRun.sector].name : ""), W / 2, 890);
     x.direction = "ltr";
     x.fillStyle = s.faint; x.font = "500 34px Deck, system-ui, sans-serif";
-    x.fillText("ilayfredi.github.io/ilayfredi", W / 2, 986);
+    x.fillText("ilayfredi.github.io/lost-in-space", W / 2, 986);
     return c;
   }
   $("btnShare").addEventListener("click", function () {
