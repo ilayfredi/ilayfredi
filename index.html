@@ -547,12 +547,14 @@
       qSector: function (n) { return "הגע לאזור " + n; },
       qScore: function (n) { return "עשה " + n.toLocaleString() + " נקודות בריצה"; },
       qGraze: function (n) { return "חלוף ליד " + n + " סלעים"; },
-      shPlain: function (u) { return "אבוד בחלל - נגיעה אחת, עשרה אזורים:\n" + u; },
+      shPlain: function (u) { return "אבוד בחלל 🛰️\nנגיעה אחת. עשרה אזורים.\nנראה אותך זריז.\n" + u; },
       shRun: function (s, d, z, zn, u, c) {
-        return "אבוד בחלל - " + (d ? "האתגר היומי: " : "") + "עשיתי " + s +
-               " והגעתי לאזור " + z + " (" + zn + ").\n" +
-               "אותו שדה סלעים בדיוק, והרוח שלי טסה לידך:\n" + u + "#c=" + c + "\n" +
-               "(אם הקישור מאבד את הקוד, הדבק אותו במשחק: " + c + ")";
+        if (d) {
+          return "האתגר היומי באבוד בחלל 🛰️\nעשיתי " + s + ".\n" +
+                 "אותם סלעים לכולם היום — נראה אותך זריז.\n" + u + "#c=" + c;
+        }
+        return "עשיתי " + s + " באבוד בחלל 🛰️\nהגעתי לאזור " + z + " · " + zn + ".\n" +
+               "אותו שדה סלעים בדיוק, והרוח שלי טסה לידך — נראה אותך זריז.\n" + u + "#c=" + c;
       }
     },
     en: {
@@ -613,12 +615,14 @@
       qSector: function (n) { return "Reach sector " + n; },
       qScore: function (n) { return "Score " + n.toLocaleString() + " in one run"; },
       qGraze: function (n) { return "Skim past " + n + " rocks"; },
-      shPlain: function (u) { return "Lost in Space - one tap, ten sectors:\n" + u; },
+      shPlain: function (u) { return "Lost in Space 🛰️\nOne tap. Ten sectors.\nLet's see how long you last.\n" + u; },
       shRun: function (s, d, z, zn, u, c) {
-        return "Lost in Space - " + (d ? "daily challenge: " : "") + "I scored " + s +
-               " and reached sector " + z + " (" + zn + ").\n" +
-               "Same debris field, my ghost racing beside you:\n" + u + "#c=" + c + "\n" +
-               "(if the link drops the code, paste this into the game: " + c + ")";
+        if (d) {
+          return "Lost in Space daily challenge 🛰️\nI scored " + s + ".\n" +
+                 "Everyone gets the same field today — let's see how quick you are.\n" + u + "#c=" + c;
+        }
+        return "I scored " + s + " in Lost in Space 🛰️\nMade it to sector " + z + " · " + zn + ".\n" +
+               "Same debris field, my ghost flying beside you — let's see how quick you are.\n" + u + "#c=" + c;
       }
     }
   };
